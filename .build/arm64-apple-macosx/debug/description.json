@@ -1,0 +1,1431 @@
+{
+  "builtTestProducts" : [
+    {
+      "binaryPath" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacPackageTests.xctest/Contents/MacOS/DOpusMacPackageTests",
+      "packagePath" : "/Users/ian.callicott/Documents/coding/DOpusMac",
+      "productName" : "DOpusMacPackageTests"
+    }
+  ],
+  "copyCommands" : {
+
+  },
+  "explicitTargetDependencyImportCheckingMode" : {
+    "none" : {
+
+    }
+  },
+  "generatedSourceTargetSet" : [
+
+  ],
+  "pluginDescriptions" : [
+
+  ],
+  "swiftCommands" : {
+    "C.DOpusMac-arm64-apple-macosx-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/sources",
+      "importPath" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/AppLaunchConfiguration.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/AppNotifications.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/AppSettings.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/CustomActionsModel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/DragSession.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/FileItem.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/FileOperationService.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/PaneSide.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/PaneStatusFormatter.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/SidebarModel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/SmartMetadataService.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/SortKey.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/ViewModels/FolderSizeViewModel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/ViewModels/PaneState.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/ViewModels/TabbedPaneState.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/ViewModels/WarpSearchViewModel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/CommandRunnerView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/ContentView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/CustomActionsSettingsView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/DividerBadge.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/FileRowView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/FolderSizeView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/GlobalToolbar.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/PaneView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/QuickLookCoordinator.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/RowMouseEventView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/SettingsView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/SidebarView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/TabbedPaneView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/TextPromptSheet.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/WarpSearchView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "DOpusMac",
+      "moduleOutputPath" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/Modules/DOpusMac.swiftmodule",
+      "objects" : [
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/AppLaunchConfiguration.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/AppNotifications.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/AppSettings.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/CustomActionsModel.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/DragSession.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/FileItem.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/FileOperationService.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/PaneSide.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/PaneStatusFormatter.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/SidebarModel.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/SmartMetadataService.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/SortKey.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/FolderSizeViewModel.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/PaneState.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/TabbedPaneState.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/WarpSearchViewModel.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/CommandRunnerView.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/ContentView.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/CustomActionsSettingsView.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/DividerBadge.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/FileRowView.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/FolderSizeView.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/GlobalToolbar.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/PaneView.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/QuickLookCoordinator.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/RowMouseEventView.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/SettingsView.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/SidebarView.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/TabbedPaneView.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/TextPromptSheet.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/WarpSearchView.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx13.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-j15",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/include/DOpusMac-Swift.h",
+        "-swift-version",
+        "5",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "dopusmac",
+        "-disable-sandbox"
+      ],
+      "outputFileMapPath" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/AppLaunchConfiguration.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/AppNotifications.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/AppSettings.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/CustomActionsModel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/DragSession.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/FileItem.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/FileOperationService.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/PaneSide.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/PaneStatusFormatter.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/SidebarModel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/SmartMetadataService.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/SortKey.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/FolderSizeViewModel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/PaneState.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/TabbedPaneState.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/WarpSearchViewModel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/CommandRunnerView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/ContentView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/CustomActionsSettingsView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/DividerBadge.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/FileRowView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/FolderSizeView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/GlobalToolbar.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/PaneView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/QuickLookCoordinator.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/RowMouseEventView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/SettingsView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/SidebarView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/TabbedPaneView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/TextPromptSheet.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/WarpSearchView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/Modules/DOpusMac.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/AppLaunchConfiguration.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/AppNotifications.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/AppSettings.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/CustomActionsModel.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/DragSession.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/FileItem.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/FileOperationService.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/PaneSide.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/PaneStatusFormatter.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/SidebarModel.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/SmartMetadataService.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/SortKey.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/ViewModels/FolderSizeViewModel.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/ViewModels/PaneState.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/ViewModels/TabbedPaneState.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/ViewModels/WarpSearchViewModel.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/CommandRunnerView.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/ContentView.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/CustomActionsSettingsView.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/DividerBadge.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/FileRowView.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/FolderSizeView.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/GlobalToolbar.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/PaneView.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/QuickLookCoordinator.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/RowMouseEventView.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/SettingsView.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/SidebarView.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/TabbedPaneView.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/TextPromptSheet.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/WarpSearchView.swift"
+      ],
+      "tempsPath" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.DOpusMacEndToEndUITests-arm64-apple-macosx-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacEndToEndUITests.build/sources",
+      "importPath" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/UITests/DOpusMacEndToEndUITests/DOpusMacEndToEndUITests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacEndToEndUITests.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "DOpusMacEndToEndUITests",
+      "moduleOutputPath" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/Modules/DOpusMacEndToEndUITests.swiftmodule",
+      "objects" : [
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacEndToEndUITests.build/DOpusMacEndToEndUITests.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-Xfrontend",
+        "-enable-cross-import-overlays",
+        "-j15",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-swift-version",
+        "5",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "dopusmac",
+        "-disable-sandbox"
+      ],
+      "outputFileMapPath" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacEndToEndUITests.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacEndToEndUITests.build/DOpusMacEndToEndUITests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/Modules/DOpusMacEndToEndUITests.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/ian.callicott/Documents/coding/DOpusMac/UITests/DOpusMacEndToEndUITests/DOpusMacEndToEndUITests.swift"
+      ],
+      "tempsPath" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacEndToEndUITests.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.DOpusMacPackageTests-arm64-apple-macosx-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacPackageTests.build/sources",
+      "importPath" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacPackageTests.derived/runner.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/Modules/DOpusMacUITests.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/Modules/DOpusMacEndToEndUITests.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacPackageTests.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "DOpusMacPackageTests",
+      "moduleOutputPath" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/Modules/DOpusMacPackageTests.swiftmodule",
+      "objects" : [
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacPackageTests.build/runner.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx13.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-Xfrontend",
+        "-enable-cross-import-overlays",
+        "-j15",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacPackageTests.build/include/DOpusMacPackageTests-Swift.h",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "dopusmac",
+        "-disable-sandbox"
+      ],
+      "outputFileMapPath" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacPackageTests.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacPackageTests.build/runner.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/Modules/DOpusMacPackageTests.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacPackageTests.derived/runner.swift"
+      ],
+      "tempsPath" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacPackageTests.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.DOpusMacUITests-arm64-apple-macosx-debug.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacUITests.build/sources",
+      "importPath" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Tests/DOpusMacUITests/DOpusMacClickTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Tests/DOpusMacUITests/DOpusMacEndToEndTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Tests/DOpusMacUITests/DOpusMacFunctionTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Tests/DOpusMacUITests/DOpusMacLatencyTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Tests/DOpusMacUITests/PrimitiveTestSupport.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/Modules/DOpusMac.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacUITests.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "DOpusMacUITests",
+      "moduleOutputPath" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/Modules/DOpusMacUITests.swiftmodule",
+      "objects" : [
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacUITests.build/DOpusMacClickTests.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacUITests.build/DOpusMacEndToEndTests.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacUITests.build/DOpusMacFunctionTests.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacUITests.build/DOpusMacLatencyTests.swift.o",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacUITests.build/PrimitiveTestSupport.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx14.0",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-Xfrontend",
+        "-enable-cross-import-overlays",
+        "-j15",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-swift-version",
+        "5",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "dopusmac",
+        "-disable-sandbox"
+      ],
+      "outputFileMapPath" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacUITests.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacUITests.build/DOpusMacClickTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacUITests.build/DOpusMacEndToEndTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacUITests.build/DOpusMacFunctionTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacUITests.build/DOpusMacLatencyTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacUITests.build/PrimitiveTestSupport.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/Modules/DOpusMacUITests.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Tests/DOpusMacUITests/DOpusMacClickTests.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Tests/DOpusMacUITests/DOpusMacEndToEndTests.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Tests/DOpusMacUITests/DOpusMacFunctionTests.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Tests/DOpusMacUITests/DOpusMacLatencyTests.swift",
+        "/Users/ian.callicott/Documents/coding/DOpusMac/Tests/DOpusMacUITests/PrimitiveTestSupport.swift"
+      ],
+      "tempsPath" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacUITests.build",
+      "wholeModuleOptimization" : false
+    }
+  },
+  "swiftFrontendCommands" : {
+
+  },
+  "swiftTargetScanArgs" : {
+    "DOpusMac" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "DOpusMac",
+      "-package-name",
+      "dopusmac",
+      "-c",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/AppLaunchConfiguration.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/AppNotifications.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/AppSettings.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/CustomActionsModel.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/DragSession.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/FileItem.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/FileOperationService.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/PaneSide.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/PaneStatusFormatter.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/SidebarModel.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/SmartMetadataService.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/SortKey.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/ViewModels/FolderSizeViewModel.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/ViewModels/PaneState.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/ViewModels/TabbedPaneState.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/ViewModels/WarpSearchViewModel.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/CommandRunnerView.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/ContentView.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/CustomActionsSettingsView.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/DividerBadge.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/FileRowView.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/FolderSizeView.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/GlobalToolbar.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/PaneView.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/QuickLookCoordinator.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/RowMouseEventView.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/SettingsView.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/SidebarView.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/TabbedPaneView.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/TextPromptSheet.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/WarpSearchView.swift",
+      "-I",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx13.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-j15",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/include/DOpusMac-Swift.h",
+      "-swift-version",
+      "5",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "dopusmac",
+      "-disable-sandbox",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "DOpusMacEndToEndUITests" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "DOpusMacEndToEndUITests",
+      "-package-name",
+      "dopusmac",
+      "-c",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/UITests/DOpusMacEndToEndUITests/DOpusMacEndToEndUITests.swift",
+      "-I",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-Xfrontend",
+      "-enable-cross-import-overlays",
+      "-j15",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-swift-version",
+      "5",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "dopusmac",
+      "-disable-sandbox",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "DOpusMacPackageTests" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "DOpusMacPackageTests",
+      "-package-name",
+      "dopusmac",
+      "-c",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacPackageTests.derived/runner.swift",
+      "-I",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx13.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-Xfrontend",
+      "-enable-cross-import-overlays",
+      "-j15",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacPackageTests.build/include/DOpusMacPackageTests-Swift.h",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "dopusmac",
+      "-disable-sandbox",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ],
+    "DOpusMacUITests" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "DOpusMacUITests",
+      "-package-name",
+      "dopusmac",
+      "-c",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Tests/DOpusMacUITests/DOpusMacClickTests.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Tests/DOpusMacUITests/DOpusMacEndToEndTests.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Tests/DOpusMacUITests/DOpusMacFunctionTests.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Tests/DOpusMacUITests/DOpusMacLatencyTests.swift",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/Tests/DOpusMacUITests/PrimitiveTestSupport.swift",
+      "-I",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx14.0",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-Xfrontend",
+      "-enable-cross-import-overlays",
+      "-j15",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-swift-version",
+      "5",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "dopusmac",
+      "-disable-sandbox",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ]
+  },
+  "targetDependencyMap" : {
+    "DOpusMac" : [
+
+    ],
+    "DOpusMacEndToEndUITests" : [
+
+    ],
+    "DOpusMacPackageTests" : [
+      "DOpusMacEndToEndUITests",
+      "DOpusMacUITests",
+      "DOpusMac"
+    ],
+    "DOpusMacUITests" : [
+      "DOpusMac"
+    ]
+  },
+  "testDiscoveryCommands" : {
+
+  },
+  "testEntryPointCommands" : {
+    "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacPackageTests.derived/runner.swift" : {
+      "inputs" : [
+
+      ],
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacPackageTests.derived/runner.swift"
+        }
+      ]
+    }
+  },
+  "traitConfiguration" : {
+    "default" : {
+
+    }
+  },
+  "writeCommands" : {
+    "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/AppLaunchConfiguration.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/AppNotifications.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/AppSettings.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/CustomActionsModel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/DragSession.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/FileItem.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/FileOperationService.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/PaneSide.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/PaneStatusFormatter.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/SidebarModel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/SmartMetadataService.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/SortKey.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/ViewModels/FolderSizeViewModel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/ViewModels/PaneState.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/ViewModels/TabbedPaneState.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/ViewModels/WarpSearchViewModel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/CommandRunnerView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/ContentView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/CustomActionsSettingsView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/DividerBadge.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/FileRowView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/FolderSizeView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/GlobalToolbar.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/PaneView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/QuickLookCoordinator.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/RowMouseEventView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/SettingsView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/SidebarView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/TabbedPaneView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/TextPromptSheet.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/WarpSearchView.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/sources"
+    },
+    "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacEndToEndUITests.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/UITests/DOpusMacEndToEndUITests/DOpusMacEndToEndUITests.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacEndToEndUITests.build/sources"
+    },
+    "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacPackageTests.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacPackageTests.derived/runner.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacPackageTests.build/sources"
+    },
+    "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacPackageTests.product/Objects.LinkFileList" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<link-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/AppLaunchConfiguration.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/AppNotifications.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/AppSettings.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/CommandRunnerView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/ContentView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/CustomActionsModel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/CustomActionsSettingsView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/DividerBadge.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/DragSession.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/FileItem.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/FileOperationService.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/FileRowView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/FolderSizeView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/FolderSizeViewModel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/GlobalToolbar.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/PaneSide.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/PaneState.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/PaneStatusFormatter.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/PaneView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/QuickLookCoordinator.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/RowMouseEventView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/SettingsView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/SidebarModel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/SidebarView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/SmartMetadataService.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/SortKey.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/TabbedPaneState.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/TabbedPaneView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/TextPromptSheet.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/WarpSearchView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMac.build/WarpSearchViewModel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacEndToEndUITests.build/DOpusMacEndToEndUITests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacPackageTests.build/runner.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacUITests.build/DOpusMacClickTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacUITests.build/DOpusMacEndToEndTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacUITests.build/DOpusMacFunctionTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacUITests.build/DOpusMacLatencyTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacUITests.build/PrimitiveTestSupport.swift.o"
+        }
+      ],
+      "outputFilePath" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacPackageTests.product/Objects.LinkFileList"
+    },
+    "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacUITests.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Tests/DOpusMacUITests/DOpusMacClickTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Tests/DOpusMacUITests/DOpusMacEndToEndTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Tests/DOpusMacUITests/DOpusMacFunctionTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Tests/DOpusMacUITests/DOpusMacLatencyTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/ian.callicott/Documents/coding/DOpusMac/Tests/DOpusMacUITests/PrimitiveTestSupport.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacUITests.build/sources"
+    },
+    "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt" : {
+      "alwaysOutOfDate" : true,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<swift-get-version>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+        }
+      ],
+      "outputFilePath" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+    }
+  }
+}

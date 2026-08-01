@@ -1,0 +1,23 @@
+{
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/AppLaunchConfiguration.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppLaunchConfiguration.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppLaunchConfiguration.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppLaunchConfiguration.dia",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppLaunchConfiguration.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppLaunchConfiguration.swiftdeps"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/AppNotifications.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppNotifications.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppNotifications.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppNotifications.dia",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppNotifications.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppNotifications.swiftdeps"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/AppSettings.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppSettings.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppSettings.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppSettings.dia",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppSettings.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppSettings.swiftdeps"
+  }
+}

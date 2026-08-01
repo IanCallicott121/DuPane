@@ -1,0 +1,339 @@
+{
+  "" : {
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DOpusMac-primary.dia",
+    "emit-module-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DOpusMac-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DOpusMac-primary-emit-module.dia",
+    "pch" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DOpusMac-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DOpusMac-primary.swiftdeps"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/GeneratedAssetSymbols.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/GeneratedAssetSymbols.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/GeneratedAssetSymbols~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/DOpusMacApp.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DOpusMacApp.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DOpusMacApp.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DOpusMacApp.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DOpusMacApp.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DOpusMacApp.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DOpusMacApp.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DOpusMacApp.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DOpusMacApp~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/AppLaunchConfiguration.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppLaunchConfiguration.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppLaunchConfiguration.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppLaunchConfiguration.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppLaunchConfiguration.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppLaunchConfiguration.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppLaunchConfiguration.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppLaunchConfiguration.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppLaunchConfiguration~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/AppNotifications.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppNotifications.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppNotifications.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppNotifications.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppNotifications.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppNotifications.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppNotifications.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppNotifications.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppNotifications~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/AppSettings.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppSettings.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppSettings.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppSettings.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppSettings.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppSettings.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppSettings.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppSettings.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/AppSettings~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/CustomActionsModel.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CustomActionsModel.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CustomActionsModel.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CustomActionsModel.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CustomActionsModel.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CustomActionsModel.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CustomActionsModel.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CustomActionsModel.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CustomActionsModel~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/DragSession.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DragSession.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DragSession.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DragSession.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DragSession.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DragSession.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DragSession.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DragSession.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DragSession~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/FileItem.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FileItem.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FileItem.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FileItem.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FileItem.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FileItem.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FileItem.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FileItem.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FileItem~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/FileOperationService.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FileOperationService.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FileOperationService.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FileOperationService.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FileOperationService.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FileOperationService.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FileOperationService.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FileOperationService.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FileOperationService~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/PaneSide.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneSide.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneSide.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneSide.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneSide.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneSide.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneSide.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneSide.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneSide~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/PaneStatusFormatter.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneStatusFormatter.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneStatusFormatter.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneStatusFormatter.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneStatusFormatter.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneStatusFormatter.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneStatusFormatter.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneStatusFormatter.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneStatusFormatter~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/SidebarModel.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SidebarModel.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SidebarModel.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SidebarModel.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SidebarModel.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SidebarModel.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SidebarModel.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SidebarModel.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SidebarModel~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/SmartMetadataService.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SmartMetadataService.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SmartMetadataService.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SmartMetadataService.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SmartMetadataService.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SmartMetadataService.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SmartMetadataService.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SmartMetadataService.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SmartMetadataService~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/SortKey.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SortKey.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SortKey.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SortKey.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SortKey.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SortKey.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SortKey.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SortKey.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SortKey~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/ViewModels/FolderSizeViewModel.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FolderSizeViewModel.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FolderSizeViewModel.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FolderSizeViewModel.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FolderSizeViewModel.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FolderSizeViewModel.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FolderSizeViewModel.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FolderSizeViewModel.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FolderSizeViewModel~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/ViewModels/PaneState.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneState.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneState.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneState.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneState.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneState.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneState.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneState.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneState~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/ViewModels/TabbedPaneState.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/TabbedPaneState.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/TabbedPaneState.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/TabbedPaneState.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/TabbedPaneState.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/TabbedPaneState.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/TabbedPaneState.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/TabbedPaneState.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/TabbedPaneState~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/ViewModels/WarpSearchViewModel.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/WarpSearchViewModel.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/WarpSearchViewModel.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/WarpSearchViewModel.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/WarpSearchViewModel.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/WarpSearchViewModel.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/WarpSearchViewModel.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/WarpSearchViewModel.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/WarpSearchViewModel~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/CommandRunnerView.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CommandRunnerView.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CommandRunnerView.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CommandRunnerView.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CommandRunnerView.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CommandRunnerView.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CommandRunnerView.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CommandRunnerView.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CommandRunnerView~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/ContentView.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/ContentView.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/ContentView.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/ContentView.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/ContentView.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/ContentView.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/ContentView.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/ContentView.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/ContentView~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/CustomActionsSettingsView.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CustomActionsSettingsView.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CustomActionsSettingsView.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CustomActionsSettingsView.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CustomActionsSettingsView.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CustomActionsSettingsView.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CustomActionsSettingsView.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CustomActionsSettingsView.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CustomActionsSettingsView~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/DividerBadge.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DividerBadge.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DividerBadge.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DividerBadge.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DividerBadge.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DividerBadge.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DividerBadge.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DividerBadge.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DividerBadge~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/FileRowView.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FileRowView.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FileRowView.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FileRowView.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FileRowView.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FileRowView.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FileRowView.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FileRowView.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FileRowView~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/FolderSizeView.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FolderSizeView.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FolderSizeView.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FolderSizeView.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FolderSizeView.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FolderSizeView.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FolderSizeView.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FolderSizeView.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/FolderSizeView~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/GlobalToolbar.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/GlobalToolbar.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/GlobalToolbar.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/GlobalToolbar.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/GlobalToolbar.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/GlobalToolbar.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/GlobalToolbar.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/GlobalToolbar.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/GlobalToolbar~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/PaneView.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneView.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneView.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneView.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneView.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneView.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneView.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneView.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/PaneView~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/QuickLookCoordinator.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/QuickLookCoordinator.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/QuickLookCoordinator.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/QuickLookCoordinator.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/QuickLookCoordinator.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/QuickLookCoordinator.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/QuickLookCoordinator.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/QuickLookCoordinator.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/QuickLookCoordinator~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/RowMouseEventView.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/RowMouseEventView.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/RowMouseEventView.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/RowMouseEventView.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/RowMouseEventView.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/RowMouseEventView.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/RowMouseEventView.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/RowMouseEventView.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/RowMouseEventView~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/SettingsView.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SettingsView.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SettingsView.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SettingsView.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SettingsView.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SettingsView.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SettingsView.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SettingsView.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SettingsView~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/SidebarView.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SidebarView.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SidebarView.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SidebarView.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SidebarView.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SidebarView.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SidebarView.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SidebarView.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/SidebarView~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/TabbedPaneView.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/TabbedPaneView.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/TabbedPaneView.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/TabbedPaneView.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/TabbedPaneView.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/TabbedPaneView.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/TabbedPaneView.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/TabbedPaneView.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/TabbedPaneView~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/TextPromptSheet.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/TextPromptSheet.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/TextPromptSheet.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/TextPromptSheet.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/TextPromptSheet.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/TextPromptSheet.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/TextPromptSheet.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/TextPromptSheet.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/TextPromptSheet~partial.swiftmodule"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/WarpSearchView.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/WarpSearchView.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/WarpSearchView.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/WarpSearchView.dia",
+    "index-unit-output-path" : "/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/WarpSearchView.o",
+    "llvm-bc" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/WarpSearchView.bc",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/WarpSearchView.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/WarpSearchView.swiftdeps",
+    "swiftmodule" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/WarpSearchView~partial.swiftmodule"
+  }
+}

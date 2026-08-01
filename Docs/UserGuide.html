@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>/Opus — User Guide</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #f5f5f7;
+    --surface2: #e8e8ed;
+    --border: #d2d2d7;
+    --text: #1d1d1f;
+    --text2: #6e6e73;
+    --accent: #0071e3;
+    --accent-hover: #0077ed;
+    --accent-light: #e8f0fe;
+    --orange: #ff6b35;
+    --green: #34c759;
+    --red: #ff3b30;
+    --purple: #af52de;
+    --gold: #ffcc00;
+    --sidebar-w: 240px;
+    --header-h: 64px;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 2px 20px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 40px rgba(0,0,0,0.12);
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+    --mono: "SF Mono", "Fira Code", "Cascadia Code", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1e;
+      --surface: #2c2c2e;
+      --surface2: #3a3a3c;
+      --border: #48484a;
+      --text: #f5f5f7;
+      --text2: #98989d;
+      --accent: #2997ff;
+      --accent-light: #0a2147;
+      --shadow: 0 2px 20px rgba(0,0,0,0.4);
+      --shadow-lg: 0 8px 40px rgba(0,0,0,0.5);
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font);
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text);
+    background: var(--bg);
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--sidebar-w);
+    height: 100vh;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    z-index: 100;
+    padding: 24px 0;
+  }
+  .sidebar-logo {
+    padding: 0 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .logo-icon {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, var(--accent), #5e5ce6);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: white;
+    font-weight: 800; letter-spacing: -1px;
+    flex-shrink: 0;
+  }
+  .sidebar-logo-text { font-size: 16px; font-weight: 700; color: var(--text); }
+  .sidebar-logo-sub { font-size: 11px; color: var(--text2); }
+  .nav-section { padding: 4px 0; }
+  .nav-heading {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text2);
+    padding: 12px 20px 4px;
+  }
+  .nav-item {
+    display: block;
+    padding: 6px 20px;
+    font-size: 13px;
+    color: var(--text2);
+    text-decoration: none;
+    border-radius: 6px;
+    margin: 0 8px;
+    transition: all 0.15s;
+  }
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active { background: var(--accent-light); color: var(--accent); font-weight: 500; }
+
+  /* ── Main ── */
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    min-width: 0;
+  }
+  .hero {
+    background: linear-gradient(135deg, #0071e3 0%, #5e5ce6 50%, #af52de 100%);
+    padding: 80px 60px;
+    color: white;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-size: 52px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .hero h1 span { opacity: 0.7; }
+  .hero p {
+    font-size: 18px;
+    opacity: 1.0;
+    max-width: 560px;
+    line-height: 1.55;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  }
+  .hero-meta {
+    margin-top: 32px;
+    display: flex;
+    gap: 24px;
+    font-size: 13px;
+    opacity: 0.75;
+  }
+  .hero-meta span { display: flex; align-items: center; gap: 6px; }
+
+  /* ── Content ── */
+  .content { padding: 60px 60px; }
+
+  /* Sections */
+  .section { margin-bottom: 80px; }
+  .section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .section-label::before {
+    content: '';
+    width: 20px; height: 2px;
+    background: var(--accent);
+    border-radius: 1px;
+  }
+  h2 {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+    color: var(--text);
+    line-height: 1.2;
+  }
+  h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 32px 0 10px;
+    color: var(--text);
+  }
+  p { color: var(--text2); margin-bottom: 14px; line-height: 1.65; }
+  p strong { color: var(--text); }
+
+  /* Lead paragraph */
+  .lead {
+    font-size: 17px;
+    color: var(--text2);
+    margin-bottom: 32px;
+    line-height: 1.6;
+  }
+
+  /* ── App Screenshot Mockup ── */
+  .mockup {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin: 28px 0;
+    box-shadow: var(--shadow-lg);
+  }
+  .mockup-titlebar {
+    background: var(--surface2);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot-red { background: #ff5f57; }
+  .dot-yellow { background: #ffbd2e; }
+  .dot-green { background: #28c840; }
+  .mockup-toolbar {
+    background: var(--surface);
+    padding: 8px 12px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .mockup-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 11px;
+    color: var(--text);
+    font-family: var(--font);
+    cursor: default;
+    white-space: nowrap;
+  }
+  .mockup-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .mockup-btn.danger { color: var(--red); }
+  .mockup-panes {
+    display: flex;
+    height: 300px;
+  }
+  .mockup-pane {
+    flex: 1;
+    border-right: 1px solid var(--border);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .mockup-pane:last-child { border-right: none; }
+  .mockup-pane-header {
+    background: var(--surface);
+    padding: 6px 10px;
+    font-size: 10px;
+    font-family: var(--mono);
+    color: var(--text2);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .pane-active-indicator {
+    width: 100%;
+    height: 2px;
+    background: var(--accent);
+    border-radius: 1px;
+    margin-bottom: 1px;
+  }
+  .mockup-col-header {
+    display: flex;
+    padding: 4px 8px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text2);
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    gap: 8px;
+  }
+  .mockup-row {
+    display: flex;
+    padding: 4px 8px;
+    font-size: 11px;
+    gap: 8px;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono);
+  }
+  .mockup-row.selected { background: rgba(0,113,227,0.12); }
+  .mockup-row-icon { width: 14px; height: 14px; flex-shrink: 0; }
+  .mockup-row-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); }
+  .mockup-row-size { width: 60px; text-align: right; color: var(--text2); }
+  .mockup-row-info { width: 70px; text-align: right; color: var(--accent); font-size: 9px; }
+  .mockup-status {
+    padding: 4px 10px;
+    font-size: 10px;
+    font-family: var(--mono);
+    color: var(--text2);
+    background: var(--surface2);
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+  }
+  .folder-icon { font-size: 12px; }
+  .file-badge {
+    display: inline-block;
+    font-size: 7px;
+    font-weight: 700;
+    padding: 1px 3px;
+    background: var(--surface2);
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-family: var(--mono);
+  }
+
+  /* ── Feature Cards ── */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .feature-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    transition: box-shadow 0.2s;
+  }
+  .feature-card:hover { box-shadow: var(--shadow); }
+  .feature-card-icon {
+    width: 42px; height: 42px;
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    margin-bottom: 12px;
+  }
+  .feature-card h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .feature-card p {
+    font-size: 12px;
+    color: var(--text2);
+    margin: 0;
+    line-height: 1.5;
+  }
+  .ic-blue   { background: #e8f0fe; }
+  .ic-orange { background: #fff3e0; }
+  .ic-green  { background: #e8f5e9; }
+  .ic-purple { background: #f3e5f5; }
+  .ic-red    { background: #fce4ec; }
+  .ic-teal   { background: #e0f7fa; }
+
+  /* ── Keyboard Shortcuts ── */
+  .shortcut-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 13px;
+  }
+  .shortcut-table th {
+    text-align: left;
+    padding: 10px 14px;
+    background: var(--surface);
+    border-bottom: 2px solid var(--border);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text2);
+  }
+  .shortcut-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .shortcut-table tr:last-child td { border-bottom: none; }
+  .shortcut-table tr:hover td { background: var(--surface); }
+  .shortcut-desc { color: var(--text); }
+  .shortcut-keys { text-align: right; white-space: nowrap; }
+
+  kbd {
+    display: inline-block;
+    padding: 2px 7px;
+    font-size: 11px;
+    font-family: var(--font);
+    font-weight: 500;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-bottom-width: 2px;
+    border-radius: 5px;
+    line-height: 1.6;
+  }
+
+  /* ── Callouts ── */
+  .callout {
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    margin: 20px 0;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .callout-icon { flex-shrink: 0; font-size: 16px; margin-top: 1px; }
+  .callout p { margin: 0; }
+  .callout.tip { background: var(--accent-light); color: var(--accent); }
+  .callout.tip p { color: var(--accent); }
+  .callout.warning { background: #fff8e1; color: #f57f17; }
+  .callout.warning p { color: #7f5a00; }
+  @media (prefers-color-scheme: dark) {
+    .callout.warning { background: #3a2e00; }
+    .callout.warning p { color: #ffd54f; }
+  }
+  .callout.info { background: #f0fdf4; }
+  .callout.info p { color: #166534; }
+  @media (prefers-color-scheme: dark) {
+    .callout.info { background: #052e16; }
+    .callout.info p { color: #86efac; }
+  }
+
+  /* ── Warp mockup ── */
+  .warp-mockup {
+    background: rgba(255,255,255,0.85);
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: var(--radius);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    width: 440px;
+    margin: 28px auto;
+    overflow: hidden;
+  }
+  @media (prefers-color-scheme: dark) {
+    .warp-mockup { background: rgba(40,40,44,0.92); border-color: rgba(255,255,255,0.1); }
+  }
+  .warp-field {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .warp-icon { font-size: 16px; opacity: 0.5; }
+  .warp-input {
+    flex: 1;
+    font-size: 15px;
+    color: var(--text);
+    font-family: var(--font);
+  }
+  .warp-result {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    margin: 4px 6px;
+    border-radius: 6px;
+    cursor: default;
+  }
+  .warp-result.selected { background: var(--accent); }
+  .warp-result-info { flex: 1; }
+  .warp-result-name { font-size: 13px; font-weight: 500; color: var(--text); }
+  .warp-result.selected .warp-result-name { color: white; }
+  .warp-result-path { font-size: 10px; color: var(--text2); font-family: var(--mono); }
+  .warp-result.selected .warp-result-path { color: rgba(255,255,255,0.75); }
+  .warp-result-icon { font-size: 13px; color: var(--accent); }
+  .warp-result.selected .warp-result-icon { color: rgba(255,255,255,0.8); }
+  .warp-footer { padding: 8px 12px 12px; }
+
+  /* ── Terminal mockup ── */
+  .terminal-mockup {
+    background: #1a1a2e;
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin: 20px 0;
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+  .terminal-bar {
+    background: #16213e;
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .terminal-prompt { color: #4af626; }
+  .terminal-cmd { color: #c9d1d9; }
+  .terminal-output { padding: 12px 14px; color: #8b949e; line-height: 1.7; }
+  .terminal-output .hi { color: #79c0ff; }
+
+  /* ── Folder size mockup ── */
+  .fsbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 6px 0;
+    font-size: 12px;
+    font-family: var(--mono);
+  }
+  .fsbar-icon { font-size: 11px; color: var(--accent); width: 14px; }
+  .fsbar-name { width: 140px; color: var(--text); }
+  .fsbar-track {
+    flex: 1;
+    height: 12px;
+    background: var(--surface2);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .fsbar-fill {
+    height: 100%;
+    background: var(--accent);
+    opacity: 0.65;
+    border-radius: 3px;
+  }
+  .fsbar-size { width: 70px; text-align: right; color: var(--text2); font-size: 11px; }
+
+  /* ── Divider ── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 60px 0;
+  }
+
+  /* ── Steps ── */
+  .steps { list-style: none; counter-reset: step; margin: 20px 0; }
+  .steps li {
+    counter-increment: step;
+    position: relative;
+    padding: 0 0 20px 44px;
+    font-size: 14px;
+    color: var(--text2);
+  }
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .steps li strong { color: var(--text); }
+  .steps li:last-child { padding-bottom: 0; }
+
+  /* ── Color tag swatches ── */
+  .tag-swatch {
+    display: inline-block;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    margin-right: 2px;
+    vertical-align: middle;
+  }
+
+  /* ── Metadata badge ── */
+  .meta-badge {
+    display: inline-block;
+    padding: 1px 7px;
+    background: var(--accent-light);
+    color: var(--accent);
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: var(--mono);
+    font-weight: 500;
+  }
+
+  /* ── TOC ── */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    margin: 0 0 56px;
+  }
+  .toc h3 { font-size: 14px; margin: 0 0 14px; color: var(--text); }
+  .toc ol { counter-reset: toc; list-style: none; }
+  .toc ol li { counter-increment: toc; margin-bottom: 6px; }
+  .toc ol li a {
+    display: flex;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text2);
+    text-decoration: none;
+  }
+  .toc ol li a:hover { color: var(--accent); }
+  .toc ol li a::before { content: counter(toc) "."; color: var(--text2); opacity: 0.5; width: 20px; flex-shrink: 0; }
+
+  /* ── Footer ── */
+  footer {
+    margin-left: var(--sidebar-w);
+    padding: 40px 60px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+</style>
+</head>
+<body>
+
+<!-- ─────────────── SIDEBAR ─────────────── -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">/O</div>
+    <div>
+      <div class="sidebar-logo-text">/Opus</div>
+      <div class="sidebar-logo-sub">User Guide v1.17</div>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-heading">Getting Started</div>
+    <a href="#overview" class="nav-item">Overview</a>
+    <a href="#why-opus" class="nav-item">Why /Opus?</a>
+    <a href="#quickstart" class="nav-item">Quick Start</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-heading">Core Features</div>
+    <a href="#navigation" class="nav-item">Dual-Pane Navigation</a>
+    <a href="#tabs" class="nav-item">Tabs</a>
+    <a href="#sidebar" class="nav-item">Sidebar &amp; Bookmarks</a>
+    <a href="#file-ops" class="nav-item">File Operations</a>
+    <a href="#sorting" class="nav-item">Sorting &amp; Filtering</a>
+    <a href="#quicklook" class="nav-item">Quick Look</a>
+    <a href="#tags" class="nav-item">Colour Tags</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-heading">Smart Features</div>
+    <a href="#smart-metadata" class="nav-item">Smart Metadata</a>
+    <a href="#warp" class="nav-item">Warp Jump (⌘K)</a>
+    <a href="#command-runner" class="nav-item">Command Runner</a>
+    <a href="#custom-actions" class="nav-item">Actions</a>
+    <a href="#folder-size" class="nav-item">Folder Size View</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-heading">Reference</div>
+    <a href="#settings" class="nav-item">Settings</a>
+    <a href="#shortcuts" class="nav-item">Keyboard Shortcuts</a>
+  </div>
+</nav>
+
+<!-- ─────────────── MAIN ─────────────── -->
+<main class="main">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-badge">USER GUIDE</div>
+    <h1>/Opus<br><span>Dual-Pane File Manager</span></h1>
+    <p>A fast, powerful macOS file manager built for developers and power users — two panes, tabs, smart metadata, and persistent tabs, all in a native SwiftUI interface.</p>
+    <div class="hero-meta">
+      <span>🍎 macOS 13+</span>
+      <span>⚡ Native SwiftUI</span>
+      <span>📑 Persistent Tabs</span>
+    </div>
+  </section>
+
+  <div class="content">
+
+    <!-- TOC -->
+    <div class="toc">
+      <h3>Table of Contents</h3>
+      <ol>
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#why-opus">Why /Opus?</a></li>
+        <li><a href="#quickstart">Quick Start</a></li>
+        <li><a href="#navigation">Dual-Pane Navigation</a></li>
+        <li><a href="#tabs">Tabs</a></li>
+        <li><a href="#sidebar">Sidebar &amp; Bookmarks</a></li>
+        <li><a href="#file-ops">File Operations</a></li>
+        <li><a href="#sorting">Sorting &amp; Filtering</a></li>
+        <li><a href="#quicklook">Quick Look</a></li>
+        <li><a href="#tags">Colour Tags</a></li>
+        <li><a href="#smart-metadata">Smart Metadata Columns</a></li>
+        <li><a href="#warp">Warp Folder Jump</a></li>
+        <li><a href="#command-runner">Command Runner</a></li>
+        <li><a href="#custom-actions">Actions (Custom Scripts)</a></li>
+        <li><a href="#folder-size">Folder Size View</a></li>
+        <li><a href="#settings">Settings</a></li>
+        <li><a href="#shortcuts">Keyboard Shortcuts</a></li>
+      </ol>
+    </div>
+
+    <!-- ─── 1. Overview ─── -->
+    <section class="section" id="overview">
+      <div class="section-label">Introduction</div>
+      <h2>What is /Opus?</h2>
+      <p class="lead">/Opus is a dual-pane file manager for macOS that puts two folder views side by side, making it effortless to copy, move, and organise files between locations.</p>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-card-icon ic-blue">⊞</div>
+          <h4>Dual Panes</h4>
+          <p>Two independent folder views with separate navigation history and tab support.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-icon ic-purple">⌘K</div>
+          <h4>Warp Jump</h4>
+          <p>Instant fuzzy folder navigation across bookmarks, recents, and history.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-icon ic-green">◉</div>
+          <h4>Smart Metadata</h4>
+          <p>Dimensions for images, duration for video, line count for code — at a glance.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-icon ic-orange">⚡</div>
+          <h4>Actions</h4>
+          <p>Run your own shell commands on selected files directly from the context menu.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-icon ic-teal">📑</div>
+          <h4>Persistent Tabs</h4>
+          <p>All open tabs are saved across restarts when using "Remember last folder" startup mode.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-icon ic-red">⊙</div>
+          <h4>Folder Sizes</h4>
+          <p>Visualise which subfolders are eating your disk space in a live bar chart.</p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ─── Why /Opus? ─── -->
+    <section class="section" id="why-opus">
+      <div class="section-label">Getting Started</div>
+      <h2>Why /Opus? Can't I just use Finder?</h2>
+      <p class="lead">Finder is great for casual browsing. /Opus is built for power users who move dozens of files a day, work across many folders simultaneously, and want the keyboard and the terminal all in one native place.</p>
+
+      <h3>The dual-pane advantage</h3>
+      <p>The single biggest productivity gain: <strong>two folder views, side by side, at all times.</strong> In Finder you open a source window, then a destination window, then try to keep both visible while dragging. In /Opus you select files in the left pane and press Move — done. No window juggling, no missed drops.</p>
+
+      <h3>Feature comparison</h3>
+      <table class="shortcut-table">
+        <thead><tr><th>Feature</th><th>Finder</th><th>/Opus</th></tr></thead>
+        <tr><td>Two folders side by side</td><td>Manually arrange two windows</td><td>Built-in dual panes with one-click Move/Copy</td></tr>
+        <tr><td>Tabs per pane</td><td>Tabs across the whole app</td><td>Separate tab rows per pane — left and right independent</td></tr>
+        <tr><td>Instant folder jump</td><td>⌘⇧G path dialog only</td><td>Warp (⌘K): fuzzy search across bookmarks, recents, open tabs</td></tr>
+        <tr><td>File metadata at a glance</td><td>Get Info popup per file</td><td>Smart Info column: dimensions, duration, line count inline</td></tr>
+        <tr><td>Run shell commands</td><td>Open Terminal separately</td><td>Built-in Command Runner — stay in context</td></tr>
+        <tr><td>Custom file actions</td><td>Automator (complex setup)</td><td>One-liner shell scripts in a single text field</td></tr>
+        <tr><td>Keyboard-driven navigation</td><td>Partial (⌘↑ to go up)</td><td>Full: ⌘[ back, ⌘] forward, ⌘↑ up, ↩ open, ⌘K jump</td></tr>
+        <tr><td>Folder disk usage</td><td>Get Info (slow, no chart)</td><td>Live proportional bar chart — see what's eating space instantly</td></tr>
+      </table>
+
+      <h3>Built for developers &amp; power users</h3>
+      <p>If you've ever used Directory Opus on Windows, Total Commander, or Midnight Commander, /Opus brings that philosophy natively to macOS — fast, keyboard-friendly, and deeply integrated with the Mac platform.</p>
+
+      <div class="callout tip">
+        <div class="callout-icon">💡</div>
+        <p><strong>/Opus doesn't replace Finder</strong> — it complements it. Right-click any file to Reveal in Finder when you need Finder's features. But for day-to-day file work, you'll rarely need to switch.</p>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ─── 2. Quick Start ─── -->
+    <section class="section" id="quickstart">
+      <div class="section-label">Getting Started</div>
+      <h2>Quick Start</h2>
+      <p class="lead">You'll be navigating files in under a minute. Here's the essential workflow.</p>
+
+      <ol class="steps">
+        <li><strong>Launch /Opus.</strong> The left pane opens your Downloads folder; the right pane shows Computer (all mounted volumes). Click any volume to enter it.</li>
+        <li><strong>Click a pane to make it active.</strong> The active pane shows a coloured border. Navigation commands always target the active pane.</li>
+        <li><strong>Double-click a folder</strong> to enter it. Use the breadcrumb trail at the top or the <kbd>↑</kbd> button to go up a level.</li>
+        <li><strong>Select files</strong> with a single click. Hold <kbd>⌘</kbd> to add items to the selection, or <kbd>⇧</kbd> to select a range.</li>
+        <li><strong>Press <kbd>⌘K</kbd></strong> to open Warp and jump to any folder instantly.</li>
+        <li><strong>Press <kbd>Space</kbd></strong> to Quick Look the selected file(s) without leaving /Opus.</li>
+      </ol>
+
+      <div class="callout tip">
+        <div class="callout-icon">💡</div>
+        <p><strong>Tip:</strong> Use <kbd>⌘T</kbd> to open a new tab and work on two paths within the same pane simultaneously.</p>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ─── 3. Navigation ─── -->
+    <section class="section" id="navigation">
+      <div class="section-label">Core Features</div>
+      <h2>Dual-Pane Navigation</h2>
+      <p class="lead">The core of /Opus is two independent file panes shown side by side. The left pane has a blue accent; the right pane has an orange accent.</p>
+
+      <!-- Mockup -->
+      <div class="mockup">
+        <div class="mockup-titlebar">
+          <div class="dot dot-red"></div>
+          <div class="dot dot-yellow"></div>
+          <div class="dot dot-green"></div>
+        </div>
+        <div class="mockup-toolbar">
+          <div class="mockup-btn active">⊞ Sidebar</div>
+          <div class="mockup-btn">⌘K Jump</div>
+          <div class="mockup-btn">📁+ New Folder</div>
+          <div class="mockup-btn">📄+ New File</div>
+          <div class="mockup-btn">→ Move</div>
+          <div class="mockup-btn">⎘ Copy</div>
+          <div class="mockup-btn danger">🗑 Delete</div>
+          <div class="mockup-btn">🔖 Bookmark</div>
+          <div class="mockup-btn">⚡ Actions</div>
+          <div class="mockup-btn">⎈ Terminal</div>
+        </div>
+        <div class="mockup-panes">
+          <!-- Left pane -->
+          <div class="mockup-pane">
+            <div style="height:3px;background:#0071e3;border-radius:2px 2px 0 0;"></div>
+            <div class="mockup-pane-header">← → ↑ &nbsp;/Users/ian/Documents</div>
+            <div class="mockup-col-header">
+              <span style="flex:1">Name ▲</span>
+              <span style="width:60px;text-align:right">Size</span>
+              <span style="width:80px">Kind</span>
+              <span style="width:90px">Modified</span>
+              <span style="width:60px;text-align:right">Info</span>
+            </div>
+            <div class="mockup-row selected">
+              <span class="folder-icon">📁</span>
+              <span class="mockup-row-name">Projects</span>
+              <span class="mockup-row-size">—</span>
+              <span style="width:80px;font-size:10px;color:var(--text2)">Folder</span>
+              <span style="width:90px;font-size:10px;color:var(--text2)">Jul 24</span>
+              <span class="mockup-row-info"></span>
+            </div>
+            <div class="mockup-row">
+              <span class="file-badge">png</span>
+              <span class="mockup-row-name">hero-mockup.png</span>
+              <span class="mockup-row-size">2.1 MB</span>
+              <span style="width:80px;font-size:10px;color:var(--text2)">PNG Image</span>
+              <span style="width:90px;font-size:10px;color:var(--text2)">Jul 25</span>
+              <span class="mockup-row-info">3840 × 2160 px</span>
+            </div>
+            <div class="mockup-row">
+              <span class="file-badge">swift</span>
+              <span class="mockup-row-name">ContentView.swift</span>
+              <span class="mockup-row-size">14 KB</span>
+              <span style="width:80px;font-size:10px;color:var(--text2)">Swift</span>
+              <span style="width:90px;font-size:10px;color:var(--text2)">Jul 26</span>
+              <span class="mockup-row-info">357 lines</span>
+            </div>
+            <div class="mockup-row">
+              <span class="file-badge">mp4</span>
+              <span class="mockup-row-name">demo-screen.mp4</span>
+              <span class="mockup-row-size">86 MB</span>
+              <span style="width:80px;font-size:10px;color:var(--text2)">Movie</span>
+              <span style="width:90px;font-size:10px;color:var(--text2)">Jul 22</span>
+              <span class="mockup-row-info">2:34</span>
+            </div>
+            <div class="mockup-status">4 items — 1 selected — 14 KB · 357 lines</div>
+          </div>
+          <!-- Right pane -->
+          <div class="mockup-pane">
+            <div style="height:3px;background:transparent;"></div>
+            <div class="mockup-pane-header">← → ↑ &nbsp;/Users/ian/Downloads</div>
+            <div class="mockup-col-header">
+              <span style="flex:1">Name</span>
+              <span style="width:60px;text-align:right">Size</span>
+              <span style="width:80px">Kind</span>
+              <span style="width:90px">Modified ▼</span>
+              <span style="width:60px;text-align:right">Info</span>
+            </div>
+            <div class="mockup-row">
+              <span class="file-badge">pdf</span>
+              <span class="mockup-row-name">invoice_2026.pdf</span>
+              <span class="mockup-row-size">540 KB</span>
+              <span style="width:80px;font-size:10px;color:var(--text2)">PDF</span>
+              <span style="width:90px;font-size:10px;color:var(--text2)">Today</span>
+              <span class="mockup-row-info"></span>
+            </div>
+            <div class="mockup-row">
+              <span class="file-badge">zip</span>
+              <span class="mockup-row-name">release-1.0.zip</span>
+              <span class="mockup-row-size">12 MB</span>
+              <span style="width:80px;font-size:10px;color:var(--text2)">Archive</span>
+              <span style="width:90px;font-size:10px;color:var(--text2)">Jul 24</span>
+              <span class="mockup-row-info"></span>
+            </div>
+            <div class="mockup-status">2 items</div>
+          </div>
+        </div>
+      </div>
+
+      <h3>Navigating Inside a Pane</h3>
+      <table class="shortcut-table">
+        <tr><td class="shortcut-desc">Enter a folder</td><td class="shortcut-keys"><kbd>Double-click</kbd> or <kbd>↩</kbd></td></tr>
+        <tr><td class="shortcut-desc">Go up one level</td><td class="shortcut-keys"><kbd>↑ button</kbd> or <kbd>⌘↑</kbd></td></tr>
+        <tr><td class="shortcut-desc">Go back / forward</td><td class="shortcut-keys"><kbd>⌘[</kbd> / <kbd>⌘]</kbd> or the <kbd>← →</kbd> buttons</td></tr>
+        <tr><td class="shortcut-desc">Click a breadcrumb</td><td class="shortcut-keys">Jump to any ancestor folder</td></tr>
+        <tr><td class="shortcut-desc">Open a file</td><td class="shortcut-keys"><kbd>↩</kbd> or <kbd>Double-click</kbd> — opens in default app</td></tr>
+        <tr><td class="shortcut-desc">Refresh folder</td><td class="shortcut-keys"><kbd>⌘R</kbd> or the ↺ button in the toolbar</td></tr>
+      </table>
+
+      <h3>Permission Indicator</h3>
+      <p>Folders you don't have read access to show a small <strong>red lock badge</strong> on their icon. Attempting to navigate into them will show an error — but you can still copy or move files to them if you have write access at the filesystem level.</p>
+
+      <h3>Switching Between Panes</h3>
+      <p>Simply click anywhere inside the desired pane. The coloured border shows which pane is active. All toolbar actions (Move, Copy, Delete, New Folder) operate on the <strong>active pane</strong>.</p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ─── 4. Tabs ─── -->
+    <section class="section" id="tabs">
+      <div class="section-label">Core Features</div>
+      <h2>Tabs</h2>
+      <p class="lead">Each pane supports multiple tabs — perfect for switching between two different working directories without losing your place.</p>
+
+      <p>A tab strip appears above each pane whenever multiple tabs are open. Click a tab to switch to it. The active tab is underlined in the pane's accent colour.</p>
+
+      <table class="shortcut-table">
+        <tr><td class="shortcut-desc">Open a new tab</td><td class="shortcut-keys"><kbd>⌘T</kbd> or click the <strong>+</strong> button at the end of the tab strip</td></tr>
+        <tr><td class="shortcut-desc">Close current tab</td><td class="shortcut-keys"><kbd>⌘⇧W</kbd></td></tr>
+        <tr><td class="shortcut-desc">Click to switch tab</td><td class="shortcut-keys">Mouse click on tab button</td></tr>
+        <tr><td class="shortcut-desc">Click × to close</td><td class="shortcut-keys">Individual tab close button</td></tr>
+      </table>
+
+      <div class="callout tip">
+        <div class="callout-icon">💡</div>
+        <p>New tabs inherit the current tab's directory — a great way to start a copy operation from the same location.</p>
+      </div>
+
+      <div class="callout info">
+        <div class="callout-icon">ℹ️</div>
+        <p><strong>Tab persistence:</strong> When the startup mode is set to <strong>Remember last folder</strong> (Settings → Startup Folders), all open tabs — not just the active one — are saved across restarts. Relaunch /Opus and every tab reappears where you left it.</p>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ─── 5. Sidebar ─── -->
+    <section class="section" id="sidebar">
+      <div class="section-label">Core Features</div>
+      <h2>Sidebar &amp; Bookmarks</h2>
+      <p class="lead">The sidebar gives you one-click access to favourite locations. It lists system locations (Home, Desktop, Downloads, Documents, and OneDrive if present) and any files or folders you've bookmarked.</p>
+
+      <p>Toggle the sidebar with <kbd>⌥⌘S</kbd> or the Sidebar button in the toolbar. Click any location to navigate the active pane there instantly. The sidebar keeps its width when opened, while file names retain a readable minimum width in the panes.</p>
+
+      <h3>Adding Bookmarks</h3>
+      <p>There are two ways to add a bookmark:</p>
+      <ul>
+        <li><strong>Toolbar button:</strong> Select exactly one file or folder, then click the <strong>Bookmark</strong> button in the toolbar. If nothing is selected, the current folder is bookmarked instead.</li>
+        <li><strong>Right-click:</strong> Right-click any file or folder → <strong>Bookmark</strong> to add it directly from the context menu.</li>
+      </ul>
+      <p>The item appears immediately in the sidebar's Bookmarks section.</p>
+
+      <h3>Opening Bookmarks</h3>
+      <p>Clicking a bookmarked <strong>folder</strong> navigates the active pane there. Clicking a bookmarked <strong>file</strong> opens it in its default application.</p>
+
+      <h3>Removing Bookmarks</h3>
+      <p>Hover over a bookmark in the sidebar — a <strong>×</strong> button fades in on the right. Click it to remove. You can also right-click a bookmark and choose <strong>Remove Bookmark</strong>, or select the bookmarked item and click the Bookmark toolbar button again to toggle it off.</p>
+
+      <table class="shortcut-table">
+        <tr><td class="shortcut-desc">Toggle Sidebar</td><td class="shortcut-keys"><kbd>⌥⌘S</kbd></td></tr>
+        <tr><td class="shortcut-desc">Bookmark selected item (or current folder)</td><td class="shortcut-keys">Bookmark toolbar button</td></tr>
+        <tr><td class="shortcut-desc">Bookmark from context menu</td><td class="shortcut-keys">Right-click → Bookmark</td></tr>
+      </table>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ─── 6. File Ops ─── -->
+    <section class="section" id="file-ops">
+      <div class="section-label">Core Features</div>
+      <h2>File Operations</h2>
+      <p class="lead">/Opus keeps common operations a single click away in the toolbar — and exposes advanced options through a context menu.</p>
+
+      <h3>Creating Files &amp; Folders</h3>
+      <table class="shortcut-table">
+        <tr><td class="shortcut-desc">New Folder</td><td class="shortcut-keys"><kbd>⌘N</kbd> or toolbar button</td></tr>
+        <tr><td class="shortcut-desc">New File</td><td class="shortcut-keys"><kbd>⌥⌘N</kbd> or toolbar button</td></tr>
+        <tr><td class="shortcut-desc">Rename</td><td class="shortcut-keys">Select one item → Rename toolbar button, or Right-click → Rename…</td></tr>
+      </table>
+
+      <h3>Moving &amp; Copying</h3>
+      <p>Select files in the active pane, then click <strong>Move →</strong> or <strong>Copy ⎘</strong> in the toolbar. Files are sent to the <em>other</em> pane's current directory.</p>
+      <p>You can also drag selected files or folders between panes. A plain drag moves the selection; holding <kbd>Option</kbd> copies it. Directory rows accept drops into that folder, while file rows and empty pane space drop into the current folder.</p>
+      <p>You can also right-click any file to get <strong>Move to [folder]</strong> and <strong>Copy to [folder]</strong> options in the context menu.</p>
+
+      <div class="callout warning">
+        <div class="callout-icon">⚠️</div>
+        <p>The other pane must be inside a real folder (not the Computer root) for Move/Copy to work. Navigate the inactive pane to the destination first.</p>
+      </div>
+
+      <h3>Deleting</h3>
+      <p>Select files and press <kbd>⌘⌫</kbd> or click the <strong>🗑 Delete</strong> toolbar button. A confirmation dialog appears (configurable in Settings). Files are always moved to the macOS Trash — you can recover them from the Trash if you change your mind.</p>
+
+      <h3>Duplicate</h3>
+      <p>Right-click any file or folder → <strong>Duplicate</strong> to create a copy in the same folder. The copy is named <em>filename copy</em> (with a counter if that name already exists). Works on the full selection.</p>
+
+      <h3>Compress &amp; Uncompress</h3>
+      <p>Right-click → <strong>Compress</strong> to zip the selected file(s) into a <code>.zip</code> archive in the same folder. The archive is named after the single selected item, or <em>Archive.zip</em> for multiple items.</p>
+      <p><strong>Uncompress</strong> appears in the context menu only when you right-click a <code>.zip</code> file. It extracts the archive into the same folder. If any file in the archive already exists at the destination, a dialog appears with three options: <strong>Overwrite</strong> (replace existing files), <strong>Skip existing</strong> (keep existing files and extract only the new ones), or <strong>Cancel</strong>.</p>
+
+      <h3>Copy &amp; Share</h3>
+      <p>Right-click → <strong>Copy</strong> places the selected file(s) on the macOS clipboard so you can paste them into Finder, Messages, Mail, or any other app that accepts files.</p>
+      <p>Right-click → <strong>Share…</strong> opens the standard macOS sharing sheet — AirDrop, Messages, Mail, Notes, and any other configured sharing service.</p>
+
+      <h3>Open With…</h3>
+      <p>Right-click any file → <strong>Open With…</strong> to choose a specific application to open it. The submenu shows up to 8 compatible apps. Choose <strong>Other…</strong> to browse to any app in <code>/Applications</code>.</p>
+
+      <h3>Copy Path</h3>
+      <p>Right-click any file → <strong>Copy Path</strong> to place the full POSIX path on the clipboard — handy for pasting into Terminal or code editors.</p>
+
+      <h3>Reveal in Finder</h3>
+      <p>Right-click any file → <strong>Reveal in Finder</strong> to highlight the item in a standard Finder window.</p>
+
+      <h3>Bookmark from Context Menu</h3>
+      <p>Right-click any file or folder → <strong>Bookmark</strong> to add it to the sidebar's Bookmarks section. If the item is already bookmarked, the option reads <strong>Remove Bookmark</strong> to toggle it off.</p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ─── 7. Sorting ─── -->
+    <section class="section" id="sorting">
+      <div class="section-label">Core Features</div>
+      <h2>Sorting &amp; Filtering</h2>
+      <p class="lead">/Opus remembers your sort preference for each folder individually, so your code folder always sorts by Name while Downloads stays sorted by Date.</p>
+
+      <h3>Sorting</h3>
+      <p>Click the column headers — <strong>Name</strong>, <strong>Size</strong>, <strong>Kind</strong>, <strong>Modified</strong>, or <strong>Info</strong> — to sort by that column. Click the same column again to reverse the direction. A small arrow shows the current sort direction.</p>
+      <p>/Opus remembers the sort preference per folder, so your code folder stays sorted by Name while Downloads stays sorted by Modified.</p>
+
+      <h3>Showing and Hiding Columns</h3>
+      <p><strong>Right-click any column header</strong> to reveal a context menu that lets you show or hide any of the four optional columns: Size, Kind, Modified, and Info. The Name column is always visible. Column visibility persists across restarts.</p>
+
+      <h3>Filtering</h3>
+      <p>Type in the <strong>Filter…</strong> field in each pane's navigation toolbar to instantly narrow the file list. The filter matches anywhere in the filename and automatically activates that pane as you type.</p>
+      <p>Click the <strong>×</strong> button that appears inside the filter field to clear it with one click. For a more powerful folder search, use <kbd>⌘K</kbd> Warp.</p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ─── 8. Quick Look ─── -->
+    <section class="section" id="quicklook">
+      <div class="section-label">Core Features</div>
+      <h2>Quick Look</h2>
+      <p class="lead">Preview any file instantly without leaving /Opus — images, PDFs, videos, code, and more — using macOS's built-in Quick Look engine.</p>
+
+      <ol class="steps">
+        <li><strong>Select one or more files</strong> in either pane.</li>
+        <li><strong>Press <kbd>Space</kbd></strong> — the Quick Look panel opens. The panel floats above /Opus and does not interrupt your session.</li>
+        <li><strong>Press <kbd>Space</kbd> again</strong> to dismiss it.</li>
+      </ol>
+
+      <p>You can also access Quick Look via <strong>Right-click → Quick Look</strong> in the context menu.</p>
+
+      <div class="callout tip">
+        <div class="callout-icon">💡</div>
+        <p>Select multiple files before pressing Space to flip through them in Quick Look one-by-one.</p>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ─── 9. Tags ─── -->
+    <section class="section" id="tags">
+      <div class="section-label">Core Features</div>
+      <h2>Colour Tags</h2>
+      <p class="lead">/Opus reads Finder colour tags from the filesystem and displays them as small coloured dots next to each file name — no extra setup needed.</p>
+
+      <p>Tags show as small coloured dots next to each file name in the list. /Opus picks them up automatically when a folder is loaded or refreshed.</p>
+
+      <h3>Setting Tags</h3>
+      <p>Right-click any file → <strong>Tag</strong> submenu to toggle any of the 7 Finder colours:</p>
+      <p>
+        <span class="tag-swatch" style="background:#ff3b30"></span> Red,
+        <span class="tag-swatch" style="background:#ff9500"></span> Orange,
+        <span class="tag-swatch" style="background:#ffcc00"></span> Yellow,
+        <span class="tag-swatch" style="background:#34c759"></span> Green,
+        <span class="tag-swatch" style="background:#007aff"></span> Blue,
+        <span class="tag-swatch" style="background:#af52de"></span> Purple,
+        <span class="tag-swatch" style="background:#8e8e93"></span> Grey.
+      </p>
+      <p>If multiple files are selected, the tag is toggled on <em>all</em> of them at once. Choose <strong>Remove All Tags</strong> at the bottom of the submenu to clear every tag from the selection.</p>
+
+      <div class="callout tip">
+        <div class="callout-icon">💡</div>
+        <p>Tags set in /Opus are fully compatible with Finder — they appear immediately in Finder and in Spotlight searches.</p>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ─── 10. Smart Metadata ─── -->
+    <section class="section" id="smart-metadata">
+      <div class="section-label">Smart Features</div>
+      <h2>Smart Metadata Columns</h2>
+      <p class="lead">The <strong>Info</strong> column on the right side of each row shows type-aware metadata — loaded in the background so it never slows you down.</p>
+
+      <table class="shortcut-table">
+        <thead>
+          <tr>
+            <th>File type</th>
+            <th>Info shown</th>
+            <th>Example</th>
+          </tr>
+        </thead>
+        <tr>
+          <td>Images (jpg, png, heic, webp…)</td>
+          <td>Pixel dimensions</td>
+          <td><span class="meta-badge">3840 × 2160 px</span></td>
+        </tr>
+        <tr>
+          <td>Video &amp; Audio (mp4, mov, mp3…)</td>
+          <td>Duration</td>
+          <td><span class="meta-badge">1:24:08</span></td>
+        </tr>
+        <tr>
+          <td>Code (swift, py, js, ts, go…)</td>
+          <td>Line count</td>
+          <td><span class="meta-badge">357 lines</span></td>
+        </tr>
+        <tr>
+          <td>Config (json, yaml, toml, html…)</td>
+          <td>Line count</td>
+          <td><span class="meta-badge">42 lines</span></td>
+        </tr>
+        <tr>
+          <td>Other files, folders</td>
+          <td>—</td>
+          <td></td>
+        </tr>
+      </table>
+
+      <p>Metadata is also echoed in the <strong>status bar</strong> when exactly one file is selected:</p>
+      <div style="background:var(--surface2);border-radius:6px;padding:6px 12px;font-size:11px;font-family:var(--mono);color:var(--text2);margin:12px 0;">
+        4 items — 1 selected — 14 KB &nbsp;·&nbsp; <span style="color:var(--accent)">357 lines</span>
+      </div>
+
+      <div class="callout tip">
+        <div class="callout-icon">💡</div>
+        <p>Metadata is cached per session so revisiting a folder is instant. It loads on a background thread and never blocks scrolling.</p>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ─── 11. Warp ─── -->
+    <section class="section" id="warp">
+      <div class="section-label">Smart Features</div>
+      <h2>Warp — Instant Folder Jump</h2>
+      <p class="lead">Warp is a lightning-fast fuzzy folder finder. Press <kbd>⌘K</kbd> and start typing — you'll jump to any bookmarked or recently visited folder before you finish the word.</p>
+
+      <!-- Warp mockup -->
+      <div class="warp-mockup">
+        <div class="warp-field">
+          <div class="warp-icon">🔍</div>
+          <div class="warp-input">doc<span style="border-left:1.5px solid var(--accent);">&nbsp;</span></div>
+        </div>
+        <div style="padding:4px 0 8px;">
+          <div class="warp-result selected">
+            <div class="warp-result-icon">📁</div>
+            <div class="warp-result-info">
+              <div class="warp-result-name">Documents</div>
+              <div class="warp-result-path">/Users/ian/Documents</div>
+            </div>
+            <span style="font-size:10px;color:rgba(255,255,255,0.6)">↩</span>
+          </div>
+          <div class="warp-result">
+            <div class="warp-result-icon">📁</div>
+            <div class="warp-result-info">
+              <div class="warp-result-name">Docs</div>
+              <div class="warp-result-path">/Users/ian/Documents/coding/DOpusMac/Docs</div>
+            </div>
+          </div>
+          <div class="warp-result">
+            <div class="warp-result-icon">📁</div>
+            <div class="warp-result-info">
+              <div class="warp-result-name">docker-compose</div>
+              <div class="warp-result-path">/Users/ian/Projects/server/docker-compose</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3>How It Works</h3>
+      <p>Warp fuzzy-matches your query against three pools of folders:</p>
+      <ul style="list-style:none;margin:12px 0 20px;display:flex;flex-direction:column;gap:8px;">
+        <li style="display:flex;gap:10px;font-size:13px;"><span style="color:var(--accent);font-weight:700;">①</span> <span><strong style="color:var(--text)">System locations</strong> — <span style="color:var(--text2)">Home, Desktop, Documents, Downloads</span></span></li>
+        <li style="display:flex;gap:10px;font-size:13px;"><span style="color:var(--accent);font-weight:700;">②</span> <span><strong style="color:var(--text)">Bookmarks</strong> — <span style="color:var(--text2)">folders you've pinned to the sidebar</span></span></li>
+        <li style="display:flex;gap:10px;font-size:13px;"><span style="color:var(--accent);font-weight:700;">③</span> <span><strong style="color:var(--text)">Open tabs</strong> — <span style="color:var(--text2)">directories currently open in any tab</span></span></li>
+      </ul>
+
+      <p>Results are ranked by match quality — consecutive character matches score higher, and prefix matches get a bonus. The top 12 results are shown.</p>
+
+      <h3>Using Warp</h3>
+      <table class="shortcut-table">
+        <tr><td class="shortcut-desc">Open Warp</td><td class="shortcut-keys"><kbd>⌘K</kbd> or Jump toolbar button</td></tr>
+        <tr><td class="shortcut-desc">Navigate results</td><td class="shortcut-keys"><kbd>↑</kbd> / <kbd>↓</kbd> arrow keys</td></tr>
+        <tr><td class="shortcut-desc">Jump to selected folder</td><td class="shortcut-keys"><kbd>↩ Return</kbd></td></tr>
+        <tr><td class="shortcut-desc">Click a result</td><td class="shortcut-keys">Mouse click to jump immediately</td></tr>
+        <tr><td class="shortcut-desc">Dismiss without jumping</td><td class="shortcut-keys"><kbd>Esc</kbd> or click the backdrop</td></tr>
+      </table>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ─── 12. Command Runner ─── -->
+    <section class="section" id="command-runner">
+      <div class="section-label">Smart Features</div>
+      <h2>Command Runner</h2>
+      <p class="lead">A retractable terminal bar at the bottom of each pane lets you run shell commands in the current directory without leaving /Opus.</p>
+
+      <div class="terminal-mockup">
+        <div class="terminal-bar">
+          <span class="terminal-prompt">Projects $</span>
+          <span class="terminal-cmd">find . -name "*.swift" | wc -l</span>
+        </div>
+        <div class="terminal-output">
+          <span class="hi">87</span>
+        </div>
+      </div>
+
+      <h3>Opening the Command Runner</h3>
+      <p>Click the <strong>Terminal</strong> button in the main toolbar (top of the window), or press <kbd>⌥`</kbd> (Option + backtick) anywhere in the active pane. The button toggles the runner for whichever pane is currently active. The runner collapses automatically when you hide it.</p>
+
+      <h3>Running a Command</h3>
+      <ol class="steps">
+        <li>Type your command in the input field. The current folder's name appears as the shell prompt.</li>
+        <li>Press <kbd>↩ Return</kbd> or click the → button to run it.</li>
+        <li>Output (stdout + stderr) appears in a scrollable area below the input. You can select and copy it.</li>
+      </ol>
+
+      <p>Commands run in a <strong>login shell</strong> (your default shell from <code>$SHELL</code>) with the pane's current directory as the working directory, so aliases, path settings, and shell functions all work.</p>
+
+      <table class="shortcut-table">
+        <tr><td class="shortcut-desc">Toggle command runner</td><td class="shortcut-keys"><kbd>⌥`</kbd></td></tr>
+        <tr><td class="shortcut-desc">Run command</td><td class="shortcut-keys"><kbd>↩ Return</kbd></td></tr>
+        <tr><td class="shortcut-desc">Hide runner</td><td class="shortcut-keys"><kbd>∨</kbd> button or <kbd>⌥`</kbd> again</td></tr>
+      </table>
+
+      <div class="callout warning">
+        <div class="callout-icon">⚠️</div>
+        <p>The Command Runner runs commands directly in your shell. Long-running commands will block the runner UI until they complete. For interactive commands (editors, REPLs), open a full Terminal window instead.</p>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ─── 13. Custom Actions ─── -->
+    <section class="section" id="custom-actions">
+      <div class="section-label">Smart Features</div>
+      <h2>Actions</h2>
+      <p class="lead">Define your own shell commands and run them on selected files with a single right-click. Actions appear at the bottom of every context menu.</p>
+
+      <h3>Creating an Action</h3>
+      <ol class="steps">
+        <li>Click the <strong>⚡ Actions</strong> button in the toolbar to open the Actions manager.</li>
+        <li>Enter a <strong>Name</strong> (shown in the context menu) and a <strong>Shell command</strong>.</li>
+        <li>Click <strong>Add</strong>. The action is saved and appears immediately in the context menu.</li>
+      </ol>
+
+      <h3>Command Variables</h3>
+      <table class="shortcut-table">
+        <thead><tr><th>Variable</th><th>Expands to</th></tr></thead>
+        <tr><td><code>$@</code></td><td>Space-separated list of selected file paths including filenames (each path is shell-quoted)</td></tr>
+        <tr><td><code>$PWD</code></td><td>The current pane's directory (set automatically by the shell)</td></tr>
+      </table>
+
+      <p>Commands run in a <strong>login shell</strong>, so your <code>$PATH</code>, shell aliases, and functions all work exactly as they do in Terminal.</p>
+
+      <p><strong>Example actions:</strong></p>
+      <div class="terminal-mockup" style="font-size:12px;">
+        <div class="terminal-output" style="padding:14px 16px;">
+          <div style="margin-bottom:8px;"><span style="color:#58a6ff;">Open in VS Code</span> &nbsp;→&nbsp; <span>code $@</span></div>
+          <div style="margin-bottom:8px;"><span style="color:#58a6ff;">Compress selection</span> &nbsp;→&nbsp; <span>zip archive.zip $@</span></div>
+          <div style="margin-bottom:8px;"><span style="color:#58a6ff;">Get image info</span> &nbsp;→&nbsp; <span>sips -g all $@</span></div>
+          <div><span style="color:#58a6ff;">Convert to MP4</span> &nbsp;→&nbsp; <span>ffmpeg -i $@ output.mp4</span></div>
+        </div>
+      </div>
+
+      <h3>Managing Actions</h3>
+      <p>The Actions manager shows <strong>+</strong> / <strong>−</strong> buttons above the list:</p>
+      <ul style="margin:10px 0 14px 20px;font-size:14px;color:var(--text2);line-height:1.7;">
+        <li><strong style="color:var(--text);">+</strong> — clears the form and readies it for a new action</li>
+        <li><strong style="color:var(--text);">Click an action in the list</strong> — selects it and loads its name and command into the edit form for modification</li>
+        <li><strong style="color:var(--text);">−</strong> — deletes the selected action (no undo)</li>
+      </ul>
+      <p>Click <strong>Save</strong> in the edit form to confirm changes. After saving, the form clears automatically and returns to "New Action" ready for the next entry. Click <strong>Cancel</strong> to discard changes without saving.</p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ─── 14. Folder Size ─── -->
+    <section class="section" id="folder-size">
+      <div class="section-label">Smart Features</div>
+      <h2>Folder Size View</h2>
+      <p class="lead">Wondering what's eating your disk space? Right-click any folder and choose <strong>Show Folder Sizes</strong> to see a live bar chart of its contents, sorted largest first.</p>
+
+      <!-- Folder size mockup -->
+      <div class="mockup" style="padding:16px 20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <div>
+            <div style="font-weight:700;font-size:15px;">Folder Sizes</div>
+            <div style="font-size:11px;color:var(--text2);font-family:var(--mono);">/Users/ian/Library</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:10px;color:var(--text2);">Total</div>
+            <div style="font-size:13px;font-weight:700;font-family:var(--mono);">42.8 GB</div>
+          </div>
+        </div>
+        <div class="fsbar">
+          <span class="fsbar-icon">📁</span>
+          <span class="fsbar-name">Application Support</span>
+          <div class="fsbar-track"><div class="fsbar-fill" style="width:95%"></div></div>
+          <span class="fsbar-size">18.4 GB</span>
+        </div>
+        <div class="fsbar">
+          <span class="fsbar-icon">📁</span>
+          <span class="fsbar-name">Caches</span>
+          <div class="fsbar-track"><div class="fsbar-fill" style="width:55%;opacity:0.5"></div></div>
+          <span class="fsbar-size">10.7 GB</span>
+        </div>
+        <div class="fsbar">
+          <span class="fsbar-icon">📁</span>
+          <span class="fsbar-name">Developer</span>
+          <div class="fsbar-track"><div class="fsbar-fill" style="width:38%;opacity:0.5"></div></div>
+          <span class="fsbar-size">7.3 GB</span>
+        </div>
+        <div class="fsbar">
+          <span class="fsbar-icon">📁</span>
+          <span class="fsbar-name">Containers</span>
+          <div class="fsbar-track"><div class="fsbar-fill" style="width:18%;opacity:0.5"></div></div>
+          <span class="fsbar-size">3.4 GB</span>
+        </div>
+        <div class="fsbar">
+          <span class="fsbar-icon">📁</span>
+          <span class="fsbar-name">Mail</span>
+          <div class="fsbar-track"><div class="fsbar-fill" style="width:9%;opacity:0.4"></div></div>
+          <span class="fsbar-size">1.6 GB</span>
+        </div>
+        <div class="fsbar">
+          <span class="fsbar-icon">📄</span>
+          <span class="fsbar-name">Preferences</span>
+          <div class="fsbar-track"><div class="fsbar-fill" style="width:3%;opacity:0.4"></div></div>
+          <span class="fsbar-size">280 MB</span>
+        </div>
+      </div>
+
+      <p>The bar chart shows the top 15 items (folders and files) sorted by size. Each bar's width is proportional to the largest entry. A percentage and formatted size appear on the right.</p>
+
+      <p>Scanning runs in the background — you'll see a progress indicator while deep folders are tallied. Close the sheet at any time; scanning stops automatically. The scan includes hidden files and directories for an accurate total.</p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ─── 16. Settings ─── -->
+    <section class="section" id="settings">
+      <div class="section-label">Reference</div>
+      <h2>Settings</h2>
+      <p class="lead">Open Settings from the <strong>/Opus</strong> menu or press <kbd>⌘,</kbd>.</p>
+
+      <h3>Delete Behaviour</h3>
+      <table class="shortcut-table">
+        <thead><tr><th>Setting</th><th>Default</th><th>Description</th></tr></thead>
+        <tr>
+          <td>Skip confirmation for files</td><td>Off</td>
+          <td>Delete files without showing a confirmation dialog. Off by default as a safety net.</td>
+        </tr>
+        <tr>
+          <td>Skip confirmation for directories</td><td>Off</td>
+          <td>Delete folders without a confirmation dialog. Directories always show an item count in the alert as an extra safeguard.</td>
+        </tr>
+      </table>
+
+      <div class="callout info">
+        <div class="callout-icon">ℹ️</div>
+        <p>Deleted items are always moved to the macOS <strong>Trash</strong> — they are never permanently removed immediately. You can recover them from the Trash at any time.</p>
+      </div>
+
+      <h3>Display</h3>
+      <table class="shortcut-table">
+        <thead><tr><th>Setting</th><th>Default</th><th>Description</th></tr></thead>
+        <tr>
+          <td>Show hidden files</td><td>Off</td>
+          <td>When on, dotfiles and other hidden items (e.g. <code>.DS_Store</code>, <code>.git</code>) appear in both panes. Applies immediately and persists across restarts.</td>
+        </tr>
+        <tr>
+          <td>Show file extensions</td><td>On</td>
+          <td>When off, file extensions are hidden in the file list (e.g. <code>report.pdf</code> shows as <code>report</code>). Folders are never affected.</td>
+        </tr>
+      </table>
+
+      <h3>Startup Folders</h3>
+      <p>Control where each pane opens when /Opus launches. You can set this independently for the left and right panes.</p>
+      <table class="shortcut-table">
+        <thead><tr><th>Mode</th><th>Behaviour</th></tr></thead>
+        <tr>
+          <td><strong>Default</strong></td>
+          <td>Left pane opens Downloads; right pane opens Computer (all volumes). Recommended starting point.</td>
+        </tr>
+        <tr>
+          <td><strong>Remember Last</strong></td>
+          <td>Restores whichever folder was open when you last quit. Each pane remembers independently.</td>
+        </tr>
+        <tr>
+          <td><strong>Fixed Folder</strong></td>
+          <td>Always opens a specific folder you choose. Type a path or click <strong>Browse…</strong> to pick one. Useful for a project you return to every day.</td>
+        </tr>
+      </table>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ─── 17. Shortcuts ─── -->
+    <section class="section" id="shortcuts">
+      <div class="section-label">Reference</div>
+      <h2>Keyboard Shortcuts</h2>
+
+      <h3>Navigation</h3>
+      <table class="shortcut-table">
+        <tr><td class="shortcut-desc">Go back</td><td class="shortcut-keys"><kbd>⌘[</kbd></td></tr>
+        <tr><td class="shortcut-desc">Go forward</td><td class="shortcut-keys"><kbd>⌘]</kbd></td></tr>
+        <tr><td class="shortcut-desc">Go up one level</td><td class="shortcut-keys"><kbd>⌘↑</kbd></td></tr>
+        <tr><td class="shortcut-desc">Open selected item / enter folder</td><td class="shortcut-keys"><kbd>↩</kbd> or <kbd>Double-click</kbd></td></tr>
+        <tr><td class="shortcut-desc">Refresh current folder</td><td class="shortcut-keys"><kbd>⌘R</kbd></td></tr>
+        <tr><td class="shortcut-desc">Warp — instant folder jump</td><td class="shortcut-keys"><kbd>⌘K</kbd></td></tr>
+      </table>
+
+      <h3>Selection</h3>
+      <table class="shortcut-table">
+        <tr><td class="shortcut-desc">Select item</td><td class="shortcut-keys"><kbd>Click</kbd></td></tr>
+        <tr><td class="shortcut-desc">Add/remove from selection</td><td class="shortcut-keys"><kbd>⌘Click</kbd></td></tr>
+        <tr><td class="shortcut-desc">Range select</td><td class="shortcut-keys"><kbd>⇧Click</kbd></td></tr>
+      </table>
+
+      <h3>File Operations</h3>
+      <table class="shortcut-table">
+        <tr><td class="shortcut-desc">New Folder</td><td class="shortcut-keys"><kbd>⌘N</kbd></td></tr>
+        <tr><td class="shortcut-desc">New File</td><td class="shortcut-keys"><kbd>⌥⌘N</kbd></td></tr>
+        <tr><td class="shortcut-desc">Rename selected item</td><td class="shortcut-keys">Pencil button in toolbar (visible when 1 item selected)</td></tr>
+        <tr><td class="shortcut-desc">Move to Trash</td><td class="shortcut-keys"><kbd>⌘⌫</kbd></td></tr>
+        <tr><td class="shortcut-desc">Quick Look selected file(s)</td><td class="shortcut-keys"><kbd>Space</kbd></td></tr>
+      </table>
+
+      <h3>View &amp; Sidebar</h3>
+      <table class="shortcut-table">
+        <tr><td class="shortcut-desc">Toggle sidebar</td><td class="shortcut-keys"><kbd>⌥⌘S</kbd></td></tr>
+        <tr><td class="shortcut-desc">Bookmark current folder</td><td class="shortcut-keys">Bookmark toolbar button</td></tr>
+      </table>
+
+      <h3>Tabs</h3>
+      <table class="shortcut-table">
+        <tr><td class="shortcut-desc">New tab</td><td class="shortcut-keys"><kbd>⌘T</kbd></td></tr>
+        <tr><td class="shortcut-desc">Close current tab</td><td class="shortcut-keys"><kbd>⌘⇧W</kbd></td></tr>
+      </table>
+
+      <h3>Developer Tools</h3>
+      <table class="shortcut-table">
+        <tr><td class="shortcut-desc">Toggle command runner</td><td class="shortcut-keys"><kbd>⌥`</kbd></td></tr>
+        <tr><td class="shortcut-desc">Open Settings</td><td class="shortcut-keys"><kbd>⌘,</kbd></td></tr>
+        <tr><td class="shortcut-desc">Open User Guide</td><td class="shortcut-keys"><kbd>⌘?</kbd> (Help menu)</td></tr>
+      </table>
+    </section>
+
+  </div><!-- /content -->
+</main>
+
+<footer>
+  <div>
+    <strong>/Opus</strong> · Dual-Pane File Manager for macOS
+  </div>
+  <div style="color:var(--text2);">
+    User Guide · Version 1.17 · Build 39 · macOS 13+
+  </div>
+</footer>
+
+<script>
+// Highlight active nav item based on scroll position
+const sections = document.querySelectorAll('section[id]');
+const navItems = document.querySelectorAll('.nav-item');
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      navItems.forEach(a => a.classList.remove('active'));
+      const link = document.querySelector('.nav-item[href="#' + entry.target.id + '"]');
+      if (link) link.classList.add('active');
+    }
+  });
+}, { rootMargin: '-30% 0px -60% 0px' });
+
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+{
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/DOpusMacApp.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DOpusMacApp.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DOpusMacApp.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DOpusMacApp.dia",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DOpusMacApp.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DOpusMacApp.swiftdeps"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/CustomActionsSettingsView.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CustomActionsSettingsView.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CustomActionsSettingsView.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CustomActionsSettingsView.dia",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CustomActionsSettingsView.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CustomActionsSettingsView.swiftdeps"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/DividerBadge.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DividerBadge.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DividerBadge.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DividerBadge.dia",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DividerBadge.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/DividerBadge.swiftdeps"
+  }
+}

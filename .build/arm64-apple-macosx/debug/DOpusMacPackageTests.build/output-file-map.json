@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacPackageTests.build/primary.swiftdeps"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacPackageTests.derived/runner.swift": {
+    "dependencies": "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacPackageTests.build/runner.d",
+    "object": "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacPackageTests.build/runner.swift.o",
+    "swiftmodule": "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacPackageTests.build/runner~partial.swiftmodule",
+    "swift-dependencies": "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacPackageTests.build/runner.swiftdeps",
+    "diagnostics": "/Users/ian.callicott/Documents/coding/DOpusMac/.build/arm64-apple-macosx/debug/DOpusMacPackageTests.build/runner.dia"
+  }
+}

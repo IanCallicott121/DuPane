@@ -1,0 +1,23 @@
+{
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Models/CustomActionsModel.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CustomActionsModel.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CustomActionsModel.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CustomActionsModel.dia",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CustomActionsModel.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CustomActionsModel.swiftdeps"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/CommandRunnerView.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CommandRunnerView.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CommandRunnerView.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CommandRunnerView.dia",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CommandRunnerView.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/CommandRunnerView.swiftdeps"
+  },
+  "/Users/ian.callicott/Documents/coding/DOpusMac/Sources/DOpusMac/Views/ContentView.swift" : {
+    "const-values" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/ContentView.swiftconstvalues",
+    "dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/ContentView.d",
+    "diagnostics" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/ContentView.dia",
+    "object" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/ContentView.o",
+    "swift-dependencies" : "/Users/ian.callicott/Documents/coding/DOpusMac/.build/XcodeDerivedData/Build/Intermediates.noindex/DOpusMac.build/Debug/DOpusMac.build/Objects-normal/arm64/ContentView.swiftdeps"
+  }
+}
