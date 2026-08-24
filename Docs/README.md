@@ -9,33 +9,48 @@ trashes actual files.
 **Dual-pane layout**
 - Left pane opens at `~/Downloads` by default; right pane shows "Computer" — a
   live list of every mounted volume.
-- Each pane is fully independent: its own location, sort, filter, and selection.
+- Each pane is fully independent: its own location, tabs, sort, filter, and
+  selection.
 
 **Navigation**
 - Back, forward, and up buttons with a real per-pane history stack.
 - Clickable breadcrumb trail from Computer down to the current folder.
+- Per-pane tab strip with drag-to-reorder and right-click rename plus Pin/Unpin;
+  pinned tabs show a small pin icon, recall the folder captured when pinned,
+  and reopen on launch even outside Remember Last startup mode.
 - Double-click a folder to enter it.
 
 **File list**
-- Sortable columns: Name, Size, Kind, Modified — click a header to sort,
+- Sortable columns: Name, Size, Kind, Modified, Info — click a header to sort,
   click again to reverse.
+- Optional metadata columns can be shown, hidden, reordered, and resized.
 - Per-pane filter box for fast narrowing by filename (case-insensitive).
+- Finder tags appear as colour dots, and the sidebar Tags section can filter
+  both panes by one tag or multiple Command-clicked tags.
 - Native multi-select: single click, ⌘-click (toggle), shift-click (range).
 - Status bar shows item count, selection count, and total size of selected files.
 
 **File operations**
 - **Move Selected / Copy Selected** — global toolbar buttons act on the active
-  pane's selection, targeting the other pane's current folder.
+  pane's selected files or folders, targeting the other pane's current folder.
+- Drag selected items between panes; plain drag moves, Option-drag copies.
+- Conflicts offer Overwrite, Skip, or Keep Both.
+- **Compare / Sync** — compare both active folders, highlight missing/newer/
+  different rows, and sync eligible changes left-to-right or right-to-left after
+  a confirmation preview.
 - **New Folder** (⌘N) — prompts for a name and creates it in the active pane.
 - **Delete** (⌘⌫) — moves selected items to Trash after a confirmation prompt.
-- **Rename** — right-click a file and choose Rename, or use the context menu.
+- **Rename** — select one item and use the toolbar, or right-click and choose Rename.
 - **Reveal in Finder** — right-click any item.
 - Double-click a file to open it in its default app via `NSWorkspace`.
 - Toast notifications confirm completed operations.
 
 **Known limitations**
-- No drag-and-drop between panes yet — use the toolbar or context menu instead.
-- Move/Copy operates on selected files only; selected folders are skipped.
+- Compare / Sync is shallow current-folder only; recursive folder diff,
+  hash-based comparison, delete mirroring, and existing-folder overwrites are
+  deferred.
+- Some toolbar file operations still run synchronously and need progress UI for
+  large batches.
 - Breadcrumbs show raw folder names (e.g. `/` rather than "Macintosh HD").
 - Deployment target is macOS 13 (Ventura).
 
@@ -68,6 +83,15 @@ swift test
 Open `DOpusMac.xcodeproj` in Xcode and press ⌘U, or use the Test navigator.
 The UI test scheme (`DOpusMacEndToEndUITests`) launches a real instance of the
 app against a temporary fixture directory.
+
+**Test run policy**
+
+Use `swift test --disable-sandbox` for the standard no-UI suite. Run the
+critical UI subset after functional-area changes, broad change sets, or any
+request for full tests. Critical UI tests are tagged by the `testCritical`
+method-name prefix in `DOpusMacEndToEndUITests`; run the whole UI suite when a
+change touches launch, accessibility, file-list input, dialogs, or Xcode project
+test configuration.
 
 **First-run permissions**
 

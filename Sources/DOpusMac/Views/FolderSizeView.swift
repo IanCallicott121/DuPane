@@ -30,10 +30,6 @@ struct FolderSizeView: View {
                             .font(.system(size: 12, weight: .semibold, design: .monospaced))
                     }
                 }
-                Button("Done", action: onDismiss)
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
-                    .keyboardShortcut(.defaultAction)
             }
             .padding(.horizontal, 16)
             .padding(.top, 16)
@@ -67,6 +63,15 @@ struct FolderSizeView: View {
                     .padding(.vertical, 8)
                 }
             }
+            Divider()
+
+            HStack {
+                Spacer()
+                Button("Done", action: onDismiss)
+                    .keyboardShortcut(.defaultAction)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
         }
         .frame(width: 480, height: 380)
         .onAppear { viewModel.scan(url: folderURL) }

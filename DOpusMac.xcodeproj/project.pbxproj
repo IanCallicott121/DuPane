@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0154D69AD16469090C7E3139 /* WarpSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8CDBE3BC3CA2212EE62664B /* WarpSearchViewModel.swift */; };
+		06C8D7F8DB229F7C6C124AAE /* DragSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 024ACF751012474242A4CFEA /* DragSession.swift */; };
 		160531C92641B80290200B17 /* TabbedPaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF829F5CEA93B65BC5DD80DD /* TabbedPaneView.swift */; };
 		190363FCDA2D3E4EE6C4EC61 /* AppLaunchConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53895C4C70A28982F42E5CC5 /* AppLaunchConfiguration.swift */; };
 		1FD4C9A9510AC05D48A51878 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1FCAFC159B3C62AA703FF4 /* SidebarView.swift */; };
@@ -29,13 +29,16 @@
 		B12EE5E58C43627F1074686A /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = B62D456E0AEAAA0841607BBA /* AppSettings.swift */; };
 		B1FB6D8205F8FA765A53A1C3 /* AppNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40AB477693CC07066740989C /* AppNotifications.swift */; };
 		C0799D0B25F9B95126879A45 /* CustomActionsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA07523AA716E51CC23B5B69 /* CustomActionsSettingsView.swift */; };
-		C1DC536E301D71AB00553B45 /* DragSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1DC536D301D71AA00553B45 /* DragSession.swift */; };
+		C1067881301FD69F00DB8FF3 /* ColumnResizeHandle.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1067880301FD69F00DB8FF3 /* ColumnResizeHandle.swift */; };
+		C10678833020F23900DB8FF3 /* PropertiesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10678823020F23900DB8FF3 /* PropertiesView.swift */; };
+		C14436B1302A6FC1001F14EE /* FolderCompareService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C14436B0302A6FC1001F14EE /* FolderCompareService.swift */; };
+		C14436B3302F4E16001F14EE /* DuplicateFinderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C14436B2302F4E16001F14EE /* DuplicateFinderViewModel.swift */; };
+		C14436B5302F4E2C001F14EE /* DuplicateFinderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C14436B4302F4E2C001F14EE /* DuplicateFinderView.swift */; };
 		C45D7429D0F95157EE630D30 /* TextPromptSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA62FE014CE065E9A734479 /* TextPromptSheet.swift */; };
 		C8E234C93CF748E42BDC141B /* DOpusMacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188031451E636B5A4568872 /* DOpusMacApp.swift */; };
 		C9F9F1137AAF6E5359EEC891 /* RowMouseEventView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 066DA313A81C17892873C1BB /* RowMouseEventView.swift */; };
 		CD3AD85E250A1AA1A6B380F2 /* SmartMetadataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23C9DF73718E87AA7638F2E3 /* SmartMetadataService.swift */; };
 		D0E2E22018B7EA6033A1ABB2 /* FileRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 597EF2F9F72BA7A13D23E61D /* FileRowView.swift */; };
-		D58CC9E704D7CB9C999F88D8 /* WarpSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1411B4C44E6F89786102047D /* WarpSearchView.swift */; };
 		DF326056ADE6624DAFB145A1 /* FolderSizeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AABC72CDC050188E2E79348 /* FolderSizeView.swift */; };
 		E09233F4340E0DECF21F9758 /* PaneState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4D06112CFB9137EB63B5454 /* PaneState.swift */; };
 		ECC69A81922FC4122EA2F3B5 /* PaneSide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B90B0ACDB4F7CAEF26056D1 /* PaneSide.swift */; };
@@ -56,9 +59,9 @@
 /* Begin PBXFileReference section */
 		004BD234DAC77AF8505C0FE5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		01DDA2CC40E5319402BB8599 /* PaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaneView.swift; sourceTree = "<group>"; };
+		024ACF751012474242A4CFEA /* DragSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DragSession.swift; sourceTree = "<group>"; };
 		066DA313A81C17892873C1BB /* RowMouseEventView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RowMouseEventView.swift; sourceTree = "<group>"; };
 		1042FE2310A11B1D327E60C1 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		1411B4C44E6F89786102047D /* WarpSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarpSearchView.swift; sourceTree = "<group>"; };
 		1AABC72CDC050188E2E79348 /* FolderSizeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderSizeView.swift; sourceTree = "<group>"; };
 		23C9DF73718E87AA7638F2E3 /* SmartMetadataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartMetadataService.swift; sourceTree = "<group>"; };
 		283143C0CCA8DBBC3B6A4F13 /* DOpusMacEndToEndUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DOpusMacEndToEndUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -83,8 +86,11 @@
 		ACDF7B343D44A51CAC660BBE /* QuickLookCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickLookCoordinator.swift; sourceTree = "<group>"; };
 		B62D456E0AEAAA0841607BBA /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		BB1FCAFC159B3C62AA703FF4 /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
-		C1DC536D301D71AA00553B45 /* DragSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DragSession.swift; sourceTree = "<group>"; };
-		C8CDBE3BC3CA2212EE62664B /* WarpSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarpSearchViewModel.swift; sourceTree = "<group>"; };
+		C1067880301FD69F00DB8FF3 /* ColumnResizeHandle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColumnResizeHandle.swift; sourceTree = "<group>"; };
+		C10678823020F23900DB8FF3 /* PropertiesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PropertiesView.swift; sourceTree = "<group>"; };
+		C14436B0302A6FC1001F14EE /* FolderCompareService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderCompareService.swift; sourceTree = "<group>"; };
+		C14436B2302F4E16001F14EE /* DuplicateFinderViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuplicateFinderViewModel.swift; sourceTree = "<group>"; };
+		C14436B4302F4E2C001F14EE /* DuplicateFinderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuplicateFinderView.swift; sourceTree = "<group>"; };
 		CF5FDA5A85DB03DB98022E7B /* PaneStatusFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaneStatusFormatter.swift; sourceTree = "<group>"; };
 		D19B8EAD7096D1EF1069DCBE /* project.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = project.yml; sourceTree = "<group>"; };
 		D76C1DA844CB7919D0C9AA59 /* DividerBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DividerBadge.swift; sourceTree = "<group>"; };
@@ -125,7 +131,7 @@
 				2AE46D268E463B795E40491C /* FolderSizeViewModel.swift */,
 				A4D06112CFB9137EB63B5454 /* PaneState.swift */,
 				3F556D8EE1829E239ECC1BEF /* TabbedPaneState.swift */,
-				C8CDBE3BC3CA2212EE62664B /* WarpSearchViewModel.swift */,
+				C14436B2302F4E16001F14EE /* DuplicateFinderViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -169,7 +175,9 @@
 				BB1FCAFC159B3C62AA703FF4 /* SidebarView.swift */,
 				FF829F5CEA93B65BC5DD80DD /* TabbedPaneView.swift */,
 				8BA62FE014CE065E9A734479 /* TextPromptSheet.swift */,
-				1411B4C44E6F89786102047D /* WarpSearchView.swift */,
+				C1067880301FD69F00DB8FF3 /* ColumnResizeHandle.swift */,
+				C10678823020F23900DB8FF3 /* PropertiesView.swift */,
+				C14436B4302F4E2C001F14EE /* DuplicateFinderView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -191,6 +199,7 @@
 				40AB477693CC07066740989C /* AppNotifications.swift */,
 				B62D456E0AEAAA0841607BBA /* AppSettings.swift */,
 				79311C96D7729B5D1F623EE2 /* CustomActionsModel.swift */,
+				024ACF751012474242A4CFEA /* DragSession.swift */,
 				FCC3D5E60D09AC656E2909DC /* FileItem.swift */,
 				2FF13EF2C3F104AE76E8C143 /* FileOperationService.swift */,
 				4B90B0ACDB4F7CAEF26056D1 /* PaneSide.swift */,
@@ -198,7 +207,7 @@
 				E00B8C44B2618F3C7EF4964A /* SidebarModel.swift */,
 				23C9DF73718E87AA7638F2E3 /* SmartMetadataService.swift */,
 				29981D0AB79444E1ABC9730B /* SortKey.swift */,
-				C1DC536D301D71AA00553B45 /* DragSession.swift */,
+				C14436B0302A6FC1001F14EE /* FolderCompareService.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -325,8 +334,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C14436B5302F4E2C001F14EE /* DuplicateFinderView.swift in Sources */,
+				C14436B1302A6FC1001F14EE /* FolderCompareService.swift in Sources */,
 				190363FCDA2D3E4EE6C4EC61 /* AppLaunchConfiguration.swift in Sources */,
+				C1067881301FD69F00DB8FF3 /* ColumnResizeHandle.swift in Sources */,
 				B1FB6D8205F8FA765A53A1C3 /* AppNotifications.swift in Sources */,
+				C10678833020F23900DB8FF3 /* PropertiesView.swift in Sources */,
 				B12EE5E58C43627F1074686A /* AppSettings.swift in Sources */,
 				5BE9471D6FF24C70E7F92671 /* CommandRunnerView.swift in Sources */,
 				275913E3B9EDB94C04C1EE1B /* ContentView.swift in Sources */,
@@ -334,18 +347,19 @@
 				C0799D0B25F9B95126879A45 /* CustomActionsSettingsView.swift in Sources */,
 				C8E234C93CF748E42BDC141B /* DOpusMacApp.swift in Sources */,
 				2FDC643129C95A746BF397FA /* DividerBadge.swift in Sources */,
+				06C8D7F8DB229F7C6C124AAE /* DragSession.swift in Sources */,
 				3602D64A33DD2006A607F0FF /* FileItem.swift in Sources */,
 				8978AE51E421FF3B8D0D1629 /* FileOperationService.swift in Sources */,
 				D0E2E22018B7EA6033A1ABB2 /* FileRowView.swift in Sources */,
 				DF326056ADE6624DAFB145A1 /* FolderSizeView.swift in Sources */,
 				359724AAB6DC2C1959768C64 /* FolderSizeViewModel.swift in Sources */,
-				C1DC536E301D71AB00553B45 /* DragSession.swift in Sources */,
 				5AE9F3D68C8A93B444D66EF0 /* GlobalToolbar.swift in Sources */,
 				ECC69A81922FC4122EA2F3B5 /* PaneSide.swift in Sources */,
 				E09233F4340E0DECF21F9758 /* PaneState.swift in Sources */,
 				6ED065770AB9287A03A0AB26 /* PaneStatusFormatter.swift in Sources */,
 				5950B259F444B38A611B985B /* PaneView.swift in Sources */,
 				F83C680FDEB6F88197AFFFA0 /* QuickLookCoordinator.swift in Sources */,
+				C14436B3302F4E16001F14EE /* DuplicateFinderViewModel.swift in Sources */,
 				C9F9F1137AAF6E5359EEC891 /* RowMouseEventView.swift in Sources */,
 				F70122138C2FD54EB5C8D4D5 /* SettingsView.swift in Sources */,
 				7A53582FC90AD8D58840A77F /* SidebarModel.swift in Sources */,
@@ -355,8 +369,6 @@
 				4BA27692CC9E4D531417B724 /* TabbedPaneState.swift in Sources */,
 				160531C92641B80290200B17 /* TabbedPaneView.swift in Sources */,
 				C45D7429D0F95157EE630D30 /* TextPromptSheet.swift in Sources */,
-				D58CC9E704D7CB9C999F88D8 /* WarpSearchView.swift in Sources */,
-				0154D69AD16469090C7E3139 /* WarpSearchViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -376,6 +388,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -481,6 +494,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

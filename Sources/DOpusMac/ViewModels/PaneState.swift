@@ -16,15 +16,24 @@ final class PaneState: ObservableObject {
     @Published var sortKey: SortKey = .name
     @Published var sortAscending: Bool = true
     @Published var filterText: String = ""
+    @Published var activeTagFilters: Set<String> = []
     @Published var errorMessage: String?
     @Published var isLoading: Bool = false
     @Published var showCommandRunner: Bool = false
     @Published var requestRename: Bool = false
+    @Published var requestGoToPath: Bool = false
+    @Published private(set) var searchResults: [FileItem]? = nil
+    @Published private(set) var isSearching: Bool = false
+    var isInSearchMode: Bool { searchResults != nil || isSearching }
     var showHiddenFiles: Bool = false
+    var showHiddenFolders: Bool = false
 
     private var history: [URL?]
     private var historyIndex: Int = 0
     private var selectionAnchor: URL?
+    private var spotlightQuery: NSMetadataQuery?
+    private var spotlightObservers: [NSObjectProtocol] = []
+    private var searchRootURL: URL?
 
     /// Tracks the in-flight directory load so callers can await it and stale
     /// loads can be cancelled when the user navigates before they finish.
@@ -39,12 +48,24 @@ final class PaneState: ObservableObject {
     var canGoForward: Bool { historyIndex < history.count - 1 }
     var canGoUp: Bool { currentURL != nil }
 
+    /// All real folder URLs visited in this pane's session history, oldest first.
+    var recentURLs: [URL] { history.compactMap { $0 } }
+
     /// "Computer" plus each real path component, with the implicit /Volumes
     /// segment hidden so a card at /Volumes/SD-512-1 reads as Computer › SD-512-1.
     var breadcrumbs: [(label: String, url: URL?)] {
         var crumbs: [(label: String, url: URL?)] = [("Computer", nil)]
         guard let url = currentURL else { return crumbs }
-        let components = url.standardizedFileURL.pathComponents.filter { $0 != "/" }
+        let standardized = url.standardizedFileURL
+        let components = standardized.pathComponents.filter { $0 != "/" }
+        // Paths not under /Volumes are on the boot volume. Inject its name so the
+        // breadcrumb reads "Computer / Macintosh HD / …" instead of just "Computer / …".
+        let isOnBootVolume = !standardized.path.hasPrefix("/Volumes/") && standardized.path != "/Volumes"
+        if isOnBootVolume {
+            let rootURL = URL(fileURLWithPath: "/")
+            let volumeName = (try? rootURL.resourceValues(forKeys: [.volumeNameKey]))?.volumeName ?? "/"
+            crumbs.append((volumeName, rootURL))
+        }
         var running = URL(fileURLWithPath: "/")
         for component in components {
             running.appendPathComponent(component)
@@ -57,9 +78,20 @@ final class PaneState: ObservableObject {
     }
 
     var displayedItems: [FileItem] {
-        var result = items
-        if !filterText.isEmpty {
-            result = result.filter { $0.name.localizedCaseInsensitiveContains(filterText) }
+        var result = searchResults ?? items
+        if searchResults == nil {
+            if !activeTagFilters.isEmpty {
+                result = result.filter { item in
+                    item.tags.contains {
+                        itemTag in activeTagFilters.contains {
+                            FinderTagMetadata.matches(itemTag: itemTag, selectedTag: $0)
+                        }
+                    }
+                }
+            }
+            if !filterText.isEmpty {
+                result = result.filter { $0.name.localizedCaseInsensitiveContains(filterText) }
+            }
         }
         result.sort { a, b in
             if a.isDirectory != b.isDirectory { return a.isDirectory }
@@ -91,12 +123,12 @@ final class PaneState: ObservableObject {
 
     /// Selected items that are files only — used for byte-count display.
     var selectedFileItems: [FileItem] {
-        items.filter { selection.contains($0.url) && !$0.isDirectory }
+        (searchResults ?? items).filter { selection.contains($0.url) && !$0.isDirectory }
     }
 
     /// All selected items including folders — used for move/copy/delete.
     var selectedItems: [FileItem] {
-        items.filter { selection.contains($0.url) }
+        (searchResults ?? items).filter { selection.contains($0.url) }
     }
 
     func start() {
@@ -111,12 +143,13 @@ final class PaneState: ObservableObject {
         isLoading = true
         let urlToLoad = currentURL
         let showHidden = showHiddenFiles
+        let showHiddenFolders = self.showHiddenFolders
         loadingTask = Task {
             do {
                 let loaded: [FileItem]
                 if let url = urlToLoad {
                     loaded = try await Task.detached(priority: .userInitiated) {
-                        try PaneState.loadFolder(url, showHidden: showHidden)
+                        try PaneState.loadFolder(url, showHidden: showHidden, showHiddenFolders: showHiddenFolders)
                     }.value
                 } else {
                     loaded = await Task.detached(priority: .userInitiated) {
@@ -138,6 +171,7 @@ final class PaneState: ObservableObject {
     }
 
     func navigate(to url: URL?, pushHistory: Bool = true) {
+        endDeepSearch()
         currentURL = url
         selection.removeAll()
         selectionAnchor = nil
@@ -158,19 +192,23 @@ final class PaneState: ObservableObject {
 
     func goBack() {
         guard canGoBack else { return }
+        endDeepSearch()
         historyIndex -= 1
         currentURL = history[historyIndex]
         selection.removeAll()
         selectionAnchor = nil
+        filterText = ""
         load()
     }
 
     func goForward() {
         guard canGoForward else { return }
+        endDeepSearch()
         historyIndex += 1
         currentURL = history[historyIndex]
         selection.removeAll()
         selectionAnchor = nil
+        filterText = ""
         load()
     }
 
@@ -231,28 +269,117 @@ final class PaneState: ObservableObject {
         selection = Set(displayedItems.map { $0.url })
     }
 
-    func rename(item: FileItem, to newName: String) {
+    @discardableResult
+    func rename(item: FileItem, to newName: String) -> Task<Void, Never>? {
         let trimmed = newName.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty, trimmed != item.name else { return }
+        guard !trimmed.isEmpty, trimmed != item.name else { return nil }
         guard !trimmed.contains("/") else {
             errorMessage = "Name cannot contain '/'"
-            return
+            return nil
         }
         let newURL = item.url.deletingLastPathComponent().appendingPathComponent(trimmed)
-        do {
-            try FileManager.default.moveItem(at: item.url, to: newURL)
-            load()
-            selection = [newURL]
-            selectionAnchor = newURL
-            if let url = currentURL {
-                NotificationCenter.default.post(name: .paneContentsChanged,
-                                                object: nil,
-                                                userInfo: ["url": url])
+        let folderURL = currentURL
+        return Task.detached {
+            do {
+                try FileManager.default.moveItem(at: item.url, to: newURL)
+                await MainActor.run {
+                    if self.isInSearchMode { self.endDeepSearch() }
+                    self.load()
+                    self.selection = [newURL]
+                    self.selectionAnchor = newURL
+                    if let url = folderURL {
+                        NotificationCenter.default.post(name: .paneContentsChanged,
+                                                        object: nil,
+                                                        userInfo: ["url": url])
+                    }
+                }
+            } catch {
+                await MainActor.run {
+                    self.errorMessage = "Couldn't rename \(item.name): \(error.localizedDescription)"
+                }
             }
-        } catch {
-            errorMessage = "Couldn't rename \(item.name): \(error.localizedDescription)"
         }
     }
+
+    // MARK: - Deep Search
+
+    func beginDeepSearch(query: String) {
+        guard let rootURL = currentURL else { return }
+        endDeepSearch()
+        isSearching = true
+        searchRootURL = rootURL
+
+        let q = NSMetadataQuery()
+        q.searchScopes = [rootURL]
+        q.predicate = NSPredicate(format: "%K LIKE[cd] %@", NSMetadataItemFSNameKey, "*\(query)*")
+        q.operationQueue = .main
+
+        let center = NotificationCenter.default
+        spotlightObservers = [
+            center.addObserver(forName: .NSMetadataQueryGatheringProgress, object: q, queue: .main) { [weak self] _ in
+                Task { @MainActor [weak self] in self?.applySearchResults() }
+            },
+            center.addObserver(forName: .NSMetadataQueryDidFinishGathering, object: q, queue: .main) { [weak self] _ in
+                Task { @MainActor [weak self] in
+                    self?.applySearchResults()
+                    self?.isSearching = false
+                }
+            },
+            center.addObserver(forName: .NSMetadataQueryDidUpdate, object: q, queue: .main) { [weak self] _ in
+                Task { @MainActor [weak self] in self?.applySearchResults() }
+            }
+        ]
+        spotlightQuery = q
+        q.start()
+    }
+
+    private func applySearchResults() {
+        guard let q = spotlightQuery, let rootURL = searchRootURL else { return }
+        q.disableUpdates()
+        var results: [FileItem] = []
+        for i in 0..<q.resultCount {
+            guard let mdItem = q.result(at: i) as? NSMetadataItem,
+                  let path = mdItem.value(forAttribute: NSMetadataItemPathKey) as? String
+            else { continue }
+            let url = URL(fileURLWithPath: path)
+            guard url != rootURL else { continue }
+            let name = mdItem.value(forAttribute: NSMetadataItemFSNameKey) as? String ?? url.lastPathComponent
+            let size = (mdItem.value(forAttribute: NSMetadataItemFSSizeKey) as? NSNumber)?.int64Value
+            let modified = mdItem.value(forAttribute: NSMetadataItemFSContentChangeDateKey) as? Date
+            var isDir: ObjCBool = false
+            FileManager.default.fileExists(atPath: path, isDirectory: &isDir)
+            let kind = isDir.boolValue
+                ? "Folder"
+                : (url.pathExtension.isEmpty ? "File" : url.pathExtension.uppercased() + " File")
+            results.append(FileItem(
+                id: url, name: name, url: url,
+                isDirectory: isDir.boolValue, isVolume: false, isRemovable: false,
+                size: isDir.boolValue ? nil : size,
+                kind: kind, modified: modified, tags: [],
+                isRestricted: isDir.boolValue && !FileManager.default.isReadableFile(atPath: path)
+            ))
+        }
+        q.enableUpdates()
+        searchResults = results
+    }
+
+    func endDeepSearch() {
+        guard spotlightQuery != nil || searchResults != nil || isSearching else { return }
+        spotlightObservers.forEach { NotificationCenter.default.removeObserver($0) }
+        spotlightObservers = []
+        spotlightQuery?.stop()
+        spotlightQuery = nil
+        searchRootURL = nil
+        searchResults = nil
+        isSearching = false
+    }
+
+#if DEBUG
+    func _setSearchResults(_ results: [FileItem]?) {
+        searchResults = results
+        isSearching = false
+    }
+#endif
 
     // MARK: - Loading
 
@@ -277,17 +404,18 @@ final class PaneState: ObservableObject {
     }
 
     /// Thread-safe: reads only from FileManager, no actor-isolated state.
-    nonisolated static func loadFolder(_ url: URL, showHidden: Bool = false) throws -> [FileItem] {
+    nonisolated static func loadFolder(_ url: URL, showHidden: Bool = false, showHiddenFolders: Bool = false) throws -> [FileItem] {
         let keys: [URLResourceKey] = [
             .isDirectoryKey, .fileSizeKey, .contentModificationDateKey,
             .localizedTypeDescriptionKey, .tagNamesKey
         ]
-        let options: FileManager.DirectoryEnumerationOptions = showHidden ? [] : [.skipsHiddenFiles]
+        let needsAllItems = showHidden || showHiddenFolders
+        let options: FileManager.DirectoryEnumerationOptions = needsAllItems ? [] : [.skipsHiddenFiles]
         let fileManager = FileManager.default
         let raw = try fileManager.contentsOfDirectory(
             at: url, includingPropertiesForKeys: keys, options: options
         )
-        return raw.map { itemURL in
+        let mapped = raw.map { itemURL in
             let values = try? itemURL.resourceValues(forKeys: Set(keys))
             var isDirectory: ObjCBool = false
             let exists = fileManager.fileExists(atPath: itemURL.path, isDirectory: &isDirectory)
@@ -306,6 +434,10 @@ final class PaneState: ObservableObject {
                 isRestricted: isDir && !fileManager.isReadableFile(atPath: itemURL.path)
             )
         }
+        if showHiddenFolders && !showHidden {
+            return mapped.filter { !$0.name.hasPrefix(".") || $0.isDirectory }
+        }
+        return mapped
     }
 }
 

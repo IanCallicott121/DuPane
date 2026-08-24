@@ -6,19 +6,30 @@ struct DOpusMacApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var settings = AppSettings()
 
+    init() {
+        NSWindow.allowsAutomaticWindowTabbing = false
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView(configuration: .current())
                 .frame(minWidth: 960, minHeight: 620)
                 .environmentObject(settings)
+                .preferredColorScheme(settings.appColorMode.preferredColorScheme)
+                .accentColor(settings.appColorScheme.accentColor)
         }
         .commands {
             CommandGroup(replacing: .help) {
-                Button("Open User Guide") {
+                Button("Open DuPane User Guide") {
                     openUserGuide()
                 }
                 .keyboardShortcut("?", modifiers: .command)
+
+                Button("Open DuPane FAQs") {
+                    openFAQs()
+                }
             }
+            CommandGroup(replacing: .windowArrangement) {}
         }
 
         Settings {
@@ -26,28 +37,25 @@ struct DOpusMacApp: App {
         }
     }
 
-    private func openUserGuide() {
-        // Look for the HTML guide next to the app bundle, then in the source tree
+    private func openDoc(_ filename: String) {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("Docs")
         let candidates: [URL] = [
-            Bundle.main.bundleURL
-                .deletingLastPathComponent()
-                .appendingPathComponent("UserGuide.html"),
-            Bundle.main.resourceURL?
-                .appendingPathComponent("UserGuide.html"),
-            // Development path relative to project root
-            URL(fileURLWithPath: #filePath)
-                .deletingLastPathComponent()   // DOpusMacApp.swift dir
-                .deletingLastPathComponent()   // Sources/DOpusMac
-                .deletingLastPathComponent()   // Sources
-                .deletingLastPathComponent()   // project root
-                .appendingPathComponent("Docs/UserGuide.html")
+            Bundle.main.bundleURL.deletingLastPathComponent().appendingPathComponent(filename),
+            Bundle.main.resourceURL?.appendingPathComponent(filename),
+            root.appendingPathComponent(filename)
         ].compactMap { $0 }
-
         for url in candidates where FileManager.default.fileExists(atPath: url.path) {
             NSWorkspace.shared.open(url)
             return
         }
     }
+
+    private func openUserGuide() { openDoc("UserGuide.html") }
+    private func openFAQs() { openDoc("FAQs.html") }
 }
 
 /// Ensures normal app behaviour (Dock icon, frontmost window) when running
@@ -58,8 +66,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.regular)
         NSApp.activate(ignoringOtherApps: true)
+        NSWindow.allowsAutomaticWindowTabbing = false
         for window in NSApp.windows {
             window.titleVisibility = .hidden
+            window.tabbingMode = .disallowed
+            if let frameStr = UserDefaults.standard.string(forKey: "mainWindowFrame") {
+                window.setFrame(NSRectFromString(frameStr), display: true)
+            } else if let screen = NSScreen.main {
+                window.setFrame(screen.visibleFrame, display: true)
+            }
             window.makeKeyAndOrderFront(nil)
         }
 
@@ -74,8 +89,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
-        if let monitor = keyEventMonitor {
-            NSEvent.removeMonitor(monitor)
+        if let monitor = keyEventMonitor { NSEvent.removeMonitor(monitor) }
+        for window in NSApp.windows {
+            UserDefaults.standard.set(NSStringFromRect(window.frame), forKey: "mainWindowFrame")
         }
     }
 }

@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DuPane — FAQs</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #f5f5f7;
+    --surface2: #e8e8ed;
+    --border: #d2d2d7;
+    --text: #1d1d1f;
+    --text2: #6e6e73;
+    --accent: #0071e3;
+    --accent-light: #e8f0fe;
+    --sidebar-w: 240px;
+    --radius: 12px;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+    --mono: "SF Mono", "Fira Code", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1e; --surface: #2c2c2e; --surface2: #3a3a3c;
+      --border: #48484a; --text: #f5f5f7; --text2: #98989d;
+      --accent: #2997ff; --accent-light: #0a2147;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font); font-size: 15px; line-height: 1.6; color: var(--text); background: var(--bg); display: flex; width: 100%; min-height: 100vh; }
+
+  .sidebar {
+    position: fixed; top: 0; left: 0; width: var(--sidebar-w);
+    height: 100vh; background: var(--surface); border-right: 1px solid var(--border);
+    overflow-y: auto; z-index: 100; padding: 24px 0;
+  }
+  .sidebar-logo { padding: 0 20px 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+  .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent), #5e5ce6); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; font-weight: 800; letter-spacing: -1px; flex-shrink: 0; }
+  .sidebar-logo-text { font-size: 16px; font-weight: 700; color: var(--text); }
+  .sidebar-logo-sub { font-size: 11px; color: var(--text2); }
+  .nav-section { padding: 4px 0; }
+  .nav-heading { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text2); padding: 12px 20px 4px; }
+  .nav-item { display: block; padding: 6px 20px; font-size: 13px; color: var(--text2); text-decoration: none; border-radius: 0; transition: all 0.1s; }
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+
+  .main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; }
+  .hero { background: linear-gradient(135deg, #0071e3 0%, #5e5ce6 50%, #af52de 100%); padding: 60px 60px 48px; color: white; }
+  .hero-badge { display: inline-block; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 4px 14px; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; margin-bottom: 16px; }
+  .hero h1 { font-size: 42px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 12px; }
+  .hero h1 span { opacity: 0.7; }
+  .hero p { font-size: 16px; color: rgba(255,255,255,0.88); max-width: 520px; line-height: 1.55; }
+
+  .content { padding: 50px 60px; }
+  .faq-section { margin-bottom: 60px; }
+  .section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  h2 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 24px; }
+  h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--text); }
+  p { color: var(--text2); margin-bottom: 14px; line-height: 1.65; }
+  p strong { color: var(--text); }
+  hr.divider { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+
+  .faq-item { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
+  .faq-q { background: var(--surface); padding: 14px 18px; font-size: 14px; font-weight: 600; color: var(--text); cursor: default; }
+  .faq-a { padding: 14px 18px; font-size: 14px; color: var(--text2); line-height: 1.7; }
+  .faq-a p { color: var(--text2); margin-bottom: 8px; }
+  .faq-a p:last-child { margin-bottom: 0; }
+  .faq-a strong { color: var(--text); }
+  .faq-a code { font-family: var(--mono); font-size: 12px; background: var(--surface2); padding: 1px 5px; border-radius: 4px; }
+  kbd { display: inline-flex; align-items: center; padding: 2px 7px; font-size: 11px; font-family: var(--font); font-weight: 600; background: var(--surface); border: 1px solid var(--border); border-radius: 5px; color: var(--text); box-shadow: 0 1px 0 var(--border); white-space: nowrap; }
+
+  footer { padding: 28px 60px; border-top: 1px solid var(--border); margin-left: var(--sidebar-w); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text2); background: var(--surface); }
+</style>
+</head>
+<body>
+
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">DP</div>
+    <div>
+      <div class="sidebar-logo-text">DuPane</div>
+      <div class="sidebar-logo-sub">FAQs</div>
+    </div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-heading">Getting Started</div>
+    <a href="#moving-files" class="nav-item">Moving &amp; Copying Files</a>
+    <a href="#navigation" class="nav-item">Navigation</a>
+    <a href="#tabs" class="nav-item">Tabs</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-heading">Smart Features</div>
+    <a href="#bookmarks" class="nav-item">Bookmarks</a>
+    <a href="#terminal" class="nav-item">Terminal</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-heading">Advanced</div>
+    <a href="#compare" class="nav-item">Compare &amp; Sync</a>
+    <a href="#actions" class="nav-item">Custom Actions</a>
+    <a href="#dupes" class="nav-item">Duplicate Finder</a>
+    <a href="#tags" class="nav-item">Colour Tags</a>
+    <a href="#settings" class="nav-item">Settings</a>
+  </div>
+</nav>
+
+<main class="main">
+  <section class="hero">
+    <div class="hero-badge">FREQUENTLY ASKED QUESTIONS</div>
+    <h1>DuPane<br><span>Quick Answers</span></h1>
+    <p>Common questions, non-obvious features, and tips for getting the most out of DuPane — especially handy if you're coming from Finder.</p>
+  </section>
+
+  <div class="content">
+
+    <!-- Moving & Copying Files -->
+    <section class="faq-section" id="moving-files">
+      <div class="section-label">Getting Started</div>
+      <h2>Moving &amp; Copying Files</h2>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I copy a file from one pane to the other?</div>
+        <div class="faq-a">
+          <p>Select the file(s) in one pane, then click the <strong>Copy</strong> button in the toolbar (the arrow-with-square icon). The direction of the arrow shows which pane is receiving the files. The other pane is always the destination — no need to navigate it first.</p>
+          <p>You can also right-click and choose <strong>Copy to Other Pane</strong> from the context menu.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I move files instead of copy?</div>
+        <div class="faq-a">
+          <p>Use the <strong>Move</strong> button (the arrow-with-circle icon). After the move, the files disappear from the source pane and appear in the destination pane. Alternatively, right-click and choose <strong>Move to Other Pane</strong>.</p>
+          <p>You can also drag files between panes — hold <kbd>⌥ Option</kbd> while dropping to copy instead of move.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">What happens if a file with the same name already exists at the destination?</div>
+        <div class="faq-a">
+          <p>A conflict dialog appears with three choices: <strong>Overwrite</strong> (replace the existing file), <strong>Skip</strong> (leave the existing file untouched and transfer only the non-conflicting ones), or <strong>Keep Both</strong> (auto-rename the incoming file with a numeric suffix, e.g. <code>report 2.pdf</code>).</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I delete a file?</div>
+        <div class="faq-a">
+          <p>Select the file and press <kbd>⌘⌫</kbd>, or click the <strong>Delete</strong> (trash) button in the toolbar. Files are always moved to the macOS Trash — they are never immediately and permanently deleted. You can recover them from Trash at any time.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">Can I drag files from Finder into DuPane?</div>
+        <div class="faq-a">
+          <p>Yes. Files dragged in from Finder (or any other app) are always <strong>copied</strong> into the target pane's current folder. Dragging between DuPane's own panes moves by default; hold <kbd>⌥</kbd> to copy instead.</p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- Navigation -->
+    <section class="faq-section" id="navigation">
+      <div class="section-label">Getting Started</div>
+      <h2>Navigation</h2>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I go up to the parent folder?</div>
+        <div class="faq-a"><p>Press <kbd>⌘↑</kbd>, or click the up-arrow (↑) in the breadcrumb bar. You can also click any segment of the breadcrumb path to jump directly to that ancestor folder.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I go back or forward?</div>
+        <div class="faq-a"><p>Press <kbd>⌘[</kbd> to go back and <kbd>⌘]</kbd> to go forward, just like a web browser. Each pane keeps its own independent navigation history.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I switch which pane is active?</div>
+        <div class="faq-a"><p>Click anywhere in the pane you want to activate. The active pane shows a more prominent border. Keyboard shortcuts and toolbar buttons always operate on the active pane.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I show hidden files (dotfiles)?</div>
+        <div class="faq-a"><p>Open <strong>Settings</strong> (<kbd>⌘,</kbd>) → Display → toggle <strong>Show hidden files</strong>. This applies to both panes immediately and persists across restarts.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">The breadcrumb path is truncated — how do I see the full path?</div>
+        <div class="faq-a"><p>The breadcrumb auto-scrolls to show the deepest (current) folder. Scroll the breadcrumb horizontally to see ancestor folders, or hover over any segment to see its full name. The status bar at the bottom also shows the complete path of the selected item.</p></div>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- Tabs -->
+    <section class="faq-section" id="tabs">
+      <div class="section-label">Getting Started</div>
+      <h2>Tabs</h2>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I open a new tab?</div>
+        <div class="faq-a"><p>Press <kbd>⌘T</kbd> or click the <strong>+</strong> button at the right end of the tab strip. The new tab opens in the same folder as the current tab.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I close a tab?</div>
+        <div class="faq-a"><p>Click the <strong>×</strong> button on the tab, or press <kbd>⌘⇧W</kbd>. Pinned tabs cannot be closed until unpinned.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">What is a pinned tab and why would I use one?</div>
+        <div class="faq-a">
+          <p>Pinning a tab <strong>captures the folder it was showing at the moment you pinned it</strong>. Even if you navigate away inside that tab, clicking the pinned tab again returns you to the captured folder — like a bookmark that lives in the tab strip.</p>
+          <p>Pinned tabs also survive restarts regardless of startup folder mode. Right-click a tab and choose <strong>Pin Tab</strong> to pin it. A small pin icon appears in the tab.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I reorder tabs?</div>
+        <div class="faq-a"><p>Right-click the tab you want to move and choose <strong>Move to Start</strong>, <strong>Move Left</strong>, <strong>Move Right</strong>, or <strong>Move to End</strong>. Options are only shown when they apply (e.g. "Move to Start" is hidden for the first tab).</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">Can I colour-code my tabs?</div>
+        <div class="faq-a"><p>Yes. Right-click any tab → <strong>Tab Color</strong> → pick one of eight colours (Red, Orange, Yellow, Green, Blue, Purple, Pink, Graphite). The colour tints the tab background and persists across restarts. Choose <strong>None</strong> to clear the tint.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">Can I give a tab a custom name?</div>
+        <div class="faq-a"><p>Yes. Right-click the tab → <strong>Rename Tab…</strong>. Type any name and click Rename. The custom name persists across restarts. To revert to the automatic folder name, right-click → <strong>Reset Tab Name</strong>.</p></div>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- Bookmarks -->
+    <section class="faq-section" id="bookmarks">
+      <div class="section-label">Smart Features</div>
+      <h2>Bookmarks</h2>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I bookmark a folder or file?</div>
+        <div class="faq-a"><p>Select exactly one item in the file list, then click the <strong>Bookmark</strong> button in the toolbar (bookmark icon). The item appears in the sidebar under Bookmarks. If the item is already bookmarked, clicking the button (which is now filled/blue) removes the bookmark.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I reorder my bookmarks?</div>
+        <div class="faq-a"><p>Drag a bookmark row up or down in the sidebar to reorder it. You can also right-click a bookmark → <strong>Move Up</strong> or <strong>Move Down</strong>.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">Can I rename a bookmark to give it a friendlier label?</div>
+        <div class="faq-a"><p>Yes. Right-click the bookmark in the sidebar → <strong>Rename…</strong>. Type the new name and press Return. The original file or folder name is unaffected — only the sidebar label changes.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">What happens when I click a bookmarked file (not a folder)?</div>
+        <div class="faq-a"><p>Clicking a bookmarked file opens it in its default application — the same as double-clicking it in Finder. Clicking a bookmarked folder navigates the active pane into that folder.</p></div>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- Terminal -->
+    <section class="faq-section" id="terminal">
+      <div class="section-label">Smart Features</div>
+      <h2>Command Runner (Terminal)</h2>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I open the terminal panel?</div>
+        <div class="faq-a"><p>Press <kbd>⌥`</kbd> (Option + backtick) or click the <strong>Terminal</strong> button in the toolbar. A shell panel slides up from the bottom of the active pane. Press the same shortcut to hide it.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">What directory do commands run in?</div>
+        <div class="faq-a"><p>Commands run in the pane's <strong>current directory</strong> — the folder being displayed. When you navigate to a different folder, the next command you run in that pane uses the new directory automatically.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">Can I run multi-line scripts?</div>
+        <div class="faq-a"><p>The Command Runner is designed for single-line shell commands. For complex scripts, use Custom Actions (bolt-circle ⚡ toolbar button) where you can store named scripts that run on selected files.</p></div>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- Compare & Sync -->
+    <section class="faq-section" id="compare">
+      <div class="section-label">Advanced</div>
+      <h2>Compare &amp; Sync</h2>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I compare the two panes?</div>
+        <div class="faq-a"><p>Navigate both panes into real folders (not Computer root), then click the <strong>Compare</strong> button in the toolbar. Each row shows a badge: <em>only here</em> (missing from the other pane), <em>newer</em>, <em>older</em>, or <em>different</em>. Click Compare again to exit compare mode.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I sync differences from left to right?</div>
+        <div class="faq-a"><p>In compare mode, click <strong>Sync L→R</strong>. A confirmation dialog shows what will be copied or overwritten. Click Sync to proceed. Files that exist only on the right side are never deleted — sync only adds or updates, never removes.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">Compare doesn't scan inside sub-folders — is that a bug?</div>
+        <div class="faq-a"><p>No, it's a current limitation. Compare v1 compares the top-level contents of both folders by name, size, and modification date. Recursive folder comparison is planned for a future release. Folders are flagged as "different" if their metadata differs, but their internal contents are not inspected.</p></div>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- Custom Actions -->
+    <section class="faq-section" id="actions">
+      <div class="section-label">Advanced</div>
+      <h2>Custom Actions</h2>
+
+      <div class="faq-item">
+        <div class="faq-q">What are Custom Actions?</div>
+        <div class="faq-a">
+          <p>Custom Actions are named shell one-liners that appear at the bottom of the right-click context menu. Select files, right-click, and choose an action to run it on your selection.</p>
+          <p>In your script, <code>$@</code> expands to the full paths of all selected files, and <code>$PWD</code> is the current directory. Example: <code>for f in $@; do cp "$f" ~/Desktop/; done</code> copies all selected files to the Desktop.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I add a Custom Action?</div>
+        <div class="faq-a"><p>Click the <strong>Actions</strong> (⚡) button in the toolbar. In the panel, click the <strong>+</strong> button at the top, type a name and a shell command, then click <strong>Save</strong>. The action immediately appears in the right-click menu on any file.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I run a shell script file (.sh) from the sidebar?</div>
+        <div class="faq-a"><p>Click (or double-click) a <code>.sh</code> bookmark in the sidebar. A confirmation dialog warns you that the script may modify files. Click <strong>Execute</strong> to open the script in Terminal and run it.</p></div>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- Duplicate Finder -->
+    <section class="faq-section" id="dupes">
+      <div class="section-label">Advanced</div>
+      <h2>Duplicate Finder</h2>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I find duplicate files?</div>
+        <div class="faq-a"><p>Navigate into a folder in either pane, then click the <strong>Dupes</strong> button in the toolbar. DuPane scans the entire folder tree, groups identical files by content (regardless of name), and shows the results in a sheet. The Dupes button is disabled when the active pane shows the Computer root (all volumes).</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">How does duplicate detection work? Does it compare filenames?</div>
+        <div class="faq-a"><p>No — DuPane compares file <em>content</em>, not names. Two files with different names but identical bytes are detected as duplicates. Files are first grouped by size (which is fast), then files sharing the same size are hashed to confirm they're actually identical. Hidden files are skipped by default.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">What does "Keep First" do?</div>
+        <div class="faq-a"><p>For a group of duplicate files, <strong>Keep First</strong> moves all copies except the first one (alphabetically by path) to the Trash. The first copy stays untouched. You can also trash individual files using the trash icon next to each row.</p></div>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- Colour Tags -->
+    <section class="faq-section" id="tags">
+      <div class="section-label">Advanced</div>
+      <h2>Colour Tags</h2>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I add a colour tag to a file?</div>
+        <div class="faq-a"><p>Right-click the file → <strong>Tag</strong> → choose a colour. The tag appears as a small coloured dot next to the filename. Tags are fully compatible with Finder — they appear immediately in Finder and in Spotlight searches.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I filter the file list by tag?</div>
+        <div class="faq-a"><p>Open the sidebar (<kbd>⌥⌘S</kbd>). The Tags section lists all tags found in the currently visible folders. Click a tag to filter both panes to show only items with that tag. <kbd>⌘Click</kbd> additional tags to filter by multiple tags simultaneously. Click the active tag again to clear the filter.</p></div>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- Settings -->
+    <section class="faq-section" id="settings">
+      <div class="section-label">Advanced</div>
+      <h2>Settings</h2>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I make DuPane remember which folders were open when I quit?</div>
+        <div class="faq-a"><p>Open <strong>Settings</strong> (<kbd>⌘,</kbd>) → Startup Folders → change each pane's mode to <strong>Remember Last</strong>. All open tabs, their names, pinned state, and order are saved automatically and restored on next launch.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I switch to dark mode?</div>
+        <div class="faq-a"><p>Open <strong>Settings</strong> → Display → Appearance → choose <strong>Dark</strong>. Or choose <strong>System</strong> to follow macOS's current appearance. The change applies immediately without relaunch.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">The toolbar is too crowded — can I hide the button labels?</div>
+        <div class="faq-a"><p>Open <strong>Settings</strong> → Display → turn off <strong>Show toolbar button labels</strong>. Buttons show icons only, saving significant horizontal space while keeping full functionality.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I resize or reorder the file list columns?</div>
+        <div class="faq-a">
+          <p><strong>Resize:</strong> Hover over a column separator in the header row until the resize cursor appears, then drag.</p>
+          <p><strong>Reorder:</strong> Right-click any column header → use the "Move Left" or "Move Right" options to rearrange columns. The Name column is always first.</p>
+          <p><strong>Show/hide:</strong> Right-click any column header → toggle individual columns on or off. Settings persist across restarts.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I get a Quick Look preview without leaving DuPane?</div>
+        <div class="faq-a"><p>Select one or more files and press <kbd>Space</kbd>. The Quick Look panel floats above DuPane. You can navigate to a different file while the panel is open and it updates automatically. Press <kbd>Space</kbd> again to dismiss it.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I navigate directly to a folder by typing its path?</div>
+        <div class="faq-a"><p>Press <kbd>⌘L</kbd> (or use the Toolbar) to open the <strong>Go to Folder</strong> sheet. Type or paste any absolute path (e.g. <code>/usr/local/bin</code>) or use <code>~</code> for your home directory. Press <kbd>↩</kbd> or click <strong>Go</strong> to navigate. If the path is not a folder, an error message appears in the status bar.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">How does type-ahead file selection work?</div>
+        <div class="faq-a"><p>With the file list focused, just start typing any letters. DuPane selects the first file whose name starts with the characters you've typed. After 0.6 seconds of inactivity the buffer resets, so you can start a new search. Type-ahead is ignored when a text field (search, filter, rename, etc.) is focused.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I change the date format in the Modified column?</div>
+        <div class="faq-a"><p>Open <strong>Settings</strong> (<kbd>⌘,</kbd>) → Display → <strong>Date format</strong>. Choose from: <strong>Short</strong> (31/12/25), <strong>Medium</strong> (31 Dec 2025 — default), <strong>Long</strong> (December 31, 2025), <strong>ISO</strong> (2025-12-31), or <strong>Relative</strong> (Today, Yesterday, 3d ago). The change applies to both panes immediately.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">Can I hide file icons to get more space for the file name?</div>
+        <div class="faq-a"><p>Yes. Right-click any column header → toggle <strong>Icon</strong> off. When icons are hidden, the Name column expands automatically to fill the space, and the column header aligns correctly. The setting persists across restarts.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I use themes (Ocean, Country, Fire, etc.)?</div>
+        <div class="faq-a"><p>Open <strong>Settings</strong> (<kbd>⌘,</kbd>) → Appearance → <strong>Theme</strong> dropdown. The app includes 8 themes: System, Light, Dark, Ocean (dark + cyan), Country (light + forest green), Earth (light + terracotta), Fire (dark + red-orange), and Vivid (light + electric purple). Each theme changes both the color scheme and the accent color used throughout the interface.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">How do Places and Recents in the sidebar work?</div>
+        <div class="faq-a">
+          <p><strong>Places</strong> shows fixed system locations (Home, Applications, Desktop, Documents, Downloads). Choose which ones appear in <strong>Settings → Sidebar Places</strong>.</p>
+          <p><strong>Recents</strong> automatically tracks the last 12 folders you visited in either pane. The most recent is always at the top. Right-click any entry to remove it, or click <strong>Clear Recents</strong> at the bottom of the section to reset the list.</p>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /content -->
+</main>
+
+<footer>
+  <div><strong>DuPane</strong> · Dual-Pane File Manager for macOS</div>
+  <div>FAQs · Build 249 · macOS 13+</div>
+</footer>
+
+</body>
+</html>

@@ -14,7 +14,37 @@ struct SettingsView: View {
             }
             Section("Display") {
                 Toggle("Show hidden files (dot-files)", isOn: $settings.showHiddenFiles)
+                Toggle("Show hidden folders (dot-folders)", isOn: $settings.showHiddenFolders)
                 Toggle("Show file name extensions", isOn: $settings.showFileExtensions)
+                Toggle("Show toolbar button labels", isOn: $settings.showToolbarLabels)
+                Stepper("File list font size: \(settings.listFontSize)pt",
+                        value: $settings.listFontSize, in: 11...16)
+                Picker("Date format", selection: $settings.dateFormatStyle) {
+                    ForEach(DateFormatStyle.allCases, id: \.self) { style in
+                        Text(style.label).tag(style)
+                    }
+                }
+            }
+            Section("Appearance") {
+                Picker("Theme", selection: $settings.appColorScheme) {
+                    ForEach(AppColorScheme.allCases, id: \.self) { scheme in
+                        Text(scheme.label).tag(scheme)
+                    }
+                }
+                .pickerStyle(.menu)
+                Picker("Mode", selection: $settings.appColorMode) {
+                    ForEach(AppColorMode.allCases, id: \.self) { mode in
+                        Text(mode.label).tag(mode)
+                    }
+                }
+                .pickerStyle(.menu)
+            }
+            Section("Sidebar places") {
+                placesRow("Home")
+                placesRow("Applications")
+                placesRow("Desktop")
+                placesRow("Documents")
+                placesRow("Downloads")
             }
             Section("Startup folders") {
                 startupRow(label: "Left pane",
@@ -30,6 +60,19 @@ struct SettingsView: View {
         .formStyle(.grouped)
         .frame(width: 460)
         .padding()
+    }
+
+    private func placesRow(_ name: String) -> some View {
+        Toggle(name, isOn: Binding(
+            get: { settings.enabledPlaces.contains(name) },
+            set: { enabled in
+                if enabled {
+                    settings.enabledPlaces.insert(name)
+                } else {
+                    settings.enabledPlaces.remove(name)
+                }
+            }
+        ))
     }
 
     @ViewBuilder

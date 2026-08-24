@@ -12,13 +12,16 @@ struct TextPromptSheet: View {
             Text(title).font(.headline)
             TextField("Name", text: $text)
                 .textFieldStyle(.roundedBorder)
+                .accessibilityIdentifier("text-prompt-name-field")
                 .onSubmit(onConfirm)
             HStack {
                 Spacer()
                 Button("Cancel", action: onCancel)
+                    .accessibilityIdentifier("text-prompt-cancel-button")
                 Button(confirmLabel, action: onConfirm)
                     .keyboardShortcut(.defaultAction)
                     .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .accessibilityIdentifier("text-prompt-confirm-button")
             }
         }
         .padding(20)

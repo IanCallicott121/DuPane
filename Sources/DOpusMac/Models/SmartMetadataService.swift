@@ -64,8 +64,19 @@ final class SmartMetadataService: ObservableObject {
     }
 
     private static func lineCount(url: URL) -> String? {
-        guard let data = try? Data(contentsOf: url, options: .mappedIfSafe) else { return nil }
-        let n = data.filter { $0 == UInt8(ascii: "\n") }.count + 1
-        return "\(n) line\(n == 1 ? "" : "s")"
+        guard let fh = try? FileHandle(forReadingFrom: url) else { return nil }
+        defer { try? fh.close() }
+        var count = 0
+        var hasContent = false
+        let newline = UInt8(ascii: "\n")
+        while true {
+            let chunk = fh.readData(ofLength: 65_536)
+            guard !chunk.isEmpty else { break }
+            hasContent = true
+            count += chunk.filter { $0 == newline }.count
+        }
+        guard hasContent else { return nil }
+        let total = count + 1
+        return "\(total) line\(total == 1 ? "" : "s")"
     }
 }

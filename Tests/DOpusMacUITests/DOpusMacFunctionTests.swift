@@ -147,6 +147,66 @@ final class DOpusMacFunctionTests: XCTestCase {
     }
 
     @MainActor
+    func testDisplayedItemsFiltersByActiveFinderTag() {
+        let pane = PaneState(initialURL: fixture.leftPaneURL)
+        pane.items = [
+            makeItem(name: "alpha.txt", tags: ["Red"]),
+            makeItem(name: "beta.txt", tags: ["Blue"]),
+            makeItem(name: "gamma.txt", tags: ["red\n6"])
+        ]
+        pane.activeTagFilters = ["red"]
+
+        XCTAssertEqual(pane.displayedItems.map(\.name), ["alpha.txt", "gamma.txt"])
+    }
+
+    @MainActor
+    func testDisplayedItemsFiltersByMultipleFinderTags() {
+        let pane = PaneState(initialURL: fixture.leftPaneURL)
+        pane.items = [
+            makeItem(name: "alpha.txt", tags: ["Red"]),
+            makeItem(name: "beta.txt", tags: ["Blue"]),
+            makeItem(name: "gamma.txt", tags: ["Green"])
+        ]
+        pane.activeTagFilters = ["red", "blue"]
+
+        XCTAssertEqual(pane.displayedItems.map(\.name), ["alpha.txt", "beta.txt"])
+    }
+
+    func testFinderTagSummariesNormalizeSpotlightValues() {
+        let tags = FinderTagMetadata.summaries(from: [
+            (value: "Red\n6", count: 2),
+            (value: ["Blue\n4", "red"], count: 1),
+            (value: "   ", count: 5)
+        ])
+
+        XCTAssertEqual(tags.map(\.name), ["Blue", "Red"])
+        XCTAssertEqual(tags.first(where: { $0.name == "Blue" })?.count, 1)
+        XCTAssertEqual(tags.first(where: { $0.name == "Red" })?.count, 3)
+    }
+
+    func testFinderTagDiscoveryPredicateUsesWildcardString() {
+        let predicate = FinderTagMetadata.tagDiscoveryPredicate()
+
+        XCTAssertTrue(predicate.predicateFormat.contains(FinderTagMetadata.userTagsAttribute))
+        XCTAssertTrue(predicate.predicateFormat.contains("\"*\""))
+        XCTAssertFalse(predicate.predicateFormat.contains("nil"))
+    }
+
+    @MainActor
+    func testSidebarModelPublishesTagsFromPaneItems() {
+        let model = SidebarModel()
+        model.updatePaneTags(from: [
+            makeItem(name: "alpha.txt", tags: ["Red"]),
+            makeItem(name: "beta.txt", tags: ["Blue"]),
+            makeItem(name: "gamma.txt", tags: ["red\n6"])
+        ])
+
+        XCTAssertEqual(model.tags.map(\.name), ["Blue", "Red"])
+        XCTAssertEqual(model.tags.first(where: { $0.name == "Blue" })?.count, 1)
+        XCTAssertEqual(model.tags.first(where: { $0.name == "Red" })?.count, 2)
+    }
+
+    @MainActor
     func testDisplayedItemsSortsDirectoriesFirstThenName() {
         let pane = PaneState(initialURL: fixture.leftPaneURL)
         pane.items = [
@@ -202,7 +262,7 @@ final class DOpusMacFunctionTests: XCTestCase {
         let item = try fixture.fileItem(named: "alpha.txt", in: .left)
         let renamedURL = fixture.fileURL(named: "renamed.txt", in: .left)
 
-        pane.rename(item: item, to: "  renamed.txt  ")
+        await pane.rename(item: item, to: "  renamed.txt  ")?.value
         await pane.loadingTask?.value
 
         XCTAssertFalse(fixture.exists(item.url))
@@ -337,6 +397,101 @@ final class DOpusMacFunctionTests: XCTestCase {
     }
 
     @MainActor
+    func testCopyConflictOverwriteReplacesDestinationAndLeavesSource() throws {
+        let sourceURL = try fixture.writeFile(named: "replace.txt", contents: "source", in: .left)
+        let destinationURL = try fixture.writeFile(named: "replace.txt", contents: "destination", in: .right)
+        let source = try fixture.fileItem(named: "replace.txt", in: .left)
+
+        let result = FileOperationService.moveOrCopy(
+            files: [source],
+            to: fixture.rightPaneURL,
+            isMove: false,
+            conflictResolution: .overwrite
+        )
+
+        XCTAssertEqual(result.succeeded, 1)
+        XCTAssertTrue(result.errors.isEmpty)
+        XCTAssertTrue(fixture.exists(sourceURL))
+        XCTAssertEqual(try String(contentsOf: destinationURL, encoding: .utf8), "source")
+    }
+
+    @MainActor
+    func testCopyConflictSkipLeavesExistingDestination() throws {
+        let sourceURL = try fixture.writeFile(named: "skip.txt", contents: "source", in: .left)
+        let destinationURL = try fixture.writeFile(named: "skip.txt", contents: "destination", in: .right)
+        let source = try fixture.fileItem(named: "skip.txt", in: .left)
+
+        let result = FileOperationService.moveOrCopy(
+            files: [source],
+            to: fixture.rightPaneURL,
+            isMove: false,
+            conflictResolution: .skip
+        )
+
+        XCTAssertEqual(result.succeeded, 0)
+        XCTAssertTrue(result.errors.isEmpty)
+        XCTAssertTrue(fixture.exists(sourceURL))
+        XCTAssertEqual(try String(contentsOf: destinationURL, encoding: .utf8), "destination")
+    }
+
+    @MainActor
+    func testCopyConflictRenameKeepsBothFiles() throws {
+        let sourceURL = try fixture.writeFile(named: "keep.txt", contents: "source", in: .left)
+        let destinationURL = try fixture.writeFile(named: "keep.txt", contents: "destination", in: .right)
+        let renamedDestinationURL = fixture.fileURL(named: "keep 2.txt", in: .right)
+        let source = try fixture.fileItem(named: "keep.txt", in: .left)
+
+        let result = FileOperationService.moveOrCopy(
+            files: [source],
+            to: fixture.rightPaneURL,
+            isMove: false,
+            conflictResolution: .rename
+        )
+
+        XCTAssertEqual(result.succeeded, 1)
+        XCTAssertTrue(result.errors.isEmpty)
+        XCTAssertTrue(fixture.exists(sourceURL))
+        XCTAssertEqual(try String(contentsOf: destinationURL, encoding: .utf8), "destination")
+        XCTAssertEqual(try String(contentsOf: renamedDestinationURL, encoding: .utf8), "source")
+    }
+
+    @MainActor
+    func testCopyOverwriteSameFolderDoesNotDeleteSource() throws {
+        let sourceURL = try fixture.writeFile(named: "same-copy.txt", contents: "source", in: .left)
+        let source = try fixture.fileItem(named: "same-copy.txt", in: .left)
+
+        let result = FileOperationService.moveOrCopy(
+            files: [source],
+            to: fixture.leftPaneURL,
+            isMove: false,
+            conflictResolution: .overwrite
+        )
+
+        XCTAssertEqual(result.succeeded, 0)
+        XCTAssertEqual(result.errors.count, 1)
+        XCTAssertTrue(fixture.exists(sourceURL))
+        XCTAssertEqual(try String(contentsOf: sourceURL, encoding: .utf8), "source")
+    }
+
+    @MainActor
+    func testMoveOverwriteSameFolderDoesNotDeleteSource() throws {
+        let sourceURL = try fixture.writeFile(named: "same-move.txt", contents: "source", in: .left)
+        let source = try fixture.fileItem(named: "same-move.txt", in: .left)
+
+        let result = FileOperationService.moveOrCopy(
+            files: [source],
+            to: fixture.leftPaneURL,
+            isMove: true,
+            conflictResolution: .overwrite
+        )
+
+        XCTAssertEqual(result.succeeded, 0)
+        XCTAssertEqual(result.errors.count, 1)
+        XCTAssertTrue(fixture.exists(sourceURL))
+        XCTAssertEqual(try String(contentsOf: sourceURL, encoding: .utf8), "source")
+    }
+
+    @MainActor
     func testMoveOrCopyReportsDestinationConflict() throws {
         let item = try fixture.fileItem(named: "target.txt", in: .right)
         try fixture.writeFile(named: "target.txt", contents: "existing", in: .left)
@@ -348,22 +503,16 @@ final class DOpusMacFunctionTests: XCTestCase {
     }
 
     func testTrashMovesItemsOutOfDocumentsFixtureAndReturnsCleanupURL() throws {
-        try skipIfTrashUnavailable()
         let url = try fixture.writeFile(named: "delete-me.txt", in: .left)
-        var trashedURLs: [URL] = []
-        defer {
-            for trashedURL in trashedURLs {
-                try? FileManager.default.removeItem(at: trashedURL)
-            }
-        }
+        let trashURL = fixture.rootURL.appendingPathComponent("test-trash", isDirectory: true)
+        try FileManager.default.createDirectory(at: trashURL, withIntermediateDirectories: true)
 
-        let result = FileOperationService.trash(urls: [url])
-        trashedURLs = result.resultingURLs
+        let result = FileOperationService.trash(urls: [url], trashHandler: moveToTestTrash(in: trashURL))
 
         XCTAssertEqual(result.succeeded, 1)
         XCTAssertTrue(result.errors.isEmpty)
         XCTAssertFalse(fixture.exists(url))
-        XCTAssertFalse(result.resultingURLs.isEmpty)
+        XCTAssertEqual(result.resultingURLs, [trashURL.appendingPathComponent("delete-me.txt")])
     }
 
     @MainActor
@@ -501,12 +650,12 @@ final class DOpusMacFunctionTests: XCTestCase {
     }
 
     @MainActor
-    func testRenameToExistingNameSetsErrorMessageAndLeavesOriginalIntact() throws {
+    func testRenameToExistingNameSetsErrorMessageAndLeavesOriginalIntact() async throws {
         let pane = PaneState(initialURL: fixture.leftPaneURL)
         pane.start()
         let item = try fixture.fileItem(named: "alpha.txt", in: .left)
 
-        pane.rename(item: item, to: "beta.txt")
+        await pane.rename(item: item, to: "beta.txt")?.value
 
         XCTAssertNotNil(pane.errorMessage)
         XCTAssertTrue(fixture.exists(item.url))
@@ -526,38 +675,56 @@ final class DOpusMacFunctionTests: XCTestCase {
     }
 
     func testTrashMultipleFilesReportsAllSuccesses() throws {
-        try skipIfTrashUnavailable()
         let url1 = try fixture.writeFile(named: "del-1.txt", in: .left)
         let url2 = try fixture.writeFile(named: "del-2.txt", in: .left)
         let url3 = try fixture.writeFile(named: "del-3.txt", in: .left)
-        var trashedURLs: [URL] = []
-        defer {
-            for trashedURL in trashedURLs {
-                try? FileManager.default.removeItem(at: trashedURL)
-            }
-        }
+        let trashURL = fixture.rootURL.appendingPathComponent("test-trash", isDirectory: true)
+        try FileManager.default.createDirectory(at: trashURL, withIntermediateDirectories: true)
 
-        let result = FileOperationService.trash(urls: [url1, url2, url3])
-        trashedURLs = result.resultingURLs
+        let result = FileOperationService.trash(
+            urls: [url1, url2, url3],
+            trashHandler: moveToTestTrash(in: trashURL)
+        )
 
         XCTAssertEqual(result.succeeded, 3)
         XCTAssertTrue(result.errors.isEmpty)
         XCTAssertFalse(fixture.exists(url1))
         XCTAssertFalse(fixture.exists(url2))
         XCTAssertFalse(fixture.exists(url3))
+        XCTAssertEqual(
+            Set(result.resultingURLs.map(\.lastPathComponent)),
+            ["del-1.txt", "del-2.txt", "del-3.txt"]
+        )
     }
 
-    private func skipIfTrashUnavailable() throws {
-        let probeURL = try fixture.writeFile(named: "trash-probe-\(UUID().uuidString).txt", in: .left)
-        var trashedURL: NSURL?
-        do {
-            try FileManager.default.trashItem(at: probeURL, resultingItemURL: &trashedURL)
-            if let trashedURL = trashedURL as URL? {
-                try? FileManager.default.removeItem(at: trashedURL)
+    func testTrashReportsFailuresAndContinues() throws {
+        let url1 = try fixture.writeFile(named: "trash-ok.txt", in: .left)
+        let url2 = try fixture.writeFile(named: "trash-fails.txt", in: .left)
+        let trashURL = fixture.rootURL.appendingPathComponent("test-trash", isDirectory: true)
+        try FileManager.default.createDirectory(at: trashURL, withIntermediateDirectories: true)
+
+        let result = FileOperationService.trash(urls: [url1, url2]) { url in
+            guard url.lastPathComponent != "trash-fails.txt" else {
+                throw CocoaError(.fileNoSuchFile)
             }
-        } catch {
-            try? FileManager.default.removeItem(at: probeURL)
-            throw XCTSkip("Trash is unavailable in this test environment: \(error.localizedDescription)")
+            return try moveToTestTrash(in: trashURL)(url)
+        }
+
+        XCTAssertEqual(result.succeeded, 1)
+        XCTAssertEqual(result.errors.count, 1)
+        XCTAssertFalse(fixture.exists(url1))
+        XCTAssertTrue(fixture.exists(url2))
+        XCTAssertEqual(result.resultingURLs, [trashURL.appendingPathComponent("trash-ok.txt")])
+    }
+
+    private func moveToTestTrash(in trashURL: URL) -> FileOperationService.TrashHandler {
+        { url in
+            let destinationURL = trashURL.appendingPathComponent(url.lastPathComponent)
+            if FileManager.default.fileExists(atPath: destinationURL.path) {
+                try FileManager.default.removeItem(at: destinationURL)
+            }
+            try FileManager.default.moveItem(at: url, to: destinationURL)
+            return destinationURL
         }
     }
 
@@ -574,7 +741,8 @@ final class DOpusMacFunctionTests: XCTestCase {
         isDirectory: Bool = false,
         size: Int64? = nil,
         kind: String = "Text",
-        modified: Date? = nil
+        modified: Date? = nil,
+        tags: [String] = []
     ) -> FileItem {
         let url = fixture.leftPaneURL.appendingPathComponent(name, isDirectory: isDirectory)
         return FileItem(
@@ -587,7 +755,7 @@ final class DOpusMacFunctionTests: XCTestCase {
             size: isDirectory ? nil : size,
             kind: isDirectory ? "Folder" : kind,
             modified: modified,
-            tags: []
+            tags: tags
         )
     }
 }
@@ -618,9 +786,38 @@ final class TabbedPaneStateTests: XCTestCase {
         XCTAssertEqual(state.tabs[1].pane.currentURL, url)
     }
 
+    func testTagFiltersPropagateToExistingAndNewTabs() {
+        let state = TabbedPaneState(initialURL: nil)
+        state.openTab()
+
+        state.activeTagFilters = ["Red", "Blue"]
+
+        XCTAssertEqual(state.tabs[0].pane.activeTagFilters, ["Red", "Blue"])
+        XCTAssertEqual(state.tabs[1].pane.activeTagFilters, ["Red", "Blue"])
+
+        state.openTab()
+        XCTAssertEqual(state.tabs[2].pane.activeTagFilters, ["Red", "Blue"])
+    }
+
     func testCloseTabCannotRemoveLastTab() {
         let state = TabbedPaneState(initialURL: nil)
         state.closeTab(at: 0)
+        XCTAssertEqual(state.tabs.count, 1)
+    }
+
+    func testPinnedTabCannotBeClosedUntilUnpinned() {
+        let state = TabbedPaneState(initialURL: nil)
+        state.openTab()
+        state.setTabPinned(true, at: 1)
+
+        state.closeTab(at: 1)
+
+        XCTAssertEqual(state.tabs.count, 2)
+        XCTAssertTrue(state.tabs[1].isPinned)
+
+        state.setTabPinned(false, at: 1)
+        state.closeTab(at: 1)
+
         XCTAssertEqual(state.tabs.count, 1)
     }
 
@@ -637,7 +834,6 @@ final class TabbedPaneStateTests: XCTestCase {
         let state = TabbedPaneState(initialURL: nil)
         state.openTab()
         state.openTab()
-        // tabs = [0, 1, 2], active = 2
         let activePaneID = ObjectIdentifier(state.activePaneState)
         state.closeTab(at: 0)
         XCTAssertEqual(state.tabs.count, 2)
@@ -650,7 +846,6 @@ final class TabbedPaneStateTests: XCTestCase {
         state.openTab()
         state.openTab()
         state.switchTab(to: 1)
-        // tabs = [0, 1, 2], active = 1
         let nextPaneID = ObjectIdentifier(state.tabs[2].pane)
         state.closeTab(at: 1)
         XCTAssertEqual(state.tabs.count, 2)
@@ -669,6 +864,190 @@ final class TabbedPaneStateTests: XCTestCase {
         let state = TabbedPaneState(initialURL: nil)
         state.switchTab(to: 99)
         XCTAssertEqual(state.activeTabIndex, 0)
+    }
+
+    func testMoveTabReordersTabs() throws {
+        let firstURL = try temporaryDirectory(named: "tab-reorder-first")
+        let secondURL = try temporaryDirectory(named: "tab-reorder-second")
+        let thirdURL = try temporaryDirectory(named: "tab-reorder-third")
+        defer {
+            try? FileManager.default.removeItem(at: firstURL)
+            try? FileManager.default.removeItem(at: secondURL)
+            try? FileManager.default.removeItem(at: thirdURL)
+        }
+
+        let state = TabbedPaneState(initialURLs: [firstURL, secondURL, thirdURL])
+        state.moveTab(from: 0, to: 3)
+
+        XCTAssertEqual(state.tabs.map { $0.pane.currentURL }, [secondURL, thirdURL, firstURL])
+    }
+
+    func testMoveTabPreservesActiveTabIdentity() throws {
+        let firstURL = try temporaryDirectory(named: "tab-active-first")
+        let secondURL = try temporaryDirectory(named: "tab-active-second")
+        let thirdURL = try temporaryDirectory(named: "tab-active-third")
+        defer {
+            try? FileManager.default.removeItem(at: firstURL)
+            try? FileManager.default.removeItem(at: secondURL)
+            try? FileManager.default.removeItem(at: thirdURL)
+        }
+
+        let state = TabbedPaneState(initialURLs: [firstURL, secondURL, thirdURL])
+        state.switchTab(to: 1)
+        let activePaneID = ObjectIdentifier(state.activePaneState)
+
+        state.moveTab(from: 1, to: 3)
+
+        XCTAssertEqual(state.activeTabIndex, 2)
+        XCTAssertEqual(ObjectIdentifier(state.activePaneState), activePaneID)
+        XCTAssertEqual(state.activePaneState.currentURL, secondURL)
+    }
+
+    func testMoveTabPersistsReorderedMetadata() throws {
+        let key = "test_tab_reorder_\(UUID().uuidString)"
+        defer { removeTabPersistence(forKey: key) }
+        let firstURL = try temporaryDirectory(named: "tab-persist-first")
+        let secondURL = try temporaryDirectory(named: "tab-persist-second")
+        let thirdURL = try temporaryDirectory(named: "tab-persist-third")
+        defer {
+            try? FileManager.default.removeItem(at: firstURL)
+            try? FileManager.default.removeItem(at: secondURL)
+            try? FileManager.default.removeItem(at: thirdURL)
+        }
+
+        let state = TabbedPaneState(initialURLs: [firstURL, secondURL, thirdURL], tabsKey: key)
+        state.setTabLabel("Pinned Second", at: 1)
+        state.setTabPinned(true, at: 1)
+        state.moveTab(from: 1, to: 0)
+
+        XCTAssertEqual(TabPersistence.paths(forKey: key), [secondURL.path, firstURL.path, thirdURL.path])
+        XCTAssertEqual(TabPersistence.labels(forKey: key), ["Pinned Second", nil, nil])
+        XCTAssertEqual(TabPersistence.pins(forKey: key), [true, false, false])
+        XCTAssertEqual(TabPersistence.pinnedPaths(forKey: key), [secondURL.path, nil, nil])
+    }
+
+    func testPinnedTabStateAndCustomNamePersist() throws {
+        let key = "test_tab_pin_\(UUID().uuidString)"
+        defer { removeTabPersistence(forKey: key) }
+        let url = try temporaryDirectory(named: "pinned-tab")
+        defer { try? FileManager.default.removeItem(at: url) }
+
+        let state = TabbedPaneState(initialURLs: [url], tabsKey: key)
+        state.setTabLabel("Reference", at: 0)
+        state.setTabPinned(true, at: 0)
+
+        let restored = TabbedPaneState(initialURLs: [url], tabsKey: key)
+
+        XCTAssertEqual(restored.tabs[0].customLabel, "Reference")
+        XCTAssertTrue(restored.tabs[0].isPinned)
+    }
+
+    func testActivatingPinnedTabRestoresPinnedFolderAfterNavigation() throws {
+        let pinnedURL = try temporaryDirectory(named: "pinned-recall-source")
+        let otherURL = try temporaryDirectory(named: "pinned-recall-other")
+        defer {
+            try? FileManager.default.removeItem(at: pinnedURL)
+            try? FileManager.default.removeItem(at: otherURL)
+        }
+
+        let state = TabbedPaneState(initialURLs: [pinnedURL])
+        state.setTabPinned(true, at: 0)
+        state.tabs[0].pane.navigate(to: otherURL)
+
+        XCTAssertEqual(state.tabs[0].pane.currentURL, otherURL)
+
+        state.activateTab(at: 0)
+
+        XCTAssertEqual(state.tabs[0].pane.currentURL, pinnedURL)
+    }
+
+    func testPinnedTabOriginalFolderPersistsAfterNavigation() throws {
+        let key = "test_tab_pinned_recall_\(UUID().uuidString)"
+        defer { removeTabPersistence(forKey: key) }
+        let pinnedURL = try temporaryDirectory(named: "pinned-persist-source")
+        let otherURL = try temporaryDirectory(named: "pinned-persist-other")
+        defer {
+            try? FileManager.default.removeItem(at: pinnedURL)
+            try? FileManager.default.removeItem(at: otherURL)
+        }
+
+        let state = TabbedPaneState(initialURLs: [pinnedURL], tabsKey: key)
+        state.setTabPinned(true, at: 0)
+        state.tabs[0].pane.navigate(to: otherURL)
+
+        let restored = TabbedPaneState(initialURLs: [otherURL], tabsKey: key)
+
+        XCTAssertTrue(restored.tabs[0].isPinned)
+        XCTAssertEqual(restored.tabs[0].pane.currentURL, otherURL)
+
+        restored.activateTab(at: 0)
+
+        XCTAssertEqual(restored.tabs[0].pane.currentURL, pinnedURL)
+    }
+
+    func testLaunchConfigurationRestoresPinnedTabsOutsideRememberLastMode() throws {
+        let keys = [
+            "leftTabState",
+            "leftTabState_labels",
+            "leftTabState_pins",
+            "leftTabState_pinnedPaths",
+            "leftStartupMode",
+            "lastLeftURL"
+        ]
+        let snapshot = snapshotDefaults(forKeys: keys)
+        defer { restoreDefaults(snapshot) }
+        keys.forEach { UserDefaults.standard.removeObject(forKey: $0) }
+
+        let unpinnedURL = try temporaryDirectory(named: "unpinned-startup-tab")
+        let pinnedURL = try temporaryDirectory(named: "pinned-startup-tab")
+        defer {
+            try? FileManager.default.removeItem(at: unpinnedURL)
+            try? FileManager.default.removeItem(at: pinnedURL)
+        }
+        UserDefaults.standard.set(StartupFolderMode.default.rawValue, forKey: "leftStartupMode")
+
+        let tabs = TabbedPaneState(initialURLs: [unpinnedURL], tabsKey: "leftTabState")
+        tabs.openTab(url: pinnedURL)
+        tabs.setTabLabel("Pinned Startup", at: 1)
+        tabs.setTabPinned(true, at: 1)
+
+        let configuration = AppLaunchConfiguration.current(arguments: ["DOpusMac"])
+
+        XCTAssertTrue(configuration.leftTabURLs.contains { $0 == pinnedURL })
+        XCTAssertFalse(configuration.leftTabURLs.contains { $0 == unpinnedURL })
+
+        let restored = TabbedPaneState(initialURLs: configuration.leftTabURLs, tabsKey: "leftTabState")
+        let restoredPinnedTab = restored.tabs.first { $0.pane.currentURL == pinnedURL }
+        XCTAssertEqual(restoredPinnedTab?.customLabel, "Pinned Startup")
+        XCTAssertEqual(restoredPinnedTab?.isPinned, true)
+    }
+
+    private func temporaryDirectory(named name: String) throws -> URL {
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent("\(name)-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+        return url
+    }
+
+    private func removeTabPersistence(forKey key: String) {
+        UserDefaults.standard.removeObject(forKey: key)
+        UserDefaults.standard.removeObject(forKey: key + TabPersistence.labelsSuffix)
+        UserDefaults.standard.removeObject(forKey: key + TabPersistence.pinsSuffix)
+        UserDefaults.standard.removeObject(forKey: key + TabPersistence.pinnedPathsSuffix)
+    }
+
+    private func snapshotDefaults(forKeys keys: [String]) -> [(key: String, value: Any?)] {
+        keys.map { ($0, UserDefaults.standard.object(forKey: $0)) }
+    }
+
+    private func restoreDefaults(_ snapshot: [(key: String, value: Any?)]) {
+        for entry in snapshot {
+            if let value = entry.value {
+                UserDefaults.standard.set(value, forKey: entry.key)
+            } else {
+                UserDefaults.standard.removeObject(forKey: entry.key)
+            }
+        }
     }
 }
 
@@ -708,6 +1087,23 @@ final class SidebarModelTests: XCTestCase {
         let count = model.bookmarks.filter { $0 == url }.count
         XCTAssertEqual(count, 1)
         model.removeBookmark(url) // cleanup
+    }
+
+    func testAddFolderBookmarksIgnoresFilesAndAddsFolders() throws {
+        let fixture = try FilePaneFixture()
+        defer { try? fixture.tearDown() }
+
+        let model = SidebarModel()
+        let folderURL = try fixture.createFolder(named: "Bookmarkable Folder", in: .left)
+        let fileURL = try fixture.writeFile(named: "not-a-folder.txt", in: .left)
+
+        let addedCount = model.addFolderBookmarks([fileURL, folderURL, folderURL])
+
+        XCTAssertEqual(addedCount, 1)
+        XCTAssertTrue(model.isBookmarked(folderURL))
+        XCTAssertFalse(model.isBookmarked(fileURL))
+        XCTAssertEqual(model.bookmarks.filter { $0 == folderURL }.count, 1)
+        model.removeBookmark(folderURL)
     }
 
     func testToggleBookmark() {
@@ -789,64 +1185,6 @@ final class PaneStateEnhancedTests: XCTestCase {
     }
 }
 
-// MARK: - WarpSearchViewModelTests
-
-@MainActor
-final class WarpSearchViewModelTests: XCTestCase {
-    func testEmptyQueryReturnsAllCandidates() {
-        let vm = WarpSearchViewModel()
-        let home = FileManager.default.homeDirectoryForCurrentUser
-        let locs = [(name: "Home", url: home, icon: "house")]
-        vm.configure(systemLocations: locs, bookmarks: [], openURLs: [])
-        XCTAssertEqual(vm.results.count, 1)
-    }
-
-    func testQueryFiltersToMatchingNames() {
-        let vm = WarpSearchViewModel()
-        let desktop = home.appendingPathComponent("Desktop")
-        let downloads = home.appendingPathComponent("Downloads")
-        let locs = [
-            (name: "Desktop", url: desktop, icon: ""),
-            (name: "Downloads", url: downloads, icon: "")
-        ]
-        vm.configure(systemLocations: locs, bookmarks: [], openURLs: [])
-        vm.query = "desk"
-        XCTAssertEqual(vm.results.count, 1)
-        XCTAssertEqual(vm.results.first?.displayName, "Desktop")
-    }
-
-    func testQueryThatMatchesNothingReturnsEmpty() {
-        let vm = WarpSearchViewModel()
-        let locs = [(name: "Home", url: home, icon: "")]
-        vm.configure(systemLocations: locs, bookmarks: [], openURLs: [])
-        vm.query = "zzzzqqqqxxx"
-        XCTAssertTrue(vm.results.isEmpty)
-    }
-
-    func testMoveSelectionClamps() {
-        let vm = WarpSearchViewModel()
-        let locs = [
-            (name: "Alpha", url: home.appendingPathComponent("a"), icon: ""),
-            (name: "Beta",  url: home.appendingPathComponent("b"), icon: "")
-        ]
-        vm.configure(systemLocations: locs, bookmarks: [], openURLs: [])
-        XCTAssertEqual(vm.selectedIndex, 0)
-        vm.moveSelection(by: 10)
-        XCTAssertEqual(vm.selectedIndex, 1)   // clamped to last
-        vm.moveSelection(by: -99)
-        XCTAssertEqual(vm.selectedIndex, 0)   // clamped to first
-    }
-
-    func testBookmarksAddedAsResults() {
-        let vm = WarpSearchViewModel()
-        let bm = home.appendingPathComponent("Projects")
-        vm.configure(systemLocations: [], bookmarks: [bm], openURLs: [])
-        XCTAssertEqual(vm.results.first?.url, bm)
-    }
-
-    private var home: URL { FileManager.default.homeDirectoryForCurrentUser }
-}
-
 // MARK: - CustomActionsModelTests
 
 @MainActor
@@ -887,6 +1225,26 @@ final class CustomActionsModelTests: XCTestCase {
         m1.add(name: "Persist", command: "open $@")
         let m2 = CustomActionsModel()
         XCTAssertEqual(m2.actions.first?.name, "Persist")
+    }
+
+    func testProcessRunnerHandlesLargeOutputWithoutDeadlock() async throws {
+        let result = try await ProcessRunner.run(
+            executableURL: URL(fileURLWithPath: "/bin/sh"),
+            arguments: ["-c", "i=0; while [ $i -lt 20000 ]; do echo line; i=$((i + 1)); done"]
+        )
+
+        XCTAssertEqual(result.terminationStatus, 0)
+        XCTAssertGreaterThan(result.stdout.count, 80_000)
+    }
+
+    func testProcessRunnerCapturesNonzeroStatusAndStderr() async throws {
+        let result = try await ProcessRunner.run(
+            executableURL: URL(fileURLWithPath: "/bin/sh"),
+            arguments: ["-c", "echo failure >&2; exit 7"]
+        )
+
+        XCTAssertEqual(result.terminationStatus, 7)
+        XCTAssertEqual(result.stderr.trimmingCharacters(in: .whitespacesAndNewlines), "failure")
     }
 }
 
@@ -1020,14 +1378,50 @@ final class FolderSizeViewModelTests: XCTestCase {
     }
 
     func testAppSettingsHiddenColumnsMultiple() {
+        UserDefaults.standard.removeObject(forKey: "hiddenColumns")
         let settings = AppSettings()
+        settings.hiddenColumns = []  // reset to empty before toggling
         settings.toggleColumn("Kind")
         settings.toggleColumn("Modified")
         XCTAssertTrue(settings.hiddenColumns.contains("Kind"))
         XCTAssertTrue(settings.hiddenColumns.contains("Modified"))
         XCTAssertFalse(settings.hiddenColumns.contains("Size"))
-        // Clean up
         UserDefaults.standard.removeObject(forKey: "hiddenColumns")
+    }
+
+    func testAppSettingsColumnOrderDefaultContainsAllColumns() {
+        UserDefaults.standard.removeObject(forKey: "columnOrder")
+        let settings = AppSettings()
+        XCTAssertEqual(settings.columnOrder, ["Size", "Kind", "Modified", "Info"])
+        UserDefaults.standard.removeObject(forKey: "columnOrder")
+    }
+
+    func testAppSettingsColumnOrderIsPersisted() {
+        UserDefaults.standard.removeObject(forKey: "columnOrder")
+        let settings = AppSettings()
+        settings.columnOrder = ["Info", "Modified", "Kind", "Size"]
+        let settings2 = AppSettings()
+        XCTAssertEqual(settings2.columnOrder, ["Info", "Modified", "Kind", "Size"])
+        UserDefaults.standard.removeObject(forKey: "columnOrder")
+    }
+
+    func testAppSettingsColumnWidthsDefaults() {
+        UserDefaults.standard.removeObject(forKey: "leftColumnWidths")
+        let settings = AppSettings()
+        XCTAssertEqual(settings.columnWidths(for: .left)["Size"], 80)
+        XCTAssertEqual(settings.columnWidths(for: .left)["Kind"], 120)
+        XCTAssertEqual(settings.columnWidths(for: .left)["Modified"], 110)
+        XCTAssertEqual(settings.columnWidths(for: .left)["Info"], 80)
+        UserDefaults.standard.removeObject(forKey: "leftColumnWidths")
+    }
+
+    func testAppSettingsColumnWidthsArePersisted() {
+        UserDefaults.standard.removeObject(forKey: "leftColumnWidths")
+        let settings = AppSettings()
+        settings.setColumnWidths(["Kind": 200], for: .left)
+        let settings2 = AppSettings()
+        XCTAssertEqual(settings2.columnWidths(for: .left)["Kind"], 200)
+        UserDefaults.standard.removeObject(forKey: "leftColumnWidths")
     }
 
     func testPaneStateShowCommandRunnerDefaultsFalse() {
@@ -1049,11 +1443,10 @@ final class FolderSizeViewModelTests: XCTestCase {
     }
 
     func testTabbedPaneShowHiddenFilesNoOpWhenValueUnchanged() {
-        // Setting the same value twice should not cause issues (guard oldValue != newValue)
         let tabs = TabbedPaneState()
-        tabs.showHiddenFiles = false  // already false — guard should skip
+        tabs.showHiddenFiles = false
         tabs.showHiddenFiles = true
-        tabs.showHiddenFiles = true   // same value — guard should skip
+        tabs.showHiddenFiles = true
         XCTAssertTrue(tabs.activePaneState.showHiddenFiles)
     }
 
@@ -1077,9 +1470,7 @@ final class FolderSizeViewModelTests: XCTestCase {
         defer { UserDefaults.standard.removeObject(forKey: key) }
         let url = FileManager.default.homeDirectoryForCurrentUser
         let tabs = TabbedPaneState(initialURLs: [url], tabsKey: key)
-        // Opening a new tab triggers a save
         tabs.openTab(url: url)
-        // Allow the save to happen (it fires synchronously via openTab)
         let data = UserDefaults.standard.data(forKey: key)
         XCTAssertNotNil(data)
     }
@@ -1115,5 +1506,25 @@ final class FolderSizeViewModelTests: XCTestCase {
         XCTAssertEqual(model.bookmarks.last, url1)
         model.removeBookmark(url1)
         model.removeBookmark(url2)
+    }
+
+    func testSidebarModelRenameBookmarkStoresCustomName() {
+        let model = SidebarModel()
+        let url = URL(fileURLWithPath: "/tmp")
+        model.addBookmark(url)
+        model.renameBookmark(url, to: "My Temp")
+        XCTAssertEqual(model.displayName(for: url), "My Temp")
+        model.renameBookmark(url, to: "")
+        XCTAssertEqual(model.displayName(for: url), url.lastPathComponent)
+        model.removeBookmark(url)
+    }
+
+    func testSidebarModelRemoveBookmarkClearsCustomName() {
+        let model = SidebarModel()
+        let url = URL(fileURLWithPath: "/tmp")
+        model.addBookmark(url)
+        model.renameBookmark(url, to: "Custom")
+        model.removeBookmark(url)
+        XCTAssertEqual(model.displayName(for: url), url.lastPathComponent)
     }
 }

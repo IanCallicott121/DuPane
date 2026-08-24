@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>/Opus — User Guide</title>
+<title>DuPane — User Guide</title>
 <style>
   :root {
     --bg: #ffffff;
@@ -142,10 +142,10 @@
   .hero h1 span { opacity: 0.7; }
   .hero p {
     font-size: 18px;
-    opacity: 1.0;
+    color: rgba(255,255,255,0.88);
     max-width: 560px;
     line-height: 1.55;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.25);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
   }
   .hero-meta {
     margin-top: 32px;
@@ -438,54 +438,6 @@
     .callout.info p { color: #86efac; }
   }
 
-  /* ── Warp mockup ── */
-  .warp-mockup {
-    background: rgba(255,255,255,0.85);
-    border: 1px solid rgba(0,0,0,0.12);
-    border-radius: var(--radius);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    width: 440px;
-    margin: 28px auto;
-    overflow: hidden;
-  }
-  @media (prefers-color-scheme: dark) {
-    .warp-mockup { background: rgba(40,40,44,0.92); border-color: rgba(255,255,255,0.1); }
-  }
-  .warp-field {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--border);
-  }
-  .warp-icon { font-size: 16px; opacity: 0.5; }
-  .warp-input {
-    flex: 1;
-    font-size: 15px;
-    color: var(--text);
-    font-family: var(--font);
-  }
-  .warp-result {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 12px;
-    margin: 4px 6px;
-    border-radius: 6px;
-    cursor: default;
-  }
-  .warp-result.selected { background: var(--accent); }
-  .warp-result-info { flex: 1; }
-  .warp-result-name { font-size: 13px; font-weight: 500; color: var(--text); }
-  .warp-result.selected .warp-result-name { color: white; }
-  .warp-result-path { font-size: 10px; color: var(--text2); font-family: var(--mono); }
-  .warp-result.selected .warp-result-path { color: rgba(255,255,255,0.75); }
-  .warp-result-icon { font-size: 13px; color: var(--accent); }
-  .warp-result.selected .warp-result-icon { color: rgba(255,255,255,0.8); }
-  .warp-footer { padding: 8px 12px 12px; }
-
   /* ── Terminal mockup ── */
   .terminal-mockup {
     background: #1a1a2e;
@@ -628,17 +580,17 @@
 <!-- ─────────────── SIDEBAR ─────────────── -->
 <nav class="sidebar">
   <div class="sidebar-logo">
-    <div class="logo-icon">/O</div>
+    <div class="logo-icon">DP</div>
     <div>
-      <div class="sidebar-logo-text">/Opus</div>
-      <div class="sidebar-logo-sub">User Guide v1.17</div>
+      <div class="sidebar-logo-text">DuPane</div>
+      <div class="sidebar-logo-sub">User Guide v1.49</div>
     </div>
   </div>
 
   <div class="nav-section">
     <div class="nav-heading">Getting Started</div>
     <a href="#overview" class="nav-item">Overview</a>
-    <a href="#why-opus" class="nav-item">Why /Opus?</a>
+    <a href="#why-opus" class="nav-item">Why DuPane?</a>
     <a href="#quickstart" class="nav-item">Quick Start</a>
   </div>
   <div class="nav-section">
@@ -647,6 +599,7 @@
     <a href="#tabs" class="nav-item">Tabs</a>
     <a href="#sidebar" class="nav-item">Sidebar &amp; Bookmarks</a>
     <a href="#file-ops" class="nav-item">File Operations</a>
+    <a href="#compare-sync" class="nav-item">Compare &amp; Sync</a>
     <a href="#sorting" class="nav-item">Sorting &amp; Filtering</a>
     <a href="#quicklook" class="nav-item">Quick Look</a>
     <a href="#tags" class="nav-item">Colour Tags</a>
@@ -654,10 +607,10 @@
   <div class="nav-section">
     <div class="nav-heading">Smart Features</div>
     <a href="#smart-metadata" class="nav-item">Smart Metadata</a>
-    <a href="#warp" class="nav-item">Warp Jump (⌘K)</a>
     <a href="#command-runner" class="nav-item">Command Runner</a>
     <a href="#custom-actions" class="nav-item">Actions</a>
     <a href="#folder-size" class="nav-item">Folder Size View</a>
+    <a href="#duplicate-finder" class="nav-item">Duplicate Finder</a>
   </div>
   <div class="nav-section">
     <div class="nav-heading">Reference</div>
@@ -672,8 +625,8 @@
   <!-- Hero -->
   <section class="hero">
     <div class="hero-badge">USER GUIDE</div>
-    <h1>/Opus<br><span>Dual-Pane File Manager</span></h1>
-    <p>A fast, powerful macOS file manager built for developers and power users — two panes, tabs, smart metadata, and persistent tabs, all in a native SwiftUI interface.</p>
+    <h1>DuPane<br><span>Dual-Pane File Manager</span></h1>
+    <p>A fast, powerful macOS file manager built for developers and power users — two panes, pinned tabs, smart metadata, and persistent workflows, all in a native SwiftUI interface.</p>
     <div class="hero-meta">
       <span>🍎 macOS 13+</span>
       <span>⚡ Native SwiftUI</span>
@@ -688,17 +641,17 @@
       <h3>Table of Contents</h3>
       <ol>
         <li><a href="#overview">Overview</a></li>
-        <li><a href="#why-opus">Why /Opus?</a></li>
+        <li><a href="#why-opus">Why DuPane?</a></li>
         <li><a href="#quickstart">Quick Start</a></li>
         <li><a href="#navigation">Dual-Pane Navigation</a></li>
         <li><a href="#tabs">Tabs</a></li>
         <li><a href="#sidebar">Sidebar &amp; Bookmarks</a></li>
         <li><a href="#file-ops">File Operations</a></li>
+        <li><a href="#compare-sync">Folder Compare &amp; Sync</a></li>
         <li><a href="#sorting">Sorting &amp; Filtering</a></li>
         <li><a href="#quicklook">Quick Look</a></li>
         <li><a href="#tags">Colour Tags</a></li>
         <li><a href="#smart-metadata">Smart Metadata Columns</a></li>
-        <li><a href="#warp">Warp Folder Jump</a></li>
         <li><a href="#command-runner">Command Runner</a></li>
         <li><a href="#custom-actions">Actions (Custom Scripts)</a></li>
         <li><a href="#folder-size">Folder Size View</a></li>
@@ -710,73 +663,107 @@
     <!-- ─── 1. Overview ─── -->
     <section class="section" id="overview">
       <div class="section-label">Introduction</div>
-      <h2>What is /Opus?</h2>
-      <p class="lead">/Opus is a dual-pane file manager for macOS that puts two folder views side by side, making it effortless to copy, move, and organise files between locations.</p>
+      <h2>What is DuPane?</h2>
+      <p class="lead">DuPane is a full-featured, keyboard-driven file manager for macOS power users — a native dual-pane workspace where copy, move, compare, script, and inspect operations are a single keystroke away, without ever touching the mouse or leaving the app.</p>
+
+      <p>Where Finder is built for casual browsing, DuPane is built for <em>work</em>. Every feature is designed to eliminate friction: no window juggling, no switching to Terminal, no hunting for Get Info. The two-pane layout means your source and destination are always visible. The integrated terminal means your shell commands run in-context. Bookmarked folders in the sidebar mean your frequently-used locations are one click away.</p>
 
       <div class="feature-grid">
         <div class="feature-card">
           <div class="feature-card-icon ic-blue">⊞</div>
           <h4>Dual Panes</h4>
-          <p>Two independent folder views with separate navigation history and tab support.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-card-icon ic-purple">⌘K</div>
-          <h4>Warp Jump</h4>
-          <p>Instant fuzzy folder navigation across bookmarks, recents, and history.</p>
+          <p>Two independent folder views with separate navigation history, tabs, sort, and filter. Move or copy files with one click — no window juggling.</p>
         </div>
         <div class="feature-card">
           <div class="feature-card-icon ic-green">◉</div>
           <h4>Smart Metadata</h4>
-          <p>Dimensions for images, duration for video, line count for code — at a glance.</p>
+          <p>Dimensions for images, duration for video/audio, line count for code files — loaded in background, always available inline.</p>
         </div>
         <div class="feature-card">
           <div class="feature-card-icon ic-orange">⚡</div>
-          <h4>Actions</h4>
-          <p>Run your own shell commands on selected files directly from the context menu.</p>
+          <h4>Custom Actions</h4>
+          <p>Write one-liner shell scripts that appear in the context menu. <code>$@</code> expands to selected file paths — run any workflow on any file, instantly.</p>
         </div>
         <div class="feature-card">
           <div class="feature-card-icon ic-teal">📑</div>
-          <h4>Persistent Tabs</h4>
-          <p>All open tabs are saved across restarts when using "Remember last folder" startup mode.</p>
+          <h4>Pinned Tabs + Persistence</h4>
+          <p>Pin important folders so they survive navigation, recall their exact location with one click, and persist across all restarts.</p>
         </div>
         <div class="feature-card">
           <div class="feature-card-icon ic-red">⊙</div>
-          <h4>Folder Sizes</h4>
-          <p>Visualise which subfolders are eating your disk space in a live bar chart.</p>
+          <h4>Folder Size Chart</h4>
+          <p>Visualise which subfolders are consuming your disk space in a live proportional bar chart, scanning the full tree in the background.</p>
         </div>
+        <div class="feature-card">
+          <div class="feature-card-icon ic-blue">⇄</div>
+          <h4>Compare &amp; Sync</h4>
+          <p>Compare the two active folders side-by-side, with per-row difference highlights (newer, older, different, only here), then sync in one click.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-icon ic-green">$_</div>
+          <h4>Integrated Terminal</h4>
+          <p>A retractable shell panel lives at the bottom of each pane. Commands run in the current directory — stay in context, never switch windows.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-icon ic-orange">⊟</div>
+          <h4>Column Control</h4>
+          <p>Show, hide, resize, and reorder columns. Per-folder sort preferences. Font size adjustable from 11–16 pt. Everything adapts and persists.</p>
+        </div>
+      </div>
+
+      <h3>Everything customisable, everything persistent</h3>
+      <p>Unlike Finder — where every window forgets your last folder, sort order, and column width — DuPane remembers everything. Your tabs, sort preferences, column widths, sidebar bookmarks, startup folders, colour tags, tab colours, and custom actions all persist across restarts. Start work exactly where you left off.</p>
+
+      <div class="callout tip">
+        <div class="callout-icon">💡</div>
+        <p>Inspired by Directory Opus (Windows) and Total Commander, DuPane brings the same power-user file management philosophy to macOS as a fully native SwiftUI application — no Electron, no performance compromises.</p>
       </div>
     </section>
 
     <hr class="divider">
 
-    <!-- ─── Why /Opus? ─── -->
+    <!-- ─── Why DuPane? ─── -->
     <section class="section" id="why-opus">
       <div class="section-label">Getting Started</div>
-      <h2>Why /Opus? Can't I just use Finder?</h2>
-      <p class="lead">Finder is great for casual browsing. /Opus is built for power users who move dozens of files a day, work across many folders simultaneously, and want the keyboard and the terminal all in one native place.</p>
+      <h2>Why DuPane? Can't I just use Finder?</h2>
+      <p class="lead">Finder is excellent for casual browsing — it wasn't designed for heavy file work. DuPane is built for developers and power users who move dozens of files a day, juggle multiple project directories, and want their shell, their file tree, and their operations in one keyboard-friendly place.</p>
 
       <h3>The dual-pane advantage</h3>
-      <p>The single biggest productivity gain: <strong>two folder views, side by side, at all times.</strong> In Finder you open a source window, then a destination window, then try to keep both visible while dragging. In /Opus you select files in the left pane and press Move — done. No window juggling, no missed drops.</p>
+      <p>The single biggest productivity gain: <strong>two folder views, side by side, at all times.</strong> In Finder you open a source window, arrange it next to a destination window, and hope your drag lands in the right place. In DuPane you select files in the left pane and press <strong>Move</strong> — the right pane is always the destination. No window juggling, no missed drops, no accidental copies.</p>
+
+      <p>But DuPane goes far beyond dual-pane. Every feature is chosen to eliminate a specific friction point that power users hit daily:</p>
 
       <h3>Feature comparison</h3>
       <table class="shortcut-table">
-        <thead><tr><th>Feature</th><th>Finder</th><th>/Opus</th></tr></thead>
-        <tr><td>Two folders side by side</td><td>Manually arrange two windows</td><td>Built-in dual panes with one-click Move/Copy</td></tr>
-        <tr><td>Tabs per pane</td><td>Tabs across the whole app</td><td>Separate tab rows per pane — left and right independent</td></tr>
-        <tr><td>Instant folder jump</td><td>⌘⇧G path dialog only</td><td>Warp (⌘K): fuzzy search across bookmarks, recents, open tabs</td></tr>
-        <tr><td>File metadata at a glance</td><td>Get Info popup per file</td><td>Smart Info column: dimensions, duration, line count inline</td></tr>
-        <tr><td>Run shell commands</td><td>Open Terminal separately</td><td>Built-in Command Runner — stay in context</td></tr>
-        <tr><td>Custom file actions</td><td>Automator (complex setup)</td><td>One-liner shell scripts in a single text field</td></tr>
-        <tr><td>Keyboard-driven navigation</td><td>Partial (⌘↑ to go up)</td><td>Full: ⌘[ back, ⌘] forward, ⌘↑ up, ↩ open, ⌘K jump</td></tr>
-        <tr><td>Folder disk usage</td><td>Get Info (slow, no chart)</td><td>Live proportional bar chart — see what's eating space instantly</td></tr>
+        <thead><tr><th>What you need</th><th>Finder</th><th>DuPane</th></tr></thead>
+        <tr><td>Two folders side by side</td><td>Manually tile two windows</td><td>Built-in dual panes with one-click Move/Copy</td></tr>
+        <tr><td>Multiple working locations</td><td>Tabs across the whole app</td><td>Separate tab strips per pane — left and right fully independent, coloured, pinned, and named</td></tr>
+        <tr><td>Jump to any folder instantly</td><td>⌘⇧G path dialog (type exact path)</td><td>Click a sidebar bookmark, breadcrumb segment, or press ⌘L to type any path directly</td></tr>
+        <tr><td>File metadata inline</td><td>Get Info popup (one file at a time)</td><td>Smart Info column: image dimensions, video duration, code line count — loaded in background, always visible</td></tr>
+        <tr><td>Run shell commands</td><td>Switch to Terminal, cd to the folder</td><td>Built-in Command Runner in each pane — commands run in the current directory, output shown inline</td></tr>
+        <tr><td>Automate file operations</td><td>Automator workflows (complex setup)</td><td>Custom Actions: one-liner shell scripts in a text field, <code>$@</code> expands to selected paths</td></tr>
+        <tr><td>Full keyboard navigation</td><td>Partial (⌘↑ up, ↩ open)</td><td>⌘[ back, ⌘] forward, ⌘↑ up, ↩ open, ⌘T new tab, ⌘R refresh, Space Quick Look</td></tr>
+        <tr><td>Folder disk usage</td><td>Get Info (slow, no chart)</td><td>Live proportional bar chart — top 15 items by size, scanning in background</td></tr>
+        <tr><td>Compare two directories</td><td>Not available</td><td>Compare mode: per-row highlights (newer, older, different, only here), one-click sync</td></tr>
+        <tr><td>Preview files instantly</td><td>Space for Quick Look (great!)</td><td>Same Space key, without leaving DuPane — multi-file Quick Look with your full selection</td></tr>
+        <tr><td>Adjustable column layout</td><td>Fixed columns per view mode</td><td>Show/hide, resize, reorder columns; adjustable font size; all settings persist per session</td></tr>
+        <tr><td>Colour-tag filtering</td><td>Sidebar shows one tag at a time</td><td>Tag sidebar with multi-tag filter (⌘Click) — filter both panes simultaneously by tag combination</td></tr>
       </table>
 
-      <h3>Built for developers &amp; power users</h3>
-      <p>If you've ever used Directory Opus on Windows, Total Commander, or Midnight Commander, /Opus brings that philosophy natively to macOS — fast, keyboard-friendly, and deeply integrated with the Mac platform.</p>
+      <h3>Why DuPane is particularly good for developers</h3>
+      <p>Every developer workflow DuPane targets maps to a concrete feature:</p>
+      <ul style="color:var(--text2);line-height:2;padding-left:1.4em;">
+        <li><strong>Deploying build artefacts?</strong> Split-pane: source on left, server mount on right. Select all, Copy. Done.</li>
+        <li><strong>Refactoring a project tree?</strong> Compare mode shows which files differ between two branches (checked out in separate directories). Sync selectively.</li>
+        <li><strong>Batch-renaming generated files?</strong> Custom Action: one <code>for f in $@; do mv "$f" ...</code> line. Run on selection.</li>
+        <li><strong>Checking image assets?</strong> Smart Metadata shows pixel dimensions inline — no need to open each file.</li>
+        <li><strong>Jumping between multiple projects?</strong> Bookmark each project root — the sidebar gets you there in one click.</li>
+        <li><strong>Running git commands?</strong> Command Runner is already in the pane — type <code>git status</code> without opening a separate terminal.</li>
+      </ul>
 
       <div class="callout tip">
         <div class="callout-icon">💡</div>
-        <p><strong>/Opus doesn't replace Finder</strong> — it complements it. Right-click any file to Reveal in Finder when you need Finder's features. But for day-to-day file work, you'll rarely need to switch.</p>
+        <p><strong>DuPane doesn't replace Finder</strong> — it complements it. Right-click any file → <strong>Reveal in Finder</strong> when you need Finder-specific features (AirDrop, Tags from colour wheel, iCloud status). For day-to-day file work, you'll rarely need to switch.</p>
       </div>
     </section>
 
@@ -789,12 +776,11 @@
       <p class="lead">You'll be navigating files in under a minute. Here's the essential workflow.</p>
 
       <ol class="steps">
-        <li><strong>Launch /Opus.</strong> The left pane opens your Downloads folder; the right pane shows Computer (all mounted volumes). Click any volume to enter it.</li>
+        <li><strong>Launch DuPane.</strong> The left pane opens your Downloads folder; the right pane shows Computer (all mounted volumes). Click any volume to enter it. On first launch macOS will ask for permission to access your Downloads and Documents folders — click <strong>Allow</strong> for each prompt. These prompts appear once and are remembered.</li>
         <li><strong>Click a pane to make it active.</strong> The active pane shows a coloured border. Navigation commands always target the active pane.</li>
         <li><strong>Double-click a folder</strong> to enter it. Use the breadcrumb trail at the top or the <kbd>↑</kbd> button to go up a level.</li>
         <li><strong>Select files</strong> with a single click. Hold <kbd>⌘</kbd> to add items to the selection, or <kbd>⇧</kbd> to select a range.</li>
-        <li><strong>Press <kbd>⌘K</kbd></strong> to open Warp and jump to any folder instantly.</li>
-        <li><strong>Press <kbd>Space</kbd></strong> to Quick Look the selected file(s) without leaving /Opus.</li>
+        <li><strong>Press <kbd>Space</kbd></strong> to Quick Look the selected file(s) without leaving DuPane.</li>
       </ol>
 
       <div class="callout tip">
@@ -809,7 +795,7 @@
     <section class="section" id="navigation">
       <div class="section-label">Core Features</div>
       <h2>Dual-Pane Navigation</h2>
-      <p class="lead">The core of /Opus is two independent file panes shown side by side. The left pane has a blue accent; the right pane has an orange accent.</p>
+      <p class="lead">The core of DuPane is two independent file panes shown side by side. Each pane has its own location, history, tabs, sort, filter, and selection; the active pane is shown with a clear focus border.</p>
 
       <!-- Mockup -->
       <div class="mockup">
@@ -820,7 +806,6 @@
         </div>
         <div class="mockup-toolbar">
           <div class="mockup-btn active">⊞ Sidebar</div>
-          <div class="mockup-btn">⌘K Jump</div>
           <div class="mockup-btn">📁+ New Folder</div>
           <div class="mockup-btn">📄+ New File</div>
           <div class="mockup-btn">→ Move</div>
@@ -829,6 +814,7 @@
           <div class="mockup-btn">🔖 Bookmark</div>
           <div class="mockup-btn">⚡ Actions</div>
           <div class="mockup-btn">⎈ Terminal</div>
+          <div class="mockup-btn">🔗 Follow</div>
         </div>
         <div class="mockup-panes">
           <!-- Left pane -->
@@ -923,6 +909,10 @@
 
       <h3>Switching Between Panes</h3>
       <p>Simply click anywhere inside the desired pane. The coloured border shows which pane is active. All toolbar actions (Move, Copy, Delete, New Folder) operate on the <strong>active pane</strong>.</p>
+
+      <h3>Follow Mode</h3>
+      <p>Click the <strong>Follow</strong> button in the toolbar to enable Follow Mode. When active (the button glows blue), any folder you navigate to in the active pane is immediately mirrored to the inactive pane. Enabling Follow Mode also snaps the inactive pane to the active pane's current folder straight away.</p>
+      <p>Follow Mode is useful when you want both panes to always show the same directory tree — for example, when exploring a project structure alongside a destination. Click Follow again to turn it off.</p>
     </section>
 
     <hr class="divider">
@@ -933,14 +923,21 @@
       <h2>Tabs</h2>
       <p class="lead">Each pane supports multiple tabs — perfect for switching between two different working directories without losing your place.</p>
 
-      <p>A tab strip appears above each pane whenever multiple tabs are open. Click a tab to switch to it. The active tab is underlined in the pane's accent colour.</p>
+      <p>A tab strip appears above each pane. Click a tab to switch to it; clicking a pinned tab also returns it to the folder captured when it was pinned. The active tab is shown with a selected background. The <strong>+</strong> button opens another tab in the same pane.</p>
 
       <table class="shortcut-table">
         <tr><td class="shortcut-desc">Open a new tab</td><td class="shortcut-keys"><kbd>⌘T</kbd> or click the <strong>+</strong> button at the end of the tab strip</td></tr>
         <tr><td class="shortcut-desc">Close current tab</td><td class="shortcut-keys"><kbd>⌘⇧W</kbd></td></tr>
-        <tr><td class="shortcut-desc">Click to switch tab</td><td class="shortcut-keys">Mouse click on tab button</td></tr>
-        <tr><td class="shortcut-desc">Click × to close</td><td class="shortcut-keys">Individual tab close button</td></tr>
+        <tr><td class="shortcut-desc">Switch tab / recall pinned folder</td><td class="shortcut-keys">Click the tab button</td></tr>
+        <tr><td class="shortcut-desc">Reorder tabs</td><td class="shortcut-keys">Right-click the tab → <strong>Move to Start</strong>, <strong>Move Left</strong>, <strong>Move Right</strong>, or <strong>Move to End</strong></td></tr>
+        <tr><td class="shortcut-desc">Close tab</td><td class="shortcut-keys">Click the × button on the tab</td></tr>
+        <tr><td class="shortcut-desc">Pin or unpin tab</td><td class="shortcut-keys">Right-click the tab → <strong>Pin Tab</strong> or <strong>Unpin Tab</strong></td></tr>
+        <tr><td class="shortcut-desc">Set tab colour</td><td class="shortcut-keys">Right-click the tab → <strong>Tab Color</strong> → choose a colour or None</td></tr>
+        <tr><td class="shortcut-desc">Rename tab</td><td class="shortcut-keys">Right-click the tab → <strong>Rename Tab…</strong></td></tr>
+        <tr><td class="shortcut-desc">Reset tab name</td><td class="shortcut-keys">Right-click the tab → <strong>Reset Tab Name</strong> (only shown when a custom name is set)</td></tr>
       </table>
+
+      <p>Right-clicking a tab shows a context menu. <strong>Move to Start / Move Left / Move Right / Move to End</strong> reorder the tab within the strip — options are shown only when they apply (e.g. "Move to Start" is hidden for the first tab). <strong>Pin Tab</strong> captures the tab's current folder, keeps that tab available across launches, and shows a small pin icon in the tab. If you browse elsewhere inside a pinned tab, click the pinned tab again to return to the captured folder. Pinned tabs hide the close button and ignore the close-tab shortcut until you right-click and choose <strong>Unpin Tab</strong>. <strong>Tab Color</strong> tints the tab background with one of eight colours (Red, Orange, Yellow, Green, Blue, Purple, Pink, Graphite); the chosen colour persists across restarts. Choose <strong>None</strong> to clear the tint. <strong>Rename Tab…</strong> opens a prompt where you can type any name for that tab — useful when you have several tabs open in similar folders. The custom name persists across restarts. <strong>Reset Tab Name</strong> removes the custom name and reverts to showing the tab's pinned folder, or the current folder for unpinned tabs.</p>
 
       <div class="callout tip">
         <div class="callout-icon">💡</div>
@@ -949,8 +946,11 @@
 
       <div class="callout info">
         <div class="callout-icon">ℹ️</div>
-        <p><strong>Tab persistence:</strong> When the startup mode is set to <strong>Remember last folder</strong> (Settings → Startup Folders), all open tabs — not just the active one — are saved across restarts. Relaunch /Opus and every tab reappears where you left it.</p>
+        <p><strong>Tab persistence:</strong> Pinned tabs restore their captured folder on launch even when the pane uses Default or Fixed Folder startup mode. When startup mode is set to <strong>Remember last folder</strong> (Settings → Startup Folders), all open tabs — not just pinned ones — are saved across restarts, including their custom names, pinned state, and tab order.</p>
       </div>
+
+      <h3>Native macOS Window Tabs</h3>
+      <p>DuPane disables the system-level macOS window tab bar so there is only one tab model to manage. Use the tab strip inside each file pane for all tab workflows.</p>
     </section>
 
     <hr class="divider">
@@ -959,28 +959,45 @@
     <section class="section" id="sidebar">
       <div class="section-label">Core Features</div>
       <h2>Sidebar &amp; Bookmarks</h2>
-      <p class="lead">The sidebar gives you one-click access to favourite locations. It lists system locations (Home, Desktop, Downloads, Documents, and OneDrive if present) and any files or folders you've bookmarked.</p>
+      <p class="lead">The sidebar gives you one-click access to favourite locations, recently visited folders, and user bookmarks — organised into clear sections.</p>
 
-      <p>Toggle the sidebar with <kbd>⌥⌘S</kbd> or the Sidebar button in the toolbar. Click any location to navigate the active pane there instantly. The sidebar keeps its width when opened, while file names retain a readable minimum width in the panes.</p>
+      <p>Toggle the sidebar with <kbd>⌥⌘S</kbd> or the Sidebar button in the toolbar. Click any location to navigate the active pane there instantly.</p>
+      <p>To resize the sidebar, drag the divider between the sidebar and the file panes left or right. The width is saved and restored across restarts. Minimum width is 120 pt, maximum 320 pt.</p>
+
+      <h3>Places</h3>
+      <p>The <strong>Places</strong> section shows fixed system locations for instant one-click access: Home, Applications, Desktop, Documents, and Downloads. You can choose which locations appear in <strong>Settings → Sidebar Places</strong> — each can be toggled on or off independently.</p>
+
+      <h3>Recents</h3>
+      <p>The <strong>Recents</strong> section automatically tracks the last 12 folders you navigated to in either pane — no configuration needed. The most recently visited folder appears at the top. Right-click any recent item to remove it, or click <strong>Clear Recents</strong> to reset the entire list.</p>
+
+      <p>The sidebar also includes a <strong>Tags</strong> section when Finder tags are present in the loaded panes or Spotlight results. The full tag row is clickable. Click a tag to filter both panes to items with that tag; selected tags keep a highlighted background. Click the only selected tag again to clear the filter. <kbd>⌘</kbd>-click additional tags to include more than one tag in the filter.</p>
 
       <h3>Adding Bookmarks</h3>
       <p>There are two ways to add a bookmark:</p>
       <ul>
-        <li><strong>Toolbar button:</strong> Select exactly one file or folder, then click the <strong>Bookmark</strong> button in the toolbar. If nothing is selected, the current folder is bookmarked instead.</li>
+        <li><strong>Toolbar button:</strong> Select exactly one file or folder, then click the <strong>Bookmark</strong> button in the toolbar.</li>
         <li><strong>Right-click:</strong> Right-click any file or folder → <strong>Bookmark</strong> to add it directly from the context menu.</li>
       </ul>
       <p>The item appears immediately in the sidebar's Bookmarks section.</p>
 
       <h3>Opening Bookmarks</h3>
-      <p>Clicking a bookmarked <strong>folder</strong> navigates the active pane there. Clicking a bookmarked <strong>file</strong> opens it in its default application.</p>
+      <p>Clicking a bookmarked <strong>folder</strong> navigates the active pane there. Clicking a bookmarked <strong>file</strong> opens it in its default application. Folder bookmarks show a <strong>folder</strong> icon; file bookmarks show a <strong>document</strong> icon — making it easy to tell them apart at a glance.</p>
+      <p>Clicking a bookmarked <strong>shell script</strong> (<code>.sh</code> file) shows a confirmation dialog before executing it in Terminal — shell scripts can modify or delete files, so you'll never accidentally run one.</p>
+
+      <h3>Renaming Bookmarks</h3>
+      <p>Right-click a bookmark and choose <strong>Rename…</strong> to give it a custom display label. The label is shown in the sidebar in place of the filename. Removing the bookmark also removes the custom label. Removing the text entirely in the rename sheet restores the original filename.</p>
+
+      <h3>Reordering Bookmarks</h3>
+      <p>Right-click a bookmark and choose <strong>Move Up</strong> or <strong>Move Down</strong> to shift it one position in the list. You can also drag bookmarks to a new position directly in the sidebar.</p>
 
       <h3>Removing Bookmarks</h3>
       <p>Hover over a bookmark in the sidebar — a <strong>×</strong> button fades in on the right. Click it to remove. You can also right-click a bookmark and choose <strong>Remove Bookmark</strong>, or select the bookmarked item and click the Bookmark toolbar button again to toggle it off.</p>
 
       <table class="shortcut-table">
         <tr><td class="shortcut-desc">Toggle Sidebar</td><td class="shortcut-keys"><kbd>⌥⌘S</kbd></td></tr>
-        <tr><td class="shortcut-desc">Bookmark selected item (or current folder)</td><td class="shortcut-keys">Bookmark toolbar button</td></tr>
+        <tr><td class="shortcut-desc">Bookmark selected item</td><td class="shortcut-keys">Bookmark toolbar button</td></tr>
         <tr><td class="shortcut-desc">Bookmark from context menu</td><td class="shortcut-keys">Right-click → Bookmark</td></tr>
+        <tr><td class="shortcut-desc">Rename / reorder bookmark</td><td class="shortcut-keys">Right-click bookmark → Rename… / Move Up / Move Down</td></tr>
       </table>
     </section>
 
@@ -990,7 +1007,7 @@
     <section class="section" id="file-ops">
       <div class="section-label">Core Features</div>
       <h2>File Operations</h2>
-      <p class="lead">/Opus keeps common operations a single click away in the toolbar — and exposes advanced options through a context menu.</p>
+      <p class="lead">DuPane keeps common operations a single click away in the toolbar — and exposes advanced options through a context menu.</p>
 
       <h3>Creating Files &amp; Folders</h3>
       <table class="shortcut-table">
@@ -1000,9 +1017,19 @@
       </table>
 
       <h3>Moving &amp; Copying</h3>
-      <p>Select files in the active pane, then click <strong>Move →</strong> or <strong>Copy ⎘</strong> in the toolbar. Files are sent to the <em>other</em> pane's current directory.</p>
-      <p>You can also drag selected files or folders between panes. A plain drag moves the selection; holding <kbd>Option</kbd> copies it. Directory rows accept drops into that folder, while file rows and empty pane space drop into the current folder.</p>
-      <p>You can also right-click any file to get <strong>Move to [folder]</strong> and <strong>Copy to [folder]</strong> options in the context menu.</p>
+      <p>Select files or folders in the active pane, then click <strong>Move →</strong> or <strong>Copy ⎘</strong> in the toolbar. Items are sent to the <em>other</em> pane's current directory.</p>
+      <p>You can also drag selected files or folders between panes. A plain drag moves the selection; holding <kbd>Option</kbd> during the drag copies it instead. Directory rows accept drops into that subfolder (blue outline on hover), while file rows and the pane background drop into the current folder. Files dragged in from Finder or other apps are always copied, never moved.</p>
+      <p>You can also right-click any file or folder to get <strong>Move to [folder]</strong> and <strong>Copy to [folder]</strong> options in the context menu.</p>
+
+      <p>For operations that take more than about 400 ms (typically large files or many items), a compact progress pill appears at the bottom of the window showing the operation label, a progress bar, and an item count (<em>N of M</em>). The pill fades away automatically when the operation completes. Quick single-file copies finish before the pill ever appears, so there is no visual noise for routine operations.</p>
+
+      <h4>Conflict resolution</h4>
+      <p>If one or more items being transferred already exist in the destination, a dialog appears with three choices:</p>
+      <ul>
+        <li><strong>Overwrite</strong> — replaces the existing item in the destination.</li>
+        <li><strong>Skip</strong> — leaves existing items untouched; only non-conflicting items are transferred.</li>
+        <li><strong>Keep Both</strong> — auto-renames the incoming item with a numeric suffix (e.g. <em>report 2.pdf</em>, <em>report 3.pdf</em>, …), preserving both the original and the new file.</li>
+      </ul>
 
       <div class="callout warning">
         <div class="callout-icon">⚠️</div>
@@ -1010,14 +1037,14 @@
       </div>
 
       <h3>Deleting</h3>
-      <p>Select files and press <kbd>⌘⌫</kbd> or click the <strong>🗑 Delete</strong> toolbar button. A confirmation dialog appears (configurable in Settings). Files are always moved to the macOS Trash — you can recover them from the Trash if you change your mind.</p>
+      <p>Select files or folders and press <kbd>⌘⌫</kbd> or click the <strong>🗑 Delete</strong> toolbar button. A confirmation dialog appears (configurable in Settings). Items are always moved to the macOS Trash — you can recover them from the Trash if you change your mind.</p>
 
       <h3>Duplicate</h3>
       <p>Right-click any file or folder → <strong>Duplicate</strong> to create a copy in the same folder. The copy is named <em>filename copy</em> (with a counter if that name already exists). Works on the full selection.</p>
 
       <h3>Compress &amp; Uncompress</h3>
       <p>Right-click → <strong>Compress</strong> to zip the selected file(s) into a <code>.zip</code> archive in the same folder. The archive is named after the single selected item, or <em>Archive.zip</em> for multiple items.</p>
-      <p><strong>Uncompress</strong> appears in the context menu only when you right-click a <code>.zip</code> file. It extracts the archive into the same folder. If any file in the archive already exists at the destination, a dialog appears with three options: <strong>Overwrite</strong> (replace existing files), <strong>Skip existing</strong> (keep existing files and extract only the new ones), or <strong>Cancel</strong>.</p>
+      <p><strong>Uncompress</strong> a <code>.zip</code> file in two ways: right-click it and choose <strong>Uncompress</strong>, or simply <strong>double-click</strong> it. Both extract the archive into the same folder, keeping you in DuPane the whole time. If any file in the archive already exists at the destination, a dialog appears with three options: <strong>Overwrite</strong> (replace existing files), <strong>Skip existing</strong> (keep existing files and extract only the new ones), or <strong>Cancel</strong>.</p>
 
       <h3>Copy &amp; Share</h3>
       <p>Right-click → <strong>Copy</strong> places the selected file(s) on the macOS clipboard so you can paste them into Finder, Messages, Mail, or any other app that accepts files.</p>
@@ -1034,6 +1061,44 @@
 
       <h3>Bookmark from Context Menu</h3>
       <p>Right-click any file or folder → <strong>Bookmark</strong> to add it to the sidebar's Bookmarks section. If the item is already bookmarked, the option reads <strong>Remove Bookmark</strong> to toggle it off.</p>
+
+      <h3>Get Info</h3>
+      <p>Right-click any file or folder → <strong>Get Info…</strong> to open a detail sheet showing the item's icon, name, kind, full path, size, modified date, created date, and any colour tags. File size is loaded from disk asynchronously for maximum accuracy.</p>
+
+      <h3>Shell Scripts</h3>
+      <p>Double-clicking a <code>.sh</code> file (or clicking a bookmarked <code>.sh</code> in the sidebar) shows a confirmation dialog. Click <strong>Execute</strong> to run the script in a new Terminal window, or <strong>Cancel</strong> to leave it unopened. This prevents accidentally running scripts that could modify or delete files.</p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ─── 7. Compare Sync ─── -->
+    <section class="section" id="compare-sync">
+      <div class="section-label">Core Features</div>
+      <h2>Folder Compare &amp; Sync</h2>
+      <p class="lead">Compare mode checks the active folders in the left and right panes, highlights differences, and lets you sync eligible changes in either direction after a confirmation preview.</p>
+
+      <h3>Starting a Compare</h3>
+      <ol class="steps">
+        <li>Navigate both panes into real folders. Compare is disabled while either pane is at the Computer root.</li>
+        <li>Click the <strong>Compare</strong> button in the main toolbar.</li>
+        <li>Rows are highlighted and badged when an item is only on one side, newer on one side, older on one side, or different.</li>
+      </ol>
+
+      <table class="shortcut-table">
+        <thead><tr><th>Status</th><th>Meaning</th></tr></thead>
+        <tr><td><strong>only here</strong></td><td>The item exists in this pane but not in the other pane.</td></tr>
+        <tr><td><strong>newer</strong></td><td>The item matches by name, kind, and size, but this pane has the newer modified date.</td></tr>
+        <tr><td><strong>older</strong></td><td>The matching item in the other pane has the newer modified date.</td></tr>
+        <tr><td><strong>different</strong></td><td>The name matches, but kind, size, or date information conflicts.</td></tr>
+      </table>
+
+      <h3>Syncing Changes</h3>
+      <p>When Compare mode is active, the toolbar shows <strong>Sync L-&gt;R</strong> and <strong>Sync R-&gt;L</strong>. A sync copies missing source-side items and overwrites eligible older or different files on the destination side. A confirmation dialog lists the planned copy and overwrite counts before anything is written.</p>
+
+      <div class="callout warning">
+        <div class="callout-icon">⚠️</div>
+        <p>Sync never deletes destination-only items. Missing folders can be copied, but existing folder differences are skipped in this version because Compare does not yet scan inside folders.</p>
+      </div>
     </section>
 
     <hr class="divider">
@@ -1042,18 +1107,45 @@
     <section class="section" id="sorting">
       <div class="section-label">Core Features</div>
       <h2>Sorting &amp; Filtering</h2>
-      <p class="lead">/Opus remembers your sort preference for each folder individually, so your code folder always sorts by Name while Downloads stays sorted by Date.</p>
+      <p class="lead">DuPane remembers your sort preference for each folder individually, so your code folder always sorts by Name while Downloads stays sorted by Date.</p>
 
       <h3>Sorting</h3>
       <p>Click the column headers — <strong>Name</strong>, <strong>Size</strong>, <strong>Kind</strong>, <strong>Modified</strong>, or <strong>Info</strong> — to sort by that column. Click the same column again to reverse the direction. A small arrow shows the current sort direction.</p>
-      <p>/Opus remembers the sort preference per folder, so your code folder stays sorted by Name while Downloads stays sorted by Modified.</p>
+      <p>DuPane remembers the sort preference per folder, so your code folder stays sorted by Name while Downloads stays sorted by Modified.</p>
 
       <h3>Showing and Hiding Columns</h3>
-      <p><strong>Right-click any column header</strong> to reveal a context menu that lets you show or hide any of the four optional columns: Size, Kind, Modified, and Info. The Name column is always visible. Column visibility persists across restarts.</p>
+      <p><strong>Right-click any column header</strong> to reveal a context menu that lets you show or hide the file icon and any of the four optional metadata columns: <strong>Icon</strong>, <strong>Size</strong>, <strong>Kind</strong>, <strong>Modified</strong>, and <strong>Info</strong>. The Name column is always visible. Hiding the Icon column collapses the icon space so the Name column gains the extra room. Column visibility persists across restarts.</p>
+
+      <h3>Reordering Columns</h3>
+      <p><strong>Right-click any column header</strong> and use the submenu at the bottom of the context menu to move a column left or right. For example, right-clicking the header area then choosing "Kind column → Move Left" moves Kind before Size. The Name column is always first and cannot be moved. Column order persists across restarts.</p>
+
+      <h3>Resizing Columns</h3>
+      <p>Hover over the separator area between any two column headers — the cursor changes to a resize arrow. <strong>Drag left or right</strong> to adjust the column width. The hit target is wider than the visible separator line, making it easier to grab. All file rows update in real time as you drag. Column widths persist across restarts.</p>
 
       <h3>Filtering</h3>
       <p>Type in the <strong>Filter…</strong> field in each pane's navigation toolbar to instantly narrow the file list. The filter matches anywhere in the filename and automatically activates that pane as you type.</p>
-      <p>Click the <strong>×</strong> button that appears inside the filter field to clear it with one click. For a more powerful folder search, use <kbd>⌘K</kbd> Warp.</p>
+      <p>Click the <strong>×</strong> button that appears inside the filter field to clear it with one click.</p>
+      <p>When a filter or tag filter is active the pane's status bar appends <strong>(filtered)</strong> to the item count so it's always clear you're seeing a subset of the folder.</p>
+
+      <h3>Subfolder Search</h3>
+      <p>The standard filter only looks at files in the <em>current folder</em>. To search the entire subtree — including nested subfolders — use the <strong>magnifying glass button</strong> that appears next to the × clear button whenever there is filter text:</p>
+      <ol class="steps">
+        <li>Type a name pattern in the <strong>Filter…</strong> field (e.g. <code>invoice</code>).</li>
+        <li>Click the <strong>🔍 magnifying glass</strong> button to the right of the × button.</li>
+        <li>A blue search banner appears below the sort header showing <em>"Searching subfolders…"</em> with a spinner while Spotlight gathers results. Once finished it shows <em>"N results in subfolders"</em>.</li>
+        <li>Results from the entire subtree are listed in the pane. You can open, move, copy, or delete them just like any other item.</li>
+        <li>Click the magnifying glass button again, click <strong>Clear search</strong> in the banner, or clear the filter text with × to exit search mode and return to the normal folder view.</li>
+      </ol>
+
+      <div class="callout info">
+        <div class="callout-icon">ℹ️</div>
+        <p>Subfolder search uses macOS Spotlight. Results depend on Spotlight's index for the target folder. External drives, network shares, or directories explicitly excluded from Spotlight may return no results. Standard in-folder filtering always works regardless of Spotlight availability.</p>
+      </div>
+
+      <div class="callout tip">
+        <div class="callout-icon">💡</div>
+        <p>Navigating to a different folder or pressing the back button automatically exits search mode and restores the normal view.</p>
+      </div>
     </section>
 
     <hr class="divider">
@@ -1062,11 +1154,11 @@
     <section class="section" id="quicklook">
       <div class="section-label">Core Features</div>
       <h2>Quick Look</h2>
-      <p class="lead">Preview any file instantly without leaving /Opus — images, PDFs, videos, code, and more — using macOS's built-in Quick Look engine.</p>
+      <p class="lead">Preview any file instantly without leaving DuPane — images, PDFs, videos, code, and more — using macOS's built-in Quick Look engine.</p>
 
       <ol class="steps">
         <li><strong>Select one or more files</strong> in either pane.</li>
-        <li><strong>Press <kbd>Space</kbd></strong> — the Quick Look panel opens. The panel floats above /Opus and does not interrupt your session.</li>
+        <li><strong>Press <kbd>Space</kbd></strong> — the Quick Look panel opens. The panel floats above DuPane and does not interrupt your session.</li>
         <li><strong>Press <kbd>Space</kbd> again</strong> to dismiss it.</li>
       </ol>
 
@@ -1084,9 +1176,10 @@
     <section class="section" id="tags">
       <div class="section-label">Core Features</div>
       <h2>Colour Tags</h2>
-      <p class="lead">/Opus reads Finder colour tags from the filesystem and displays them as small coloured dots next to each file name — no extra setup needed.</p>
+      <p class="lead">DuPane reads Finder colour tags from the filesystem and displays them as small coloured dots next to each file name — no extra setup needed.</p>
 
-      <p>Tags show as small coloured dots next to each file name in the list. /Opus picks them up automatically when a folder is loaded or refreshed.</p>
+      <p>Tags show as small coloured dots next to each file name in the list. DuPane picks them up automatically when a folder is loaded or refreshed.</p>
+      <p>The sidebar's <strong>Tags</strong> section lists Finder tags from the loaded panes and Spotlight summaries, with a count beside each tag. Selecting a tag filters both panes while preserving each pane's current folder, sort order, and filename filter. Selected tags stay highlighted; click the only selected tag again to clear the filter. <kbd>⌘</kbd>-click tags to build a multi-tag filter.</p>
 
       <h3>Setting Tags</h3>
       <p>Right-click any file → <strong>Tag</strong> submenu to toggle any of the 7 Finder colours:</p>
@@ -1103,7 +1196,7 @@
 
       <div class="callout tip">
         <div class="callout-icon">💡</div>
-        <p>Tags set in /Opus are fully compatible with Finder — they appear immediately in Finder and in Spotlight searches.</p>
+        <p>Tags set in DuPane are fully compatible with Finder — they appear immediately in Finder and in Spotlight searches.</p>
       </div>
     </section>
 
@@ -1163,71 +1256,11 @@
 
     <hr class="divider">
 
-    <!-- ─── 11. Warp ─── -->
-    <section class="section" id="warp">
-      <div class="section-label">Smart Features</div>
-      <h2>Warp — Instant Folder Jump</h2>
-      <p class="lead">Warp is a lightning-fast fuzzy folder finder. Press <kbd>⌘K</kbd> and start typing — you'll jump to any bookmarked or recently visited folder before you finish the word.</p>
-
-      <!-- Warp mockup -->
-      <div class="warp-mockup">
-        <div class="warp-field">
-          <div class="warp-icon">🔍</div>
-          <div class="warp-input">doc<span style="border-left:1.5px solid var(--accent);">&nbsp;</span></div>
-        </div>
-        <div style="padding:4px 0 8px;">
-          <div class="warp-result selected">
-            <div class="warp-result-icon">📁</div>
-            <div class="warp-result-info">
-              <div class="warp-result-name">Documents</div>
-              <div class="warp-result-path">/Users/ian/Documents</div>
-            </div>
-            <span style="font-size:10px;color:rgba(255,255,255,0.6)">↩</span>
-          </div>
-          <div class="warp-result">
-            <div class="warp-result-icon">📁</div>
-            <div class="warp-result-info">
-              <div class="warp-result-name">Docs</div>
-              <div class="warp-result-path">/Users/ian/Documents/coding/DOpusMac/Docs</div>
-            </div>
-          </div>
-          <div class="warp-result">
-            <div class="warp-result-icon">📁</div>
-            <div class="warp-result-info">
-              <div class="warp-result-name">docker-compose</div>
-              <div class="warp-result-path">/Users/ian/Projects/server/docker-compose</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <h3>How It Works</h3>
-      <p>Warp fuzzy-matches your query against three pools of folders:</p>
-      <ul style="list-style:none;margin:12px 0 20px;display:flex;flex-direction:column;gap:8px;">
-        <li style="display:flex;gap:10px;font-size:13px;"><span style="color:var(--accent);font-weight:700;">①</span> <span><strong style="color:var(--text)">System locations</strong> — <span style="color:var(--text2)">Home, Desktop, Documents, Downloads</span></span></li>
-        <li style="display:flex;gap:10px;font-size:13px;"><span style="color:var(--accent);font-weight:700;">②</span> <span><strong style="color:var(--text)">Bookmarks</strong> — <span style="color:var(--text2)">folders you've pinned to the sidebar</span></span></li>
-        <li style="display:flex;gap:10px;font-size:13px;"><span style="color:var(--accent);font-weight:700;">③</span> <span><strong style="color:var(--text)">Open tabs</strong> — <span style="color:var(--text2)">directories currently open in any tab</span></span></li>
-      </ul>
-
-      <p>Results are ranked by match quality — consecutive character matches score higher, and prefix matches get a bonus. The top 12 results are shown.</p>
-
-      <h3>Using Warp</h3>
-      <table class="shortcut-table">
-        <tr><td class="shortcut-desc">Open Warp</td><td class="shortcut-keys"><kbd>⌘K</kbd> or Jump toolbar button</td></tr>
-        <tr><td class="shortcut-desc">Navigate results</td><td class="shortcut-keys"><kbd>↑</kbd> / <kbd>↓</kbd> arrow keys</td></tr>
-        <tr><td class="shortcut-desc">Jump to selected folder</td><td class="shortcut-keys"><kbd>↩ Return</kbd></td></tr>
-        <tr><td class="shortcut-desc">Click a result</td><td class="shortcut-keys">Mouse click to jump immediately</td></tr>
-        <tr><td class="shortcut-desc">Dismiss without jumping</td><td class="shortcut-keys"><kbd>Esc</kbd> or click the backdrop</td></tr>
-      </table>
-    </section>
-
-    <hr class="divider">
-
-    <!-- ─── 12. Command Runner ─── -->
+    <!-- ─── 11. Command Runner ─── -->
     <section class="section" id="command-runner">
       <div class="section-label">Smart Features</div>
       <h2>Command Runner</h2>
-      <p class="lead">A retractable terminal bar at the bottom of each pane lets you run shell commands in the current directory without leaving /Opus.</p>
+      <p class="lead">A retractable terminal bar at the bottom of each pane lets you run shell commands in the current directory without leaving DuPane.</p>
 
       <div class="terminal-mockup">
         <div class="terminal-bar">
@@ -1372,11 +1405,42 @@
 
     <hr class="divider">
 
+    <!-- ─── 15. Duplicate Finder ─── -->
+    <section class="section" id="duplicate-finder">
+      <div class="section-label">Smart Features</div>
+      <h2>Duplicate Finder</h2>
+      <p class="lead">Find identical files anywhere in a folder tree — regardless of filename — and reclaim wasted disk space in seconds.</p>
+
+      <h3>How to use it</h3>
+      <ol>
+        <li>Navigate into a folder in either pane.</li>
+        <li>Click the <strong>Dupes</strong> button in the toolbar.</li>
+        <li>DuPane scans the entire folder tree in the background, comparing file content byte-for-byte.</li>
+        <li>Duplicate groups appear as the scan progresses. Each group shows all copies with their full paths.</li>
+        <li>Trash individual copies using the <strong>trash icon</strong> next to each file, or click <strong>Keep First</strong> to automatically move all copies except the first (alphabetically by path) to the Trash.</li>
+        <li>Click <strong>Done</strong> to close the sheet.</li>
+      </ol>
+
+      <h3>How detection works</h3>
+      <p>Duplicate detection uses a two-pass algorithm that is both fast and accurate:</p>
+      <ol>
+        <li><strong>Size grouping</strong> — files are first bucketed by byte size. Only files that share the same size proceed to the next pass, eliminating most non-duplicates with zero I/O overhead.</li>
+        <li><strong>Content hashing</strong> — same-size files are hashed with FNV-1a 64-bit. Two files whose hashes match are identical regardless of name, location, or modification date.</li>
+      </ol>
+      <p>Hidden files are skipped. The scan runs entirely off the main thread so the app stays responsive.</p>
+
+      <div class="tip">
+        <p><strong>Note:</strong> The Dupes button is disabled when the active pane is showing the Computer (all volumes) root. Navigate into a real folder first.</p>
+      </div>
+    </section>
+
+    <hr class="divider">
+
     <!-- ─── 16. Settings ─── -->
     <section class="section" id="settings">
       <div class="section-label">Reference</div>
       <h2>Settings</h2>
-      <p class="lead">Open Settings from the <strong>/Opus</strong> menu or press <kbd>⌘,</kbd>.</p>
+      <p class="lead">Open Settings from the <strong>DuPane</strong> menu or press <kbd>⌘,</kbd>.</p>
 
       <h3>Delete Behaviour</h3>
       <table class="shortcut-table">
@@ -1404,13 +1468,46 @@
           <td>When on, dotfiles and other hidden items (e.g. <code>.DS_Store</code>, <code>.git</code>) appear in both panes. Applies immediately and persists across restarts.</td>
         </tr>
         <tr>
+          <td>Show hidden folders (dot-folders)</td><td>Off</td>
+          <td>When on, hidden folders (e.g. <code>.git</code>) appear in both panes while regular hidden files remain hidden.</td>
+        </tr>
+        <tr>
           <td>Show file extensions</td><td>On</td>
           <td>When off, file extensions are hidden in the file list (e.g. <code>report.pdf</code> shows as <code>report</code>). Folders are never affected.</td>
         </tr>
+        <tr>
+          <td>Show toolbar button labels</td><td>On</td>
+          <td>When off, toolbar buttons use icons only. This is useful when you want a denser toolbar.</td>
+        </tr>
+        <tr>
+          <td>File list font size</td><td>14 pt</td>
+          <td>Adjusts file-row text from 11 pt to 16 pt. Row height adapts so icons and text remain readable.</td>
+        </tr>
+        <tr>
+          <td>Date format</td><td>Medium (31 Dec 2025)</td>
+          <td>Controls how dates appear in the Modified column. Options: Short (31/12/25), Medium (31 Dec 2025), Long (December 31, 2025), ISO (2025-12-31), Relative (Today, Yesterday, 3d ago).</td>
+        </tr>
       </table>
 
+      <h3>Appearance</h3>
+      <p>Choose a theme from the <strong>Theme</strong> picker in Settings → Appearance. Changes apply instantly across the whole app.</p>
+      <table class="shortcut-table">
+        <thead><tr><th>Theme</th><th>Style</th><th>Accent</th></tr></thead>
+        <tr><td><strong>System</strong></td><td>Follows macOS setting</td><td>System blue</td></tr>
+        <tr><td><strong>Light</strong></td><td>Light</td><td>System blue</td></tr>
+        <tr><td><strong>Dark</strong></td><td>Dark</td><td>System blue</td></tr>
+        <tr><td><strong>Ocean</strong></td><td>Dark</td><td>Cyan (#00B5DE)</td></tr>
+        <tr><td><strong>Country</strong></td><td>Light</td><td>Forest green (#5C9F33)</td></tr>
+        <tr><td><strong>Earth</strong></td><td>Light</td><td>Terracotta (#B87333)</td></tr>
+        <tr><td><strong>Fire</strong></td><td>Dark</td><td>Fire red (#E8421A)</td></tr>
+        <tr><td><strong>Vivid</strong></td><td>Light</td><td>Electric purple (#9900E6)</td></tr>
+      </table>
+
+      <h3>Sidebar Places</h3>
+      <p>Choose which fixed locations appear in the sidebar's <strong>Places</strong> section. Each can be toggled on or off independently. Available locations: <strong>Home</strong>, <strong>Applications</strong>, <strong>Desktop</strong>, <strong>Documents</strong>, <strong>Downloads</strong>. All are enabled by default.</p>
+
       <h3>Startup Folders</h3>
-      <p>Control where each pane opens when /Opus launches. You can set this independently for the left and right panes.</p>
+      <p>Control where each pane opens when DuPane launches. You can set this independently for the left and right panes.</p>
       <table class="shortcut-table">
         <thead><tr><th>Mode</th><th>Behaviour</th></tr></thead>
         <tr>
@@ -1442,7 +1539,8 @@
         <tr><td class="shortcut-desc">Go up one level</td><td class="shortcut-keys"><kbd>⌘↑</kbd></td></tr>
         <tr><td class="shortcut-desc">Open selected item / enter folder</td><td class="shortcut-keys"><kbd>↩</kbd> or <kbd>Double-click</kbd></td></tr>
         <tr><td class="shortcut-desc">Refresh current folder</td><td class="shortcut-keys"><kbd>⌘R</kbd></td></tr>
-        <tr><td class="shortcut-desc">Warp — instant folder jump</td><td class="shortcut-keys"><kbd>⌘K</kbd></td></tr>
+        <tr><td class="shortcut-desc">Go to folder by path</td><td class="shortcut-keys"><kbd>⌘L</kbd></td></tr>
+        <tr><td class="shortcut-desc">Type-ahead file selection</td><td class="shortcut-keys">Type any letter key (selects first file matching prefix)</td></tr>
       </table>
 
       <h3>Selection</h3>
@@ -1450,6 +1548,7 @@
         <tr><td class="shortcut-desc">Select item</td><td class="shortcut-keys"><kbd>Click</kbd></td></tr>
         <tr><td class="shortcut-desc">Add/remove from selection</td><td class="shortcut-keys"><kbd>⌘Click</kbd></td></tr>
         <tr><td class="shortcut-desc">Range select</td><td class="shortcut-keys"><kbd>⇧Click</kbd></td></tr>
+        <tr><td class="shortcut-desc">Select all</td><td class="shortcut-keys"><kbd>⌘A</kbd></td></tr>
       </table>
 
       <h3>File Operations</h3>
@@ -1457,6 +1556,8 @@
         <tr><td class="shortcut-desc">New Folder</td><td class="shortcut-keys"><kbd>⌘N</kbd></td></tr>
         <tr><td class="shortcut-desc">New File</td><td class="shortcut-keys"><kbd>⌥⌘N</kbd></td></tr>
         <tr><td class="shortcut-desc">Rename selected item</td><td class="shortcut-keys">Pencil button in toolbar (visible when 1 item selected)</td></tr>
+        <tr><td class="shortcut-desc">Compare active folders</td><td class="shortcut-keys">Compare toolbar button</td></tr>
+        <tr><td class="shortcut-desc">Sync folder differences</td><td class="shortcut-keys">Sync L-&gt;R / Sync R-&gt;L toolbar buttons</td></tr>
         <tr><td class="shortcut-desc">Move to Trash</td><td class="shortcut-keys"><kbd>⌘⌫</kbd></td></tr>
         <tr><td class="shortcut-desc">Quick Look selected file(s)</td><td class="shortcut-keys"><kbd>Space</kbd></td></tr>
       </table>
@@ -1464,20 +1565,27 @@
       <h3>View &amp; Sidebar</h3>
       <table class="shortcut-table">
         <tr><td class="shortcut-desc">Toggle sidebar</td><td class="shortcut-keys"><kbd>⌥⌘S</kbd></td></tr>
-        <tr><td class="shortcut-desc">Bookmark current folder</td><td class="shortcut-keys">Bookmark toolbar button</td></tr>
+        <tr><td class="shortcut-desc">Bookmark selected item</td><td class="shortcut-keys">Bookmark toolbar button</td></tr>
+        <tr><td class="shortcut-desc">Multi-tag sidebar filter</td><td class="shortcut-keys"><kbd>⌘Click</kbd> a sidebar tag</td></tr>
+        <tr><td class="shortcut-desc">Toggle Follow Mode (mirror navigation)</td><td class="shortcut-keys">Follow toolbar button</td></tr>
       </table>
 
       <h3>Tabs</h3>
       <table class="shortcut-table">
         <tr><td class="shortcut-desc">New tab</td><td class="shortcut-keys"><kbd>⌘T</kbd></td></tr>
         <tr><td class="shortcut-desc">Close current tab</td><td class="shortcut-keys"><kbd>⌘⇧W</kbd></td></tr>
+        <tr><td class="shortcut-desc">Pin or unpin tab</td><td class="shortcut-keys">Right-click tab → Pin Tab / Unpin Tab</td></tr>
+        <tr><td class="shortcut-desc">Recall pinned tab folder</td><td class="shortcut-keys">Click the pinned tab</td></tr>
+        <tr><td class="shortcut-desc">Reorder tabs</td><td class="shortcut-keys">Right-click tab → Move to Start / Left / Right / End</td></tr>
+        <tr><td class="shortcut-desc">Set tab colour</td><td class="shortcut-keys">Right-click tab → Tab Color</td></tr>
+        <tr><td class="shortcut-desc">Rename / reset tab name</td><td class="shortcut-keys">Right-click tab → Rename Tab… / Reset Tab Name</td></tr>
       </table>
 
       <h3>Developer Tools</h3>
       <table class="shortcut-table">
         <tr><td class="shortcut-desc">Toggle command runner</td><td class="shortcut-keys"><kbd>⌥`</kbd></td></tr>
         <tr><td class="shortcut-desc">Open Settings</td><td class="shortcut-keys"><kbd>⌘,</kbd></td></tr>
-        <tr><td class="shortcut-desc">Open User Guide</td><td class="shortcut-keys"><kbd>⌘?</kbd> (Help menu)</td></tr>
+        <tr><td class="shortcut-desc">Open DuPane User Guide</td><td class="shortcut-keys"><kbd>⌘?</kbd> (Help menu)</td></tr>
       </table>
     </section>
 
@@ -1486,10 +1594,10 @@
 
 <footer>
   <div>
-    <strong>/Opus</strong> · Dual-Pane File Manager for macOS
+    <strong>DuPane</strong> · Dual-Pane File Manager for macOS
   </div>
   <div style="color:var(--text2);">
-    User Guide · Version 1.17 · Build 39 · macOS 13+
+    User Guide · Version 1.49 · Build 249 · macOS 13+
   </div>
 </footer>
 

@@ -10,23 +10,6 @@ struct CustomActionsSettingsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Close button row — red traffic light
-            HStack {
-                Button { dismiss() } label: {
-                    Circle()
-                        .fill(Color(red: 0.91, green: 0.33, blue: 0.33))
-                        .frame(width: 12, height: 12)
-                }
-                .buttonStyle(.plain)
-                .help("Close")
-                Spacer()
-            }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 10)
-            .background(Color(nsColor: .windowBackgroundColor))
-
-            Divider()
-
             VStack(alignment: .leading, spacing: 14) {
                 // Header
                 VStack(alignment: .leading, spacing: 4) {
@@ -165,6 +148,16 @@ struct CustomActionsSettingsView: View {
                 }
             }
             .padding(16)
+
+            Divider()
+
+            HStack {
+                Spacer()
+                Button("Done") { dismiss() }
+                    .keyboardShortcut(.defaultAction)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
         }
         .frame(width: 580, height: 380)
     }

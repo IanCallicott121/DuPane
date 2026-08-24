@@ -9,10 +9,21 @@ struct FileOperationResult {
     var lastError: String? { errors.last }
 }
 
+enum ConflictResolution {
+    case automatic
+    case overwrite
+    case skip
+    case rename
+}
+
 enum FileOperationService {
+    typealias TrashHandler = (URL) throws -> URL?
+
     @discardableResult
     static func createFolder(named rawName: String, in baseURL: URL) throws -> URL {
         let name = rawName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty else { throw CocoaError(.fileWriteInvalidFileName) }
+        guard !name.contains("/") else { throw CocoaError(.fileWriteInvalidFileName) }
         let newURL = baseURL.appendingPathComponent(name)
         try FileManager.default.createDirectory(at: newURL, withIntermediateDirectories: false)
         return newURL
@@ -32,7 +43,21 @@ enum FileOperationService {
         return newURL
     }
 
-    static func moveOrCopy(files: [FileItem], to destinationFolder: URL, isMove: Bool) -> FileOperationResult {
+    // Returns names of files that already exist in destinationFolder.
+    static func detectConflicts(files: [FileItem], in destinationFolder: URL) -> [String] {
+        files.compactMap { file in
+            let dest = destinationFolder.appendingPathComponent(file.name)
+            return FileManager.default.fileExists(atPath: dest.path) ? file.name : nil
+        }
+    }
+
+    static func moveOrCopy(
+        files: [FileItem],
+        to destinationFolder: URL,
+        isMove: Bool,
+        conflictResolution: ConflictResolution = .automatic,
+        onProgress: ((Int, Int) -> Void)? = nil
+    ) -> FileOperationResult {
         // Guard: refuse to copy/move a folder into its own subtree
         let dstPath = destinationFolder.standardizedFileURL.path
         for file in files where file.isDirectory {
@@ -50,20 +75,67 @@ enum FileOperationService {
         var errors: [String] = []
         var resultingURLs: [URL] = []
 
-        for file in files {
-            let destination = destinationFolder.appendingPathComponent(file.name)
+        for (index, file) in files.enumerated() {
+            defer { onProgress?(index + 1, files.count) }
+            let proposed = destinationFolder.appendingPathComponent(file.name)
+            let exists = FileManager.default.fileExists(atPath: proposed.path)
+
+            let destination: URL
+            if exists {
+                switch conflictResolution {
+                case .automatic:
+                    if isMove {
+                        destination = proposed
+                    } else {
+                        errors.append("Couldn't copy \(file.name): a file with the same name already exists.")
+                        continue
+                    }
+                case .overwrite:
+                    destination = proposed
+                case .skip:
+                    continue
+                case .rename:
+                    destination = uniqueDestination(for: file.url, in: destinationFolder)
+                }
+            } else {
+                destination = proposed
+            }
+
+            guard !sameFileLocation(file.url, destination) else {
+                errors.append("Cannot \(isMove ? "move" : "copy") '\(file.name)': source and destination are the same.")
+                continue
+            }
+
+            // Step 1: atomically back up any existing destination (same-volume rename).
+            // This ensures the destination is restored if the subsequent operation fails,
+            // preventing permanent data loss on a copy/move error.
+            var backupURL: URL? = nil
+            if FileManager.default.fileExists(atPath: destination.path) {
+                let tmp = destination.deletingLastPathComponent()
+                    .appendingPathComponent(".\(destination.lastPathComponent).\(UUID().uuidString).tmp")
+                do {
+                    try FileManager.default.moveItem(at: destination, to: tmp)
+                    backupURL = tmp
+                } catch {
+                    errors.append("Couldn't \(isMove ? "move" : "copy") \(file.name): \(error.localizedDescription)")
+                    continue
+                }
+            }
+
+            // Step 2: perform the actual operation; restore backup on failure.
             do {
                 if isMove {
-                    if FileManager.default.fileExists(atPath: destination.path) {
-                        try FileManager.default.removeItem(at: destination)
-                    }
                     try FileManager.default.moveItem(at: file.url, to: destination)
                 } else {
                     try FileManager.default.copyItem(at: file.url, to: destination)
                 }
+                if let backup = backupURL { try? FileManager.default.removeItem(at: backup) }
                 succeeded += 1
                 resultingURLs.append(destination)
             } catch {
+                if let backup = backupURL {
+                    try? FileManager.default.moveItem(at: backup, to: destination)
+                }
                 errors.append("Couldn't \(isMove ? "move" : "copy") \(file.name): \(error.localizedDescription)")
             }
         }
@@ -71,17 +143,16 @@ enum FileOperationService {
         return FileOperationResult(succeeded: succeeded, errors: errors, resultingURLs: resultingURLs)
     }
 
-    static func trash(urls: [URL]) -> FileOperationResult {
+    static func trash(urls: [URL], trashHandler: TrashHandler = defaultTrashHandler) -> FileOperationResult {
         var succeeded = 0
         var errors: [String] = []
         var resultingURLs: [URL] = []
 
         for url in urls {
             do {
-                var resultingURL: NSURL?
-                try FileManager.default.trashItem(at: url, resultingItemURL: &resultingURL)
+                let resultingURL = try trashHandler(url)
                 succeeded += 1
-                if let resultingURL = resultingURL as URL? {
+                if let resultingURL {
                     resultingURLs.append(resultingURL)
                 }
             } catch {
@@ -109,5 +180,79 @@ enum FileOperationService {
         }
 
         return FileOperationResult(succeeded: succeeded, errors: errors, resultingURLs: resultingURLs)
+    }
+
+    // Returns a destination URL that doesn't exist by appending a numeric suffix.
+    private static func uniqueDestination(for url: URL, in folder: URL) -> URL {
+        let base = url.deletingPathExtension().lastPathComponent
+        let ext = url.pathExtension
+        var n = 2
+        var dest: URL
+        repeat {
+            let name = ext.isEmpty ? "\(base) \(n)" : "\(base) \(n).\(ext)"
+            dest = folder.appendingPathComponent(name)
+            n += 1
+        } while FileManager.default.fileExists(atPath: dest.path)
+        return dest
+    }
+
+    private static func sameFileLocation(_ first: URL, _ second: URL) -> Bool {
+        first.standardizedFileURL.resolvingSymlinksInPath().path ==
+            second.standardizedFileURL.resolvingSymlinksInPath().path
+    }
+
+    private static let defaultTrashHandler: TrashHandler = { url in
+        var resultingURL: NSURL?
+        try FileManager.default.trashItem(at: url, resultingItemURL: &resultingURL)
+        return resultingURL as URL?
+    }
+}
+
+struct ProcessExecutionResult {
+    let terminationStatus: Int32
+    let stdout: String
+    let stderr: String
+
+    var combinedOutput: String {
+        stdout + stderr
+    }
+
+    var trimmedCombinedOutput: String {
+        combinedOutput.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+}
+
+enum ProcessRunner {
+    static func run(
+        executableURL: URL,
+        arguments: [String],
+        currentDirectoryURL: URL? = nil
+    ) async throws -> ProcessExecutionResult {
+        let process = Process()
+        process.executableURL = executableURL
+        process.arguments = arguments
+        process.currentDirectoryURL = currentDirectoryURL
+
+        let outPipe = Pipe()
+        let errPipe = Pipe()
+        process.standardOutput = outPipe
+        process.standardError = errPipe
+
+        try process.run()
+        let stdoutTask = Task.detached {
+            outPipe.fileHandleForReading.readDataToEndOfFile()
+        }
+        let stderrTask = Task.detached {
+            errPipe.fileHandleForReading.readDataToEndOfFile()
+        }
+        process.waitUntilExit()
+
+        let stdoutData = await stdoutTask.value
+        let stderrData = await stderrTask.value
+        return ProcessExecutionResult(
+            terminationStatus: process.terminationStatus,
+            stdout: String(data: stdoutData, encoding: .utf8) ?? "",
+            stderr: String(data: stderrData, encoding: .utf8) ?? ""
+        )
     }
 }

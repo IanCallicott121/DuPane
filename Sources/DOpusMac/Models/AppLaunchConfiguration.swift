@@ -46,8 +46,10 @@ struct AppLaunchConfiguration {
     }
 
     private static func restoredTabURLs(argURL: URL?, firstURL: URL?, mode: StartupFolderMode, key: String) -> [URL?] {
+        guard argURL == nil else { return [argURL] }
+
         // Restore all saved tabs only in rememberLast mode with no explicit command-line URL
-        if argURL == nil, mode == .rememberLast,
+        if mode == .rememberLast,
            let data = UserDefaults.standard.data(forKey: key),
            let paths = try? JSONDecoder().decode([String?].self, from: data),
            !paths.isEmpty {
@@ -57,7 +59,10 @@ struct AppLaunchConfiguration {
                 return URL(fileURLWithPath: path)
             }
         }
-        return [firstURL]
+
+        let pinnedURLs = TabPersistence.pinnedStartupURLs(forKey: key, excluding: firstURL)
+        guard !pinnedURLs.isEmpty else { return [firstURL] }
+        return [firstURL] + pinnedURLs
     }
 
     private static func startupURL(pane: String, defaultURL: URL?) -> URL? {

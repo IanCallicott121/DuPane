@@ -77,24 +77,23 @@ struct CommandRunnerView: View {
         let wd = workingDirectory
 
         Task.detached(priority: .userInitiated) {
-            let process = Process()
-            process.executableURL = URL(fileURLWithPath: shell)
-            process.arguments = ["-l", "-c", cmd]
-            if let dir = wd { process.currentDirectoryURL = dir }
-
-            let outPipe = Pipe()
-            let errPipe = Pipe()
-            process.standardOutput = outPipe
-            process.standardError = errPipe
-
             do {
-                try process.run()
-                process.waitUntilExit()
-                let stdout = String(data: outPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
-                let stderr = String(data: errPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
-                let combined = (stdout + stderr).trimmingCharacters(in: .whitespacesAndNewlines)
+                let result = try await ProcessRunner.run(
+                    executableURL: URL(fileURLWithPath: shell),
+                    arguments: ["-l", "-c", cmd],
+                    currentDirectoryURL: wd
+                )
+                let combined = result.trimmedCombinedOutput
+                let displayOutput: String
+                if result.terminationStatus == 0 {
+                    displayOutput = combined.isEmpty ? "(no output)" : combined
+                } else if combined.isEmpty {
+                    displayOutput = "Command exited with status \(result.terminationStatus)"
+                } else {
+                    displayOutput = "\(combined)\n(exit \(result.terminationStatus))"
+                }
                 await MainActor.run {
-                    output = combined.isEmpty ? "(no output)" : combined
+                    output = displayOutput
                     isRunning = false
                 }
             } catch {

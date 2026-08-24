@@ -18,7 +18,7 @@ enum RowMouseEventPolicy {
 }
 
 struct RowMouseEventView: NSViewRepresentable {
-    let onSelect: () -> Void
+    let onSelect: (NSEvent.ModifierFlags) -> Void
     let onOpen: () -> Void
     var isSelected: Bool = false
     var getDragItems: (() -> [FileItem])? = nil
@@ -41,7 +41,7 @@ struct RowMouseEventView: NSViewRepresentable {
 }
 
 final class RowMouseEventNSView: NSView {
-    var onSelect: (() -> Void)?
+    var onSelect: ((NSEvent.ModifierFlags) -> Void)?
     var onOpen: (() -> Void)?
     var isSelected: Bool = false
     var getDragItems: (() -> [FileItem])? = nil
@@ -129,7 +129,7 @@ final class RowMouseEventNSView: NSView {
         } else {
             for action in RowMouseEventPolicy.actions(clickCount: event.clickCount, buttonNumber: event.buttonNumber) {
                 switch action {
-                case .select: onSelect?()
+                case .select: onSelect?(event.modifierFlags)
                 case .open:   onOpen?()
                 }
             }
@@ -141,7 +141,7 @@ final class RowMouseEventNSView: NSView {
             // No drag occurred — apply the deferred selection/open now.
             for action in RowMouseEventPolicy.actions(clickCount: event.clickCount, buttonNumber: event.buttonNumber) {
                 switch action {
-                case .select: onSelect?()
+                case .select: onSelect?(event.modifierFlags)
                 case .open:   onOpen?()
                 }
             }
@@ -166,6 +166,7 @@ final class RowMouseEventNSView: NSView {
 
         let isCopy = currentCopyIntent(from: event)
         lastDragCopyState = isCopy
+        // Badge update: DragSession fires copyIntentDidChange → updateDragBadge
         DragSession.shared.copyIntentDidChange = { [weak self] isCopy in
             self?.updateDragBadge(isCopy: isCopy)
         }
@@ -182,9 +183,10 @@ final class RowMouseEventNSView: NSView {
             return dragItem
         }
 
-        // Monitor Option key presses to swap the badge while dragging.
-        flagsMonitor = NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
-            self?.updateDragBadge(isCopy: DragSession.isOptionKeyPressed)
+        // Monitor Option key changes during drag; setCopyIntent propagates to badge
+        // via copyIntentDidChange and to the destination via DragSession.shared.isCopy.
+        flagsMonitor = NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { event in
+            DragSession.shared.setCopyIntent(DragSession.isOptionKeyPressed)
             return event
         }
 
@@ -207,13 +209,11 @@ extension RowMouseEventNSView: NSDraggingSource {
         return DragSession.isOptionKeyPressed
     }
 
+    // Keeps DragSession.shared.isCopy in sync with current key state so the
+    // destination can read it in requestedLocalOperation.
     private func syncDragOperationFromModifierFlags() -> NSDragOperation {
-        let isCopy = currentCopyIntent() || DragSession.shared.isCopy
-        if isCopy != lastDragCopyState {
-            updateDragBadge(isCopy: isCopy)
-        } else {
-            DragSession.shared.setCopyIntent(isCopy)
-        }
+        let isCopy = currentCopyIntent()
+        DragSession.shared.setCopyIntent(isCopy)
         return isCopy ? .copy : .move
     }
 
