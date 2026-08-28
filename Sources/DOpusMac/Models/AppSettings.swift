@@ -123,7 +123,7 @@ enum StartupFolderMode: String, CaseIterable {
 }
 
 enum FileColumnLayout {
-    static let defaultWidths: [String: CGFloat] = ["Size": 80, "Kind": 120, "Modified": 110, "Info": 80]
+    static let defaultWidths: [String: CGFloat] = ["Size": 80, "Kind": 120, "Modified": 150, "Info": 80]
     static let minWidth: CGFloat = 50
     static let maxWidth: CGFloat = 400
     static let headerHeight: CGFloat = 28
@@ -212,6 +212,21 @@ final class AppSettings: ObservableObject {
             UserDefaults.standard.set(Array(enabledPlaces), forKey: "enabledPlaces")
         }
     }
+    // Sidebar section visibility
+    @Published var showSidebarPlaces: Bool {
+        didSet { UserDefaults.standard.set(showSidebarPlaces, forKey: "showSidebarPlaces") }
+    }
+    @Published var showSidebarRecents: Bool {
+        didSet { UserDefaults.standard.set(showSidebarRecents, forKey: "showSidebarRecents") }
+    }
+    // Sort behaviour
+    @Published var foldersFirst: Bool {
+        didSet { UserDefaults.standard.set(foldersFirst, forKey: "foldersFirst") }
+    }
+    // Date display
+    @Published var showTimeInDate: Bool {
+        didSet { UserDefaults.standard.set(showTimeInDate, forKey: "showTimeInDate") }
+    }
 
     init() {
         fileDeleteNoConfirm = UserDefaults.standard.bool(forKey: "fileDeleteNoConfirm")
@@ -259,6 +274,10 @@ final class AppSettings: ObservableObject {
         } else {
             enabledPlaces = ["Home", "Applications", "Desktop", "Documents", "Downloads"]
         }
+        showSidebarPlaces = UserDefaults.standard.object(forKey: "showSidebarPlaces").map { ($0 as? Bool) ?? true } ?? true
+        showSidebarRecents = UserDefaults.standard.object(forKey: "showSidebarRecents").map { ($0 as? Bool) ?? true } ?? true
+        foldersFirst = UserDefaults.standard.object(forKey: "foldersFirst").map { ($0 as? Bool) ?? true } ?? true
+        showTimeInDate = UserDefaults.standard.object(forKey: "showTimeInDate").map { ($0 as? Bool) ?? true } ?? true
     }
 
     var hiddenColumns: Set<String> {

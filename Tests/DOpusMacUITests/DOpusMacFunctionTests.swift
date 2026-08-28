@@ -1410,7 +1410,7 @@ final class FolderSizeViewModelTests: XCTestCase {
         let settings = AppSettings()
         XCTAssertEqual(settings.columnWidths(for: .left)["Size"], 80)
         XCTAssertEqual(settings.columnWidths(for: .left)["Kind"], 120)
-        XCTAssertEqual(settings.columnWidths(for: .left)["Modified"], 110)
+        XCTAssertEqual(settings.columnWidths(for: .left)["Modified"], 150)
         XCTAssertEqual(settings.columnWidths(for: .left)["Info"], 80)
         UserDefaults.standard.removeObject(forKey: "leftColumnWidths")
     }

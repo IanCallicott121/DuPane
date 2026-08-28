@@ -27,6 +27,9 @@ final class PaneState: ObservableObject {
     var isInSearchMode: Bool { searchResults != nil || isSearching }
     var showHiddenFiles: Bool = false
     var showHiddenFolders: Bool = false
+    @Published var foldersFirst: Bool = true
+    @Published var requestGetInfo: Bool = false
+    @Published var requestFocusFilter: Bool = false
 
     private var history: [URL?]
     private var historyIndex: Int = 0
@@ -94,7 +97,7 @@ final class PaneState: ObservableObject {
             }
         }
         result.sort { a, b in
-            if a.isDirectory != b.isDirectory { return a.isDirectory }
+            if foldersFirst && a.isDirectory != b.isDirectory { return a.isDirectory }
             let ascending = sortAscending
             switch sortKey {
             case .name:
@@ -223,6 +226,41 @@ final class PaneState: ObservableObject {
             navigate(to: nil)
         } else {
             navigate(to: parent)
+        }
+    }
+
+    func duplicate() {
+        guard let dir = currentURL, !selectedItems.isEmpty else { return }
+        let targets = selectedItems
+        Task.detached(priority: .userInitiated) {
+            var errors: [String] = []
+            for item in targets {
+                let url = item.url
+                let base = url.deletingPathExtension().lastPathComponent
+                let ext = url.pathExtension
+                var dest = dir.appendingPathComponent(ext.isEmpty ? "\(base) copy" : "\(base) copy.\(ext)")
+                var n = 2
+                while FileManager.default.fileExists(atPath: dest.path) {
+                    let name = ext.isEmpty ? "\(base) copy \(n)" : "\(base) copy \(n).\(ext)"
+                    dest = dir.appendingPathComponent(name)
+                    n += 1
+                }
+                do {
+                    try FileManager.default.copyItem(at: url, to: dest)
+                } catch {
+                    errors.append(error.localizedDescription)
+                }
+            }
+            let capturedErrors = errors
+            await MainActor.run {
+                if !capturedErrors.isEmpty {
+                    self.errorMessage = capturedErrors.joined(separator: "\n")
+                }
+                if let dir = self.currentURL {
+                    NotificationCenter.default.post(name: .paneContentsChanged, object: nil, userInfo: ["url": dir])
+                }
+                self.load()
+            }
         }
     }
 

@@ -89,22 +89,19 @@ struct ContentView: View {
             .sheet(isPresented: $showCustomActionsSettings) {
                 CustomActionsSettingsView(model: customActionsModel)
             }
-            .background(
-                Color.clear
-                    .sheet(isPresented: $showDuplicateFinder, onDismiss: { duplicateFinderViewModel.cancel() }) {
-                        if let rootURL = duplicateScanURL {
-                            DuplicateFinderView(
-                                viewModel: duplicateFinderViewModel,
-                                rootURL: rootURL,
-                                onDismiss: {
-                                    showDuplicateFinder = false
-                                    leftTabs.activePaneState.load()
-                                    rightTabs.activePaneState.load()
-                                }
-                            )
+            .sheet(isPresented: $showDuplicateFinder, onDismiss: { duplicateFinderViewModel.cancel() }) {
+                if let rootURL = duplicateScanURL {
+                    DuplicateFinderView(
+                        viewModel: duplicateFinderViewModel,
+                        rootURL: rootURL,
+                        onDismiss: {
+                            showDuplicateFinder = false
+                            leftTabs.activePaneState.load()
+                            rightTabs.activePaneState.load()
                         }
-                    }
-            )
+                    )
+                }
+            }
             .alert(deleteAlertTitle, isPresented: $showDeleteConfirm) {
                 Button("Move to Trash", role: .destructive) { performDelete() }
                 Button("Cancel", role: .cancel) {}
@@ -240,6 +237,10 @@ struct ContentView: View {
             leftTabs.showHiddenFolders  = newValue
             rightTabs.showHiddenFolders = newValue
         })
+        .onChange(of: settings.foldersFirst, perform: { newValue in
+            leftTabs.foldersFirst  = newValue
+            rightTabs.foldersFirst = newValue
+        })
         .onChange(of: showSidebar, perform: { newValue in
             UserDefaults.standard.set(newValue, forKey: "showSidebar")
         })
@@ -270,7 +271,7 @@ struct ContentView: View {
                 Button("New Tab") { activeTabs.openTab() }
                     .keyboardShortcut("t", modifiers: .command)
                 Button("Close Tab") { activeTabs.closeTab(at: activeTabs.activeTabIndex) }
-                    .keyboardShortcut("w", modifiers: [.command, .shift])
+                    .keyboardShortcut("w", modifiers: .command)
                 Button("Go Back") { active.goBack() }
                     .keyboardShortcut("[", modifiers: .command)
                 Button("Go Forward") { active.goForward() }
@@ -279,12 +280,44 @@ struct ContentView: View {
                     .keyboardShortcut(.upArrow, modifiers: .command)
                 Button("Open Selected") { openSelected() }
                     .keyboardShortcut(.return, modifiers: [])
+                Button("Open Selected") { openSelected() }
+                    .keyboardShortcut(.downArrow, modifiers: .command)
                 Button("Refresh") { active.load() }
                     .keyboardShortcut("r", modifiers: .command)
                 Button("Select All") { active.selectAll() }
                     .keyboardShortcut("a", modifiers: .command)
                 Button("Go to Path") { active.requestGoToPath = true }
                     .keyboardShortcut("l", modifiers: .command)
+                Button("Go to Path") { active.requestGoToPath = true }
+                    .keyboardShortcut("g", modifiers: [.command, .shift])
+                Button("Go Home") { active.navigate(to: FileManager.default.homeDirectoryForCurrentUser) }
+                    .keyboardShortcut("h", modifiers: [.command, .shift])
+                Button("Go Desktop") { active.navigate(to: FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")) }
+                    .keyboardShortcut("d", modifiers: [.command, .shift])
+                Button("Go Documents") { active.navigate(to: FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Documents")) }
+                    .keyboardShortcut("o", modifiers: [.command, .shift])
+                Button("Go Computer") { active.navigate(to: nil) }
+                    .keyboardShortcut("c", modifiers: [.command, .shift])
+                Button("Go Applications") { active.navigate(to: URL(fileURLWithPath: "/Applications")) }
+                    .keyboardShortcut("a", modifiers: [.command, .shift])
+                Button("Go Utilities") { active.navigate(to: URL(fileURLWithPath: "/Applications/Utilities")) }
+                    .keyboardShortcut("u", modifiers: [.command, .shift])
+                Button("Copy to Other Pane") { moveOrCopy(isMove: false) }
+                    .keyboardShortcut("c", modifiers: .command)
+                Button("Move to Other Pane") { moveOrCopy(isMove: true) }
+                    .keyboardShortcut("v", modifiers: [.command, .option])
+                Button("Duplicate") { active.duplicate() }
+                    .keyboardShortcut("d", modifiers: .command)
+                Button("Quick Look") {
+                    let urls = active.selectedItems.map { $0.url }
+                    guard !urls.isEmpty else { return }
+                    QuickLookCoordinator.shared.toggle(urls: urls)
+                }
+                .keyboardShortcut(" ", modifiers: [])
+                Button("Get Info") { active.requestGetInfo = true }
+                    .keyboardShortcut("i", modifiers: .command)
+                Button("Focus Filter") { active.requestFocusFilter = true }
+                    .keyboardShortcut("f", modifiers: .command)
             }
             .frame(width: 0, height: 0)
             .opacity(0)

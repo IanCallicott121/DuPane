@@ -28,7 +28,7 @@ struct SidebarView: View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(alignment: .leading, spacing: 0) {
                 // Places section
-                if !visiblePlaces.isEmpty {
+                if settings.showSidebarPlaces && !visiblePlaces.isEmpty {
                     sectionHeader("Places")
                     ForEach(visiblePlaces, id: \.name) { loc in
                         placeRow(name: loc.name, url: loc.url, icon: loc.icon)
@@ -46,7 +46,7 @@ struct SidebarView: View {
                 }
 
                 // Recents section
-                if !model.recentURLs.isEmpty {
+                if settings.showSidebarRecents && !model.recentURLs.isEmpty {
                     sectionHeader("Recents")
                     ForEach(model.recentURLs, id: \.self) { url in
                         recentRow(url: url)

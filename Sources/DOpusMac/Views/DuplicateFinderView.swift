@@ -149,6 +149,7 @@ struct DuplicateFinderView: View {
             }
             Spacer()
             Button("Done") { onDismiss() }
+                .keyboardShortcut(.defaultAction)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)

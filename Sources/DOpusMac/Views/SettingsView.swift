@@ -17,6 +17,7 @@ struct SettingsView: View {
                 Toggle("Show hidden folders (dot-folders)", isOn: $settings.showHiddenFolders)
                 Toggle("Show file name extensions", isOn: $settings.showFileExtensions)
                 Toggle("Show toolbar button labels", isOn: $settings.showToolbarLabels)
+                Toggle("Sort folders before files", isOn: $settings.foldersFirst)
                 Stepper("File list font size: \(settings.listFontSize)pt",
                         value: $settings.listFontSize, in: 11...16)
                 Picker("Date format", selection: $settings.dateFormatStyle) {
@@ -24,6 +25,7 @@ struct SettingsView: View {
                         Text(style.label).tag(style)
                     }
                 }
+                Toggle("Show time in date modified", isOn: $settings.showTimeInDate)
             }
             Section("Appearance") {
                 Picker("Theme", selection: $settings.appColorScheme) {
@@ -38,6 +40,10 @@ struct SettingsView: View {
                     }
                 }
                 .pickerStyle(.menu)
+            }
+            Section("Sidebar") {
+                Toggle("Show Places section", isOn: $settings.showSidebarPlaces)
+                Toggle("Show Recents section", isOn: $settings.showSidebarRecents)
             }
             Section("Sidebar places") {
                 placesRow("Home")

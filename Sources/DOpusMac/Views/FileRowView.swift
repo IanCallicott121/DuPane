@@ -100,7 +100,7 @@ struct FileRowView: View {
             }
         case "Modified":
             columnCell(name, alignment: .leading) {
-                Text(Self.formatDate(item.modified, style: settings.dateFormatStyle))
+                Text(Self.formatDate(item.modified, style: settings.dateFormatStyle, showTime: settings.showTimeInDate))
                     .font(.system(size: fsMeta, design: .monospaced))
                     .foregroundStyle(.secondary)
             }
@@ -241,30 +241,36 @@ struct FileRowView: View {
         return ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)
     }
 
-    static func formatDate(_ date: Date?, style: DateFormatStyle = .medium) -> String {
+    static func formatDate(_ date: Date?, style: DateFormatStyle = .medium, showTime: Bool = false) -> String {
         guard let date else { return "—" }
         switch style {
         case .short:
             let f = DateFormatter()
-            f.dateFormat = "dd/MM/yy"
+            f.dateFormat = showTime ? "dd/MM/yy HH:mm" : "dd/MM/yy"
             return f.string(from: date)
         case .medium:
             let f = DateFormatter()
-            f.dateFormat = "d MMM yyyy"
+            f.dateFormat = showTime ? "d MMM yyyy HH:mm" : "d MMM yyyy"
             return f.string(from: date)
         case .long:
             let f = DateFormatter()
             f.dateStyle = .long
-            f.timeStyle = .none
+            f.timeStyle = showTime ? .short : .none
             return f.string(from: date)
         case .iso:
             let f = DateFormatter()
-            f.dateFormat = "yyyy-MM-dd"
+            f.dateFormat = showTime ? "yyyy-MM-dd HH:mm" : "yyyy-MM-dd"
             return f.string(from: date)
         case .relative:
             let cal = Calendar.current
-            if cal.isDateInToday(date) { return "Today" }
-            if cal.isDateInYesterday(date) { return "Yesterday" }
+            let timeStr: String = {
+                let f = DateFormatter()
+                f.dateFormat = " HH:mm"
+                return f.string(from: date)
+            }()
+            let suffix = showTime ? timeStr : ""
+            if cal.isDateInToday(date) { return "Today\(suffix)" }
+            if cal.isDateInYesterday(date) { return "Yesterday\(suffix)" }
             let days = cal.dateComponents([.day], from: date, to: Date()).day ?? 0
             if days < 7 { return "\(days)d ago" }
             if days < 30 { return "\(days / 7)w ago" }

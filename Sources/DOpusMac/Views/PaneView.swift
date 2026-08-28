@@ -27,6 +27,7 @@ struct PaneView: View {
     @State private var typeBuffer: String = ""
     @State private var typeBufferTimer: Timer? = nil
     @State private var typeAheadScrollURL: URL? = nil
+    @FocusState private var filterFocused: Bool
     @State private var folderSizeItem: FileItem? = nil
     @State private var propertiesItem: FileItem? = nil
     @State private var pendingShellScript: FileItem? = nil
@@ -138,6 +139,17 @@ struct PaneView: View {
         })
         .onChange(of: pane.filterText, perform: { newValue in
             if newValue.isEmpty { pane.endDeepSearch() }
+        })
+        .onChange(of: pane.requestGetInfo, perform: { newValue in
+            guard newValue else { return }
+            pane.requestGetInfo = false
+            guard let item = pane.selectedItems.first else { return }
+            propertiesItem = item
+        })
+        .onChange(of: pane.requestFocusFilter, perform: { newValue in
+            guard newValue else { return }
+            pane.requestFocusFilter = false
+            filterFocused = true
         })
         .onChange(of: pane.requestRename, perform: { shouldRename in
             guard shouldRename else { return }
@@ -257,6 +269,7 @@ struct PaneView: View {
                     .textFieldStyle(.plain)
                     .padding(.horizontal, 5)
                     .padding(.vertical, 3)
+                    .focused($filterFocused)
                     .frame(width: 92)
                     .font(.system(size: 11))
                     .background(Color(nsColor: .textBackgroundColor))
@@ -721,8 +734,10 @@ struct PaneView: View {
         Divider()
         // File manipulation group
         Button("Duplicate") {
-            let targets = pane.selectedItems.isEmpty ? [item] : pane.selectedItems
-            duplicateItems(targets.map { $0.url })
+            if !pane.selectedItems.contains(where: { $0.url == item.url }) {
+                pane.selection = [item.url]
+            }
+            pane.duplicate()
         }
         Button("Compress") {
             let targets = pane.selectedItems.isEmpty ? [item] : pane.selectedItems

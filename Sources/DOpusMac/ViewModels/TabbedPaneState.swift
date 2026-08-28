@@ -196,6 +196,13 @@ final class TabbedPaneState: ObservableObject {
         }
     }
 
+    var foldersFirst: Bool = true {
+        didSet {
+            guard oldValue != foldersFirst else { return }
+            tabs.forEach { $0.pane.foldersFirst = foldersFirst }
+        }
+    }
+
     var activeTagFilters: Set<String> = [] {
         didSet {
             guard oldValue != activeTagFilters else { return }
@@ -234,6 +241,7 @@ final class TabbedPaneState: ObservableObject {
         let pane = PaneState(initialURL: url ?? activePaneState.currentURL)
         pane.showHiddenFiles = showHiddenFiles
         pane.showHiddenFolders = showHiddenFolders
+        pane.foldersFirst = foldersFirst
         pane.activeTagFilters = activeTagFilters
         tabs.append(Tab(pane: pane))
         activeTabIndex = tabs.count - 1
