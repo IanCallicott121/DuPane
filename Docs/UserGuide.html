@@ -583,7 +583,7 @@
     <div class="logo-icon">DP</div>
     <div>
       <div class="sidebar-logo-text">DuPane</div>
-      <div class="sidebar-logo-sub">User Guide v1.49</div>
+      <div class="sidebar-logo-sub">User Guide v1.50</div>
     </div>
   </div>
 
@@ -900,7 +900,7 @@
         <tr><td class="shortcut-desc">Go up one level</td><td class="shortcut-keys"><kbd>↑ button</kbd> or <kbd>⌘↑</kbd></td></tr>
         <tr><td class="shortcut-desc">Go back / forward</td><td class="shortcut-keys"><kbd>⌘[</kbd> / <kbd>⌘]</kbd> or the <kbd>← →</kbd> buttons</td></tr>
         <tr><td class="shortcut-desc">Click a breadcrumb</td><td class="shortcut-keys">Jump to any ancestor folder</td></tr>
-        <tr><td class="shortcut-desc">Open a file</td><td class="shortcut-keys"><kbd>↩</kbd> or <kbd>Double-click</kbd> — opens in default app</td></tr>
+        <tr><td class="shortcut-desc">Open a file</td><td class="shortcut-keys"><kbd>↩</kbd> or <kbd>⌘↓</kbd> or <kbd>Double-click</kbd> — opens in default app</td></tr>
         <tr><td class="shortcut-desc">Refresh folder</td><td class="shortcut-keys"><kbd>⌘R</kbd> or the ↺ button in the toolbar</td></tr>
       </table>
 
@@ -927,7 +927,7 @@
 
       <table class="shortcut-table">
         <tr><td class="shortcut-desc">Open a new tab</td><td class="shortcut-keys"><kbd>⌘T</kbd> or click the <strong>+</strong> button at the end of the tab strip</td></tr>
-        <tr><td class="shortcut-desc">Close current tab</td><td class="shortcut-keys"><kbd>⌘⇧W</kbd></td></tr>
+        <tr><td class="shortcut-desc">Close current tab</td><td class="shortcut-keys"><kbd>⌘W</kbd></td></tr>
         <tr><td class="shortcut-desc">Switch tab / recall pinned folder</td><td class="shortcut-keys">Click the tab button</td></tr>
         <tr><td class="shortcut-desc">Reorder tabs</td><td class="shortcut-keys">Right-click the tab → <strong>Move to Start</strong>, <strong>Move Left</strong>, <strong>Move Right</strong>, or <strong>Move to End</strong></td></tr>
         <tr><td class="shortcut-desc">Close tab</td><td class="shortcut-keys">Click the × button on the tab</td></tr>
@@ -1487,6 +1487,14 @@
           <td>Date format</td><td>Medium (31 Dec 2025)</td>
           <td>Controls how dates appear in the Modified column. Options: Short (31/12/25), Medium (31 Dec 2025), Long (December 31, 2025), ISO (2025-12-31), Relative (Today, Yesterday, 3d ago).</td>
         </tr>
+        <tr>
+          <td>Show time in date modified</td><td>On</td>
+          <td>When on, the Modified column shows the full date and time (e.g. 31 Dec 2025 14:30). When off, only the date is shown.</td>
+        </tr>
+        <tr>
+          <td>Sort folders before files</td><td>On</td>
+          <td>When on, folders always appear at the top of the file list regardless of the current sort column. When off, folders and files are sorted together.</td>
+        </tr>
       </table>
 
       <h3>Appearance</h3>
@@ -1503,8 +1511,19 @@
         <tr><td><strong>Vivid</strong></td><td>Light</td><td>Electric purple (#9900E6)</td></tr>
       </table>
 
-      <h3>Sidebar Places</h3>
-      <p>Choose which fixed locations appear in the sidebar's <strong>Places</strong> section. Each can be toggled on or off independently. Available locations: <strong>Home</strong>, <strong>Applications</strong>, <strong>Desktop</strong>, <strong>Documents</strong>, <strong>Downloads</strong>. All are enabled by default.</p>
+      <h3>Sidebar</h3>
+      <table class="shortcut-table">
+        <thead><tr><th>Setting</th><th>Default</th><th>Description</th></tr></thead>
+        <tr>
+          <td>Show Places section</td><td>On</td>
+          <td>Shows the Places section (Home, Applications, Desktop, Documents, Downloads) in the sidebar. Turn off to hide the section entirely.</td>
+        </tr>
+        <tr>
+          <td>Show Recents section</td><td>On</td>
+          <td>Shows the Recents section in the sidebar, listing the last 12 folders you visited. Turn off if you prefer a minimal sidebar.</td>
+        </tr>
+      </table>
+      <p>Within the Places section, each individual location can be toggled on or off independently. Available locations: <strong>Home</strong>, <strong>Applications</strong>, <strong>Desktop</strong>, <strong>Documents</strong>, <strong>Downloads</strong>. All are enabled by default.</p>
 
       <h3>Startup Folders</h3>
       <p>Control where each pane opens when DuPane launches. You can set this independently for the left and right panes.</p>
@@ -1537,9 +1556,16 @@
         <tr><td class="shortcut-desc">Go back</td><td class="shortcut-keys"><kbd>⌘[</kbd></td></tr>
         <tr><td class="shortcut-desc">Go forward</td><td class="shortcut-keys"><kbd>⌘]</kbd></td></tr>
         <tr><td class="shortcut-desc">Go up one level</td><td class="shortcut-keys"><kbd>⌘↑</kbd></td></tr>
-        <tr><td class="shortcut-desc">Open selected item / enter folder</td><td class="shortcut-keys"><kbd>↩</kbd> or <kbd>Double-click</kbd></td></tr>
+        <tr><td class="shortcut-desc">Open selected item / enter folder</td><td class="shortcut-keys"><kbd>↩</kbd> or <kbd>⌘↓</kbd> or <kbd>Double-click</kbd></td></tr>
         <tr><td class="shortcut-desc">Refresh current folder</td><td class="shortcut-keys"><kbd>⌘R</kbd></td></tr>
-        <tr><td class="shortcut-desc">Go to folder by path</td><td class="shortcut-keys"><kbd>⌘L</kbd></td></tr>
+        <tr><td class="shortcut-desc">Go to folder by path (breadcrumb)</td><td class="shortcut-keys"><kbd>⌘L</kbd></td></tr>
+        <tr><td class="shortcut-desc">Go to folder by path (dialog)</td><td class="shortcut-keys"><kbd>⌘⇧G</kbd></td></tr>
+        <tr><td class="shortcut-desc">Go to Home folder</td><td class="shortcut-keys"><kbd>⌘⇧H</kbd></td></tr>
+        <tr><td class="shortcut-desc">Go to Desktop</td><td class="shortcut-keys"><kbd>⌘⇧D</kbd></td></tr>
+        <tr><td class="shortcut-desc">Go to Documents</td><td class="shortcut-keys"><kbd>⌘⇧O</kbd></td></tr>
+        <tr><td class="shortcut-desc">Go to Computer (all volumes)</td><td class="shortcut-keys"><kbd>⌘⇧C</kbd></td></tr>
+        <tr><td class="shortcut-desc">Go to Applications</td><td class="shortcut-keys"><kbd>⌘⇧A</kbd></td></tr>
+        <tr><td class="shortcut-desc">Go to Utilities</td><td class="shortcut-keys"><kbd>⌘⇧U</kbd></td></tr>
         <tr><td class="shortcut-desc">Type-ahead file selection</td><td class="shortcut-keys">Type any letter key (selects first file matching prefix)</td></tr>
       </table>
 
@@ -1556,6 +1582,10 @@
         <tr><td class="shortcut-desc">New Folder</td><td class="shortcut-keys"><kbd>⌘N</kbd></td></tr>
         <tr><td class="shortcut-desc">New File</td><td class="shortcut-keys"><kbd>⌥⌘N</kbd></td></tr>
         <tr><td class="shortcut-desc">Rename selected item</td><td class="shortcut-keys">Pencil button in toolbar (visible when 1 item selected)</td></tr>
+        <tr><td class="shortcut-desc">Copy selection to other pane</td><td class="shortcut-keys"><kbd>⌘C</kbd></td></tr>
+        <tr><td class="shortcut-desc">Move selection to other pane</td><td class="shortcut-keys"><kbd>⌘V</kbd></td></tr>
+        <tr><td class="shortcut-desc">Duplicate selected item(s) in place</td><td class="shortcut-keys"><kbd>⌘D</kbd></td></tr>
+        <tr><td class="shortcut-desc">Get Info for selected item</td><td class="shortcut-keys"><kbd>⌘I</kbd></td></tr>
         <tr><td class="shortcut-desc">Compare active folders</td><td class="shortcut-keys">Compare toolbar button</td></tr>
         <tr><td class="shortcut-desc">Sync folder differences</td><td class="shortcut-keys">Sync L-&gt;R / Sync R-&gt;L toolbar buttons</td></tr>
         <tr><td class="shortcut-desc">Move to Trash</td><td class="shortcut-keys"><kbd>⌘⌫</kbd></td></tr>
@@ -1565,6 +1595,7 @@
       <h3>View &amp; Sidebar</h3>
       <table class="shortcut-table">
         <tr><td class="shortcut-desc">Toggle sidebar</td><td class="shortcut-keys"><kbd>⌥⌘S</kbd></td></tr>
+        <tr><td class="shortcut-desc">Focus filter field</td><td class="shortcut-keys"><kbd>⌘F</kbd></td></tr>
         <tr><td class="shortcut-desc">Bookmark selected item</td><td class="shortcut-keys">Bookmark toolbar button</td></tr>
         <tr><td class="shortcut-desc">Multi-tag sidebar filter</td><td class="shortcut-keys"><kbd>⌘Click</kbd> a sidebar tag</td></tr>
         <tr><td class="shortcut-desc">Toggle Follow Mode (mirror navigation)</td><td class="shortcut-keys">Follow toolbar button</td></tr>
@@ -1573,7 +1604,7 @@
       <h3>Tabs</h3>
       <table class="shortcut-table">
         <tr><td class="shortcut-desc">New tab</td><td class="shortcut-keys"><kbd>⌘T</kbd></td></tr>
-        <tr><td class="shortcut-desc">Close current tab</td><td class="shortcut-keys"><kbd>⌘⇧W</kbd></td></tr>
+        <tr><td class="shortcut-desc">Close current tab</td><td class="shortcut-keys"><kbd>⌘W</kbd></td></tr>
         <tr><td class="shortcut-desc">Pin or unpin tab</td><td class="shortcut-keys">Right-click tab → Pin Tab / Unpin Tab</td></tr>
         <tr><td class="shortcut-desc">Recall pinned tab folder</td><td class="shortcut-keys">Click the pinned tab</td></tr>
         <tr><td class="shortcut-desc">Reorder tabs</td><td class="shortcut-keys">Right-click tab → Move to Start / Left / Right / End</td></tr>
@@ -1597,7 +1628,7 @@
     <strong>DuPane</strong> · Dual-Pane File Manager for macOS
   </div>
   <div style="color:var(--text2);">
-    User Guide · Version 1.49 · Build 249 · macOS 13+
+    User Guide · Version 1.50 · Build 250 · macOS 13+
   </div>
 </footer>
 

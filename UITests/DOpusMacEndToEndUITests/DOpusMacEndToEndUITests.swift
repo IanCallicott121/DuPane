@@ -7,6 +7,7 @@ final class DOpusMacEndToEndUITests: XCTestCase {
     override func setUpWithError() throws {
         try super.setUpWithError()
         continueAfterFailure = false
+        #if SWIFT_PACKAGE
         // XCUIApplication requires DOpusMac.app to be built and placed next to
         // this test bundle in the build products directory. When running the
         // package test plan without the app scheme, the bundle won't exist and
@@ -18,6 +19,7 @@ final class DOpusMacEndToEndUITests: XCTestCase {
             atPath: productsDir.appendingPathComponent("DOpusMac.app").path
         )
         try XCTSkipUnless(appExists, "Build DOpusMac.app first — run via Xcode with the app scheme")
+        #endif
         fixture = try EndToEndFixture()
         app = XCUIApplication()
     }
@@ -28,6 +30,99 @@ final class DOpusMacEndToEndUITests: XCTestCase {
         try fixture?.tearDown()
         fixture = nil
         try super.tearDownWithError()
+    }
+
+    // Critical UI tag: method names beginning with testCritical are the
+    // post-build subset for functional, broad, or explicitly full test runs.
+    @MainActor
+    func testCriticalRenameFileThroughToolbarSheet() throws {
+        launchApp()
+        let originalRow = waitForRow(named: "alpha.txt", in: "left")
+
+        clickRow(originalRow)
+        waitForSelection(originalRow)
+        clickToolbarButton("toolbar-rename-button")
+
+        let nameField = app.textFields["text-prompt-name-field"]
+        XCTAssertTrue(nameField.waitForExistence(timeout: 5))
+        nameField.click()
+        nameField.typeKey("a", modifierFlags: .command)
+        nameField.typeText("renamed-alpha.txt")
+        clickToolbarButton("text-prompt-confirm-button")
+
+        XCTAssertTrue(row(named: "renamed-alpha.txt", in: "left").waitForExistence(timeout: 5))
+        waitForMissingRow(named: "alpha.txt", in: "left")
+        XCTAssertFalse(fixture.exists(fixture.fileURL(named: "alpha.txt", in: fixture.leftPaneURL)))
+        XCTAssertEqual(
+            try fixture.fileContents(named: "renamed-alpha.txt", in: fixture.leftPaneURL),
+            "alpha"
+        )
+    }
+
+    @MainActor
+    func testCriticalCopySelectedFileBetweenPanes() throws {
+        let sourceURL = try fixture.writeFile(named: "copy-me.txt", contents: "copy source", in: fixture.leftPaneURL)
+        launchApp()
+
+        let sourceRow = waitForRow(named: "copy-me.txt", in: "left")
+        clickRow(sourceRow)
+        waitForSelection(sourceRow)
+        clickToolbarButton("toolbar-copy-button")
+
+        XCTAssertTrue(row(named: "copy-me.txt", in: "right").waitForExistence(timeout: 5))
+        XCTAssertTrue(fixture.exists(sourceURL))
+        XCTAssertEqual(try fixture.fileContents(named: "copy-me.txt", in: fixture.rightPaneURL), "copy source")
+    }
+
+    @MainActor
+    func testCriticalMoveSelectedFileBetweenPanes() throws {
+        let sourceURL = try fixture.writeFile(named: "move-me.txt", contents: "move source", in: fixture.leftPaneURL)
+        launchApp()
+
+        let sourceRow = waitForRow(named: "move-me.txt", in: "left")
+        clickRow(sourceRow)
+        waitForSelection(sourceRow)
+        clickToolbarButton("toolbar-move-button")
+
+        XCTAssertTrue(row(named: "move-me.txt", in: "right").waitForExistence(timeout: 5))
+        waitForMissingRow(named: "move-me.txt", in: "left")
+        XCTAssertFalse(fixture.exists(sourceURL))
+        XCTAssertEqual(try fixture.fileContents(named: "move-me.txt", in: fixture.rightPaneURL), "move source")
+    }
+
+    @MainActor
+    func testCriticalCopyConflictDialogResolvesOverwriteSkipAndKeepBoth() throws {
+        try fixture.writeFile(named: "overwrite-conflict.txt", contents: "incoming overwrite", in: fixture.leftPaneURL)
+        try fixture.writeFile(named: "overwrite-conflict.txt", contents: "existing overwrite", in: fixture.rightPaneURL)
+        try fixture.writeFile(named: "skip-conflict.txt", contents: "incoming skip", in: fixture.leftPaneURL)
+        try fixture.writeFile(named: "skip-conflict.txt", contents: "existing skip", in: fixture.rightPaneURL)
+        try fixture.writeFile(named: "keep-conflict.txt", contents: "incoming keep", in: fixture.leftPaneURL)
+        try fixture.writeFile(named: "keep-conflict.txt", contents: "existing keep", in: fixture.rightPaneURL)
+        launchApp()
+
+        copyConflictingFile(named: "overwrite-conflict.txt", choosing: "Overwrite")
+        XCTAssertEqual(
+            try fixture.fileContents(named: "overwrite-conflict.txt", in: fixture.rightPaneURL),
+            "incoming overwrite"
+        )
+
+        copyConflictingFile(named: "skip-conflict.txt", choosing: "Skip")
+        XCTAssertEqual(
+            try fixture.fileContents(named: "skip-conflict.txt", in: fixture.rightPaneURL),
+            "existing skip"
+        )
+        XCTAssertFalse(fixture.exists(fixture.fileURL(named: "skip-conflict 2.txt", in: fixture.rightPaneURL)))
+
+        copyConflictingFile(named: "keep-conflict.txt", choosing: "Keep Both")
+        XCTAssertEqual(
+            try fixture.fileContents(named: "keep-conflict.txt", in: fixture.rightPaneURL),
+            "existing keep"
+        )
+        XCTAssertTrue(row(named: "keep-conflict 2.txt", in: "right").waitForExistence(timeout: 5))
+        XCTAssertEqual(
+            try fixture.fileContents(named: "keep-conflict 2.txt", in: fixture.rightPaneURL),
+            "incoming keep"
+        )
     }
 
     @MainActor
@@ -44,9 +139,9 @@ final class DOpusMacEndToEndUITests: XCTestCase {
         let alphaRow = row(named: "alpha.txt", in: "left")
         XCTAssertTrue(alphaRow.waitForExistence(timeout: 5))
 
-        alphaRow.click()
+        clickRow(alphaRow)
 
-        waitForStatus(in: "left", containing: "1 selected")
+        waitForSelection(alphaRow)
     }
 
     @MainActor
@@ -57,7 +152,7 @@ final class DOpusMacEndToEndUITests: XCTestCase {
         let folderRow = row(named: "Open Folder", in: "left")
         XCTAssertTrue(folderRow.waitForExistence(timeout: 5))
 
-        folderRow.doubleClick()
+        doubleClickRow(folderRow)
 
         XCTAssertTrue(row(named: "inside.txt", in: "left").waitForExistence(timeout: 5))
     }
@@ -69,27 +164,33 @@ final class DOpusMacEndToEndUITests: XCTestCase {
         let betaRow = row(named: "beta.txt", in: "left")
         XCTAssertTrue(alphaRow.waitForExistence(timeout: 5))
 
-        alphaRow.click()
+        clickRow(alphaRow)
+        waitForSelection(alphaRow)
         XCUIElement.perform(withKeyModifiers: .command) {
-            betaRow.click()
+            clickRow(betaRow)
         }
 
-        waitForStatus(in: "left", containing: "2 selected")
+        waitForSelection(alphaRow)
+        waitForSelection(betaRow)
     }
 
     @MainActor
     func testShiftClickExtendsSelectionToRange() throws {
         launchApp()
         let alphaRow = row(named: "alpha.txt", in: "left")
+        let betaRow = row(named: "beta.txt", in: "left")
         let gammaRow = row(named: "gamma.txt", in: "left")
         XCTAssertTrue(alphaRow.waitForExistence(timeout: 5))
 
-        alphaRow.click()
+        clickRow(alphaRow)
+        waitForSelection(alphaRow)
         XCUIElement.perform(withKeyModifiers: .shift) {
-            gammaRow.click()
+            clickRow(gammaRow)
         }
 
-        waitForStatus(in: "left", containing: "3 selected")
+        waitForSelection(alphaRow)
+        waitForSelection(betaRow)
+        waitForSelection(gammaRow)
     }
 
     @MainActor
@@ -98,7 +199,7 @@ final class DOpusMacEndToEndUITests: XCTestCase {
         let alphaRow = row(named: "alpha.txt", in: "left")
         XCTAssertTrue(alphaRow.waitForExistence(timeout: 5))
 
-        alphaRow.rightClick()
+        rightClickRow(alphaRow)
 
         XCTAssertTrue(app.menuItems["Open"].waitForExistence(timeout: 2))
         XCTAssertTrue(app.menuItems["Rename…"].exists)
@@ -122,11 +223,65 @@ final class DOpusMacEndToEndUITests: XCTestCase {
     }
 
     @MainActor
-    private func waitForStatus(in pane: String, containing text: String) {
-        let status = app.staticTexts["\(pane)-pane-status"]
-        XCTAssertTrue(status.waitForExistence(timeout: 5))
-        let predicate = NSPredicate(format: "label CONTAINS %@", text)
-        expectation(for: predicate, evaluatedWith: status)
+    @discardableResult
+    private func waitForRow(named name: String, in pane: String) -> XCUIElement {
+        let element = row(named: name, in: pane)
+        XCTAssertTrue(element.waitForExistence(timeout: 5))
+        return element
+    }
+
+    @MainActor
+    private func waitForMissingRow(named name: String, in pane: String) {
+        let element = row(named: name, in: pane)
+        let predicate = NSPredicate(format: "exists == false")
+        expectation(for: predicate, evaluatedWith: element)
+        waitForExpectations(timeout: 5)
+    }
+
+    @MainActor
+    private func clickToolbarButton(_ identifier: String) {
+        let button = app.buttons[identifier]
+        XCTAssertTrue(button.waitForExistence(timeout: 5))
+        button.click()
+    }
+
+    @MainActor
+    private func copyConflictingFile(named name: String, choosing buttonTitle: String) {
+        let sourceRow = waitForRow(named: name, in: "left")
+        clickRow(sourceRow)
+        waitForSelection(sourceRow)
+        clickToolbarButton("toolbar-copy-button")
+
+        let sheet = app.sheets.firstMatch
+        XCTAssertTrue(sheet.waitForExistence(timeout: 5))
+        let button = sheet.buttons[buttonTitle]
+        XCTAssertTrue(button.waitForExistence(timeout: 5))
+        button.click()
+
+        let predicate = NSPredicate(format: "exists == false")
+        expectation(for: predicate, evaluatedWith: sheet)
+        waitForExpectations(timeout: 5)
+    }
+
+    @MainActor
+    private func clickRow(_ row: XCUIElement) {
+        row.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).click()
+    }
+
+    @MainActor
+    private func doubleClickRow(_ row: XCUIElement) {
+        row.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).doubleClick()
+    }
+
+    @MainActor
+    private func rightClickRow(_ row: XCUIElement) {
+        row.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).rightClick()
+    }
+
+    @MainActor
+    private func waitForSelection(_ row: XCUIElement) {
+        let predicate = NSPredicate(format: "value == %@", "selected")
+        expectation(for: predicate, evaluatedWith: row)
         waitForExpectations(timeout: 2)
     }
 }
@@ -161,7 +316,7 @@ private final class EndToEndFixture {
 
     @discardableResult
     func writeFile(named name: String, contents: String, in folderURL: URL) throws -> URL {
-        let fileURL = folderURL.appendingPathComponent(name)
+        let fileURL = fileURL(named: name, in: folderURL)
         try contents.write(to: fileURL, atomically: true, encoding: .utf8)
         return fileURL
     }
@@ -171,5 +326,17 @@ private final class EndToEndFixture {
         let url = folderURL.appendingPathComponent(name, isDirectory: true)
         try fileManager.createDirectory(at: url, withIntermediateDirectories: false)
         return url
+    }
+
+    func fileURL(named name: String, in folderURL: URL) -> URL {
+        folderURL.appendingPathComponent(name)
+    }
+
+    func fileContents(named name: String, in folderURL: URL) throws -> String {
+        try String(contentsOf: fileURL(named: name, in: folderURL), encoding: .utf8)
+    }
+
+    func exists(_ url: URL) -> Bool {
+        fileManager.fileExists(atPath: url.path)
     }
 }

@@ -58,6 +58,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: local.DOpusMac.EndToEndUITests
         SWIFT_VERSION: "5.9"
         TEST_TARGET_NAME: DOpusMac
+        GENERATE_INFOPLIST_FILE: YES
     dependencies:
       - target: DOpusMac
         embed: false

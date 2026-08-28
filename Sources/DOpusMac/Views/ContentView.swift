@@ -305,7 +305,7 @@ struct ContentView: View {
                 Button("Copy to Other Pane") { moveOrCopy(isMove: false) }
                     .keyboardShortcut("c", modifiers: .command)
                 Button("Move to Other Pane") { moveOrCopy(isMove: true) }
-                    .keyboardShortcut("v", modifiers: [.command, .option])
+                    .keyboardShortcut("v", modifiers: .command)
                 Button("Duplicate") { active.duplicate() }
                     .keyboardShortcut("d", modifiers: .command)
                 Button("Quick Look") {
