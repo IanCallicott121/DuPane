@@ -267,6 +267,7 @@ final class FolderSizeViewModelEdgeCaseTests: XCTestCase {
 // MARK: - AppSettings & PaneState defaults (2 tests)
 
 final class AppSettingsAndPaneDefaultTests: XCTestCase {
+    // [optional] — trivial default; covered by the broader new-defaults test in Build268Tests
     func testAppSettingsListFontSizeDefaultIs14() {
         UserDefaults.standard.removeObject(forKey: "listFontSize")
         let settings = AppSettings()
@@ -275,6 +276,7 @@ final class AppSettingsAndPaneDefaultTests: XCTestCase {
     }
 
     @MainActor
+    // [optional] — trivial nil default; incidentally verified by all tests that check errorMessage
     func testPaneErrorMessageDefaultsToNil() {
         let pane = PaneState()
         XCTAssertNil(pane.errorMessage)

@@ -1,5 +1,6 @@
 import XCTest
 @testable import DOpusMac
+// All tests in this file are [optional] — performance budgets, run periodically.
 
 final class DOpusMacLatencyTests: XCTestCase {
 
@@ -12,6 +13,7 @@ final class DOpusMacLatencyTests: XCTestCase {
 
     private let rows = (0..<20).map { "file\($0).txt" }
 
+    // [optional]
     func testPlainClickLatency() {
         let harness = makeHarness()
         let elapsed = ContinuousClock().measure {
@@ -23,6 +25,7 @@ final class DOpusMacLatencyTests: XCTestCase {
             "\(Self.iterations) plain clicks took \(elapsed), exceeded budget of \(Self.clickBudget)")
     }
 
+    // [optional]
     func testCommandClickLatency() {
         let harness = makeHarness()
         let elapsed = ContinuousClock().measure {
@@ -34,6 +37,7 @@ final class DOpusMacLatencyTests: XCTestCase {
             "\(Self.iterations) command-clicks took \(elapsed), exceeded budget of \(Self.clickBudget)")
     }
 
+    // [optional]
     func testShiftClickLatency() {
         let harness = makeHarness()
         try? harness.click(.plain, rowNamed: rows[0], in: .left)
@@ -55,6 +59,7 @@ final class DOpusMacLatencyTests: XCTestCase {
     private static let largeItemCount = 10_000
 
     @MainActor
+    // [optional]
     func testSortLatencyOnLargeList() {
         let pane = PaneState()
         pane.items = makeLargeItemList(count: Self.largeItemCount)
@@ -68,6 +73,7 @@ final class DOpusMacLatencyTests: XCTestCase {
     }
 
     @MainActor
+    // [optional]
     func testFilterLatencyOnLargeList() {
         let pane = PaneState()
         pane.items = makeLargeItemList(count: Self.largeItemCount)
@@ -86,6 +92,7 @@ final class DOpusMacLatencyTests: XCTestCase {
     // A local folder with 500 files must load in under 500 ms. Remote volumes
     // are excluded — they have their own latency budget and are non-blocking
     // by design (async load).
+    // [optional]
     func testFolderLoadLatencyFor500Files() async throws {
         let tempDir = FileManager.default.temporaryDirectory
             .appendingPathComponent("DOpusMacLatency-\(UUID().uuidString)", isDirectory: true)

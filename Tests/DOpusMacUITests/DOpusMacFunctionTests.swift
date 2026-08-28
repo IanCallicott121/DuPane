@@ -1,6 +1,7 @@
 import Foundation
 import XCTest
 @testable import DOpusMac
+// All tests [must] unless marked [optional]. See Build268Tests.swift for tagging convention.
 
 final class DOpusMacFunctionTests: XCTestCase {
     private var fixture: FilePaneFixture!
@@ -172,6 +173,7 @@ final class DOpusMacFunctionTests: XCTestCase {
         XCTAssertEqual(pane.displayedItems.map(\.name), ["alpha.txt", "beta.txt"])
     }
 
+    // [optional] — tests internal string normalization, not user-visible output
     func testFinderTagSummariesNormalizeSpotlightValues() {
         let tags = FinderTagMetadata.summaries(from: [
             (value: "Red\n6", count: 2),
@@ -184,6 +186,7 @@ final class DOpusMacFunctionTests: XCTestCase {
         XCTAssertEqual(tags.first(where: { $0.name == "Red" })?.count, 3)
     }
 
+    // [optional] — tests internal NSPredicate string format, not user-visible
     func testFinderTagDiscoveryPredicateUsesWildcardString() {
         let predicate = FinderTagMetadata.tagDiscoveryPredicate()
 
@@ -1056,6 +1059,7 @@ final class TabbedPaneStateTests: XCTestCase {
 @MainActor
 final class SidebarModelTests: XCTestCase {
 
+    // [optional] — environment check; fails only if system folders are missing
     func testSystemLocationsAreNonEmpty() {
         let model = SidebarModel()
         XCTAssertFalse(model.systemLocations.isEmpty)
@@ -1144,6 +1148,7 @@ final class PaneStateEnhancedTests: XCTestCase {
         XCTAssertTrue(pane.items.contains { $0.name == "alpha.txt" }, "File should be unchanged")
     }
 
+    // [optional] — verifies isLoading flag timing; tested implicitly by all async load tests
     func testIsLoadingTransition() async throws {
         let pane = PaneState(initialURL: fixture.leftPaneURL)
         XCTAssertFalse(pane.isLoading)
@@ -1173,6 +1178,7 @@ final class PaneStateEnhancedTests: XCTestCase {
         XCTAssertFalse(pane2.sortAscending)
     }
 
+    // [optional] — checks tags array is never nil; trivial structural assertion
     func testTagsLoadedForFiles() async throws {
         let pane = PaneState(initialURL: fixture.leftPaneURL)
         pane.start()
@@ -1227,6 +1233,7 @@ final class CustomActionsModelTests: XCTestCase {
         XCTAssertEqual(m2.actions.first?.name, "Persist")
     }
 
+    // [optional] — slow I/O stress test; run periodically, not on every build
     func testProcessRunnerHandlesLargeOutputWithoutDeadlock() async throws {
         let result = try await ProcessRunner.run(
             executableURL: URL(fileURLWithPath: "/bin/sh"),
@@ -1237,6 +1244,7 @@ final class CustomActionsModelTests: XCTestCase {
         XCTAssertGreaterThan(result.stdout.count, 80_000)
     }
 
+    // [optional] — slow shell process invocation; run periodically
     func testProcessRunnerCapturesNonzeroStatusAndStderr() async throws {
         let result = try await ProcessRunner.run(
             executableURL: URL(fileURLWithPath: "/bin/sh"),
@@ -1252,6 +1260,7 @@ final class CustomActionsModelTests: XCTestCase {
 
 @MainActor
 final class SmartMetadataServiceTests: XCTestCase {
+    // [optional] — slow (500ms sleep); metadata correctness covered by Build42BugFixTests
     func testLineCountForSwiftFile() async throws {
         let tmp = FileManager.default.temporaryDirectory
             .appendingPathComponent("test-\(UUID().uuidString).swift")
@@ -1268,6 +1277,7 @@ final class SmartMetadataServiceTests: XCTestCase {
         XCTAssertTrue(info?.contains("line") == true, "Expected line count, got: \(info ?? "nil")")
     }
 
+    // [optional] — slow (500ms sleep); tests SmartMetadataService background path
     func testImageDimensionsForPNG() async throws {
         // Create a minimal 1x1 PNG (89 bytes)
         let pngData = Data([
@@ -1305,6 +1315,7 @@ final class SmartMetadataServiceTests: XCTestCase {
 
 @MainActor
 final class FolderSizeViewModelTests: XCTestCase {
+    // [optional] — slow folder scan; FolderSizeViewModel edge cases in FrontendCoverageTests
     func testScanCountsSubitems() async throws {
         let dir = FileManager.default.temporaryDirectory
             .appendingPathComponent("fsvmtest-\(UUID().uuidString)", isDirectory: true)
@@ -1330,6 +1341,7 @@ final class FolderSizeViewModelTests: XCTestCase {
         XCTAssertGreaterThan(vm.totalBytes, 0)
     }
 
+    // [optional] — slow folder scan; correctness covered by testScanCountsSubitems
     func testScanSortsLargestFirst() async throws {
         let dir = FileManager.default.temporaryDirectory
             .appendingPathComponent("fsvmsort-\(UUID().uuidString)", isDirectory: true)
@@ -1351,11 +1363,13 @@ final class FolderSizeViewModelTests: XCTestCase {
         XCTAssertEqual(vm.entries.first?.name, "large.txt")
     }
 
+    // [optional] — trivial enum-case existence check; compiler catches removal anyway
     func testSortKeyInfoCaseExists() {
         XCTAssertTrue(SortKey.allCases.contains(.info))
         XCTAssertEqual(SortKey.info.rawValue, "Info")
     }
 
+    // [optional] — trivial default; struct initialiser ensures this unless explicitly set
     func testFileItemIsRestrictedDefaultsFalse() {
         let url = URL(fileURLWithPath: "/tmp/test")
         let item = FileItem(
@@ -1486,6 +1500,7 @@ final class FolderSizeViewModelTests: XCTestCase {
         XCTAssertEqual(configuration.leftPaneURL, configuration.leftTabURLs.first ?? nil)
     }
 
+    // [optional] — hits real home directory; selectAll logic covered by testSelectAllWithActiveFilterOnlySelectsVisibleSubset
     func testPaneStateSelectAllSelectsDisplayedItems() async throws {
         let pane = PaneState(initialURL: FileManager.default.homeDirectoryForCurrentUser)
         pane.start()

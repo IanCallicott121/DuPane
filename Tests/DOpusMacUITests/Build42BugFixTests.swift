@@ -153,6 +153,7 @@ final class Build42BugFixTests: XCTestCase {
     // MARK: - Major: SmartMetadataService lineCount correctness
 
     @MainActor
+    // [optional] — slow async metadata test; tests background service, not hot path
     func testSmartMetadataLineCountIsAccurateForSwiftFile() async throws {
         // 3 newlines → lineCount returns count + 1 = 4 lines
         let content = "let a = 1\nlet b = 2\nlet c = 3\n"
@@ -179,6 +180,7 @@ final class Build42BugFixTests: XCTestCase {
     }
 
     @MainActor
+    // [optional] — slow async metadata test
     func testSmartMetadataLineCountHandlesSingleLineFile() async throws {
         let content = "no newline at end"
         let tmpURL = FileManager.default.temporaryDirectory
