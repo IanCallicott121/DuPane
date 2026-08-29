@@ -130,10 +130,10 @@ final class NetworkVolumeMonitorTests: XCTestCase {
     }
 
     func testReconnectPinnedSkipsInvalidURLs() {
-        // reconnectPinned with garbage strings must not crash
+        // All of these must be rejected by the scheme+host guard — no NSWorkspace calls
         let monitor = NetworkVolumeMonitor()
-        monitor.reconnectPinned(["not a url", "", "://bad"])
-        // no assertion — just verifying no crash
+        monitor.reconnectPinned(["not a url", "", "relative/path", "missinghost://"])
+        // no assertion — just verifying no crash and no system dialog
     }
 
     func testIsMountedReturnsFalseForUnknownPinnedURL() {

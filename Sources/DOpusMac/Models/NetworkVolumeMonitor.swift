@@ -77,7 +77,9 @@ final class NetworkVolumeMonitor: ObservableObject {
 
     func reconnectPinned(_ pinnedURLs: [String]) {
         for raw in pinnedURLs {
-            guard let url = URL(string: raw), url.scheme != nil else { continue }
+            guard let url = URL(string: raw),
+                  let scheme = url.scheme, !scheme.isEmpty,
+                  url.host != nil else { continue }
             NSWorkspace.shared.open(url)
         }
     }
