@@ -100,6 +100,7 @@
     <a href="#dupes" class="nav-item">Duplicate Finder</a>
     <a href="#tags" class="nav-item">Colour Tags</a>
     <a href="#settings" class="nav-item">Settings</a>
+    <a href="#network" class="nav-item">Network &amp; Servers</a>
   </div>
 </nav>
 
@@ -440,12 +441,59 @@
       </div>
     </section>
 
+    <section class="faq-section" id="network">
+      <h2>Network &amp; Servers</h2>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I connect to a network share (SMB, AFP, NFS)?</div>
+        <div class="faq-a">
+          <p>Make sure <strong>Settings → Sidebar → Show Network section</strong> is on, then click <strong>Connect to Server…</strong> at the bottom of the sidebar. Enter the server address (e.g. <code>smb://server/share</code>) and press <kbd>⏎</kbd> or click Connect. macOS will prompt for credentials if the share isn't already in Keychain and mount it under <code>/Volumes/</code>.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I find servers on my local network without knowing their addresses?</div>
+        <div class="faq-a">
+          <p>Enable <strong>Settings → Network → Bonjour discovery in Connect sheet</strong>. When you open the Connect to Server sheet, DuPane scans your local network using Bonjour and lists discovered SMB and AFP servers. Click any result to populate the address field automatically.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I unmount (eject) a network share?</div>
+        <div class="faq-a">
+          <p>Mounted shares appear in the <strong>Network</strong> sidebar section. Click the <strong>Eject</strong> button (⏏) on the right of any mounted-volume row. DuPane calls <code>NSWorkspace.unmountAndEjectDevice</code> which cleanly disconnects the share.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">Can I save a server address so I don't have to type it every time?</div>
+        <div class="faq-a">
+          <p>Yes — tick <strong>Pin this server</strong> in the Connect to Server sheet before clicking Connect. The server URL is saved to a persistent list and appears in the Network sidebar section even when not mounted. Click it any time to reconnect, or right-click for <strong>Connect Now</strong> / <strong>Remove from Pinned</strong>.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">Can DuPane automatically reconnect to a server on startup?</div>
+        <div class="faq-a">
+          <p>Enable <strong>Settings → Network → Auto-reconnect pinned servers on launch</strong> (off by default). On the next launch DuPane will silently attempt to mount each pinned server. This works without a prompt when the credentials are stored in the macOS Keychain from a previous connection.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">What does the coloured dot next to a network entry mean?</div>
+        <div class="faq-a">
+          <p>A <span style="color:green">●</span> green dot means the share is currently mounted and accessible. A <span style="color:gray">●</span> grey dot means the server is pinned but not currently mounted. Toggle the indicator with <strong>Settings → Network → Show status indicator</strong>.</p>
+        </div>
+      </div>
+
+    </section>
+
   </div><!-- /content -->
 </main>
 
 <footer>
   <div><strong>DuPane</strong> · Dual-Pane File Manager for macOS</div>
-  <div>FAQs · Build 249 · macOS 13+</div>
+  <div>FAQs · Build 313 · macOS 13+</div>
 </footer>
 
 </body>

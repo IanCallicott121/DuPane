@@ -12,6 +12,7 @@ struct SidebarView: View {
     let selectedTags: Set<String>
     let onNavigate: (URL) -> Void
     let onTagSelected: (String, Bool) -> Void
+    @StateObject private var networkMonitor = NetworkVolumeMonitor()
     @State private var hoveredURL: URL? = nil
     @State private var renamingBookmark: URL? = nil
     @State private var renameBookmarkText = ""
@@ -20,6 +21,7 @@ struct SidebarView: View {
     @State private var showConnectToServer = false
     @State private var connectAddress = "smb://"
     @State private var connectError: String? = nil
+    @State private var pinThisServer = false
 
     // MARK: - Visible places (filtered by settings)
 
@@ -79,6 +81,16 @@ struct SidebarView: View {
 
                 if settings.showNetworkSection {
                     sectionHeader("Network")
+                    if settings.networkShowMountedVolumes {
+                        ForEach(networkMonitor.mountedVolumes) { volume in
+                            networkVolumeRow(volume)
+                        }
+                    }
+                    if settings.networkPinnedLocations && !settings.pinnedNetworkURLs.isEmpty {
+                        ForEach(settings.pinnedNetworkURLs, id: \.self) { urlString in
+                            pinnedServerRow(urlString)
+                        }
+                    }
                     connectToServerRow
                 }
                 Spacer(minLength: 12)
@@ -132,36 +144,91 @@ struct SidebarView: View {
             Text("\u{201C}\(scriptURL.lastPathComponent)\u{201D} is a shell script and could modify or delete files. Run it?")
         }
         .sheet(isPresented: $showConnectToServer) {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Connect to Server")
-                    .font(.headline)
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Server Address:")
-                        .font(.system(size: 12))
-                        .foregroundStyle(.secondary)
-                    TextField("smb://server/share", text: $connectAddress)
-                        .textFieldStyle(.roundedBorder)
-                        .font(.system(size: 12, design: .monospaced))
-                        .onSubmit { connectToServer() }
+            connectSheet
+                .onAppear {
+                    if settings.networkBonjourDiscovery { networkMonitor.startBonjourBrowsing() }
                 }
-                if let err = connectError {
-                    Text(err).font(.system(size: 11)).foregroundStyle(.red)
-                }
-                Text("macOS will prompt for credentials if required. The mounted share will appear in /Volumes/.")
-                    .font(.system(size: 11))
-                    .foregroundStyle(.secondary)
-                HStack {
-                    Spacer()
-                    Button("Cancel") { showConnectToServer = false; connectError = nil }
-                    Button("Connect") { connectToServer() }
-                        .keyboardShortcut(.defaultAction)
-                        .disabled(connectAddress.trimmingCharacters(in: .whitespaces).isEmpty)
-                }
+                .onDisappear { networkMonitor.stopBonjourBrowsing() }
+        }
+        .onAppear {
+            if settings.showNetworkSection && settings.networkShowMountedVolumes {
+                networkMonitor.startMonitoring(
+                    autoReconnect: settings.networkAutoReconnect,
+                    pinnedURLs: settings.pinnedNetworkURLs
+                )
             }
-            .padding(24)
-            .frame(width: 400)
+        }
+        .onDisappear {
+            networkMonitor.stopMonitoring()
+            networkMonitor.stopBonjourBrowsing()
         }
 
+    }
+
+    // MARK: - Connect to Server sheet
+
+    private var connectSheet: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Connect to Server").font(.headline)
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Server Address:")
+                    .font(.system(size: 12)).foregroundStyle(.secondary)
+                TextField("smb://server/share", text: $connectAddress)
+                    .textFieldStyle(.roundedBorder)
+                    .font(.system(size: 12, design: .monospaced))
+                    .onSubmit { connectToServer() }
+            }
+            if let err = connectError {
+                Text(err).font(.system(size: 11)).foregroundStyle(.red)
+            }
+            if settings.networkBonjourDiscovery && !networkMonitor.bonjourServers.isEmpty {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Discovered Servers:")
+                        .font(.system(size: 12)).foregroundStyle(.secondary)
+                    ScrollView(.vertical) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            ForEach(networkMonitor.bonjourServers) { server in
+                                Button {
+                                    connectAddress = server.connectURL?.absoluteString ?? "\(server.scheme)://\(server.hostName)/"
+                                } label: {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: server.scheme == "afp" ? "externaldrive.fill" : "network")
+                                            .font(.system(size: 11)).frame(width: 14)
+                                        Text(server.name)
+                                            .font(.system(size: 12))
+                                        Text(server.hostName)
+                                            .font(.system(size: 11))
+                                            .foregroundStyle(.secondary)
+                                        Spacer()
+                                    }
+                                    .padding(.horizontal, 6).padding(.vertical, 3)
+                                    .contentShape(Rectangle())
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    }
+                    .frame(maxHeight: 120)
+                    .background(Color.primary.opacity(0.04))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                }
+            }
+            if settings.networkPinnedLocations {
+                Toggle("Pin this server", isOn: $pinThisServer)
+                    .font(.system(size: 12))
+            }
+            Text("macOS will prompt for credentials if required. The mounted share will appear in /Volumes/.")
+                .font(.system(size: 11)).foregroundStyle(.secondary)
+            HStack {
+                Spacer()
+                Button("Cancel") { showConnectToServer = false; connectError = nil; pinThisServer = false }
+                Button("Connect") { connectToServer() }
+                    .keyboardShortcut(.defaultAction)
+                    .disabled(connectAddress.trimmingCharacters(in: .whitespaces).isEmpty)
+            }
+        }
+        .padding(24)
+        .frame(width: 420)
     }
 
     private func executeShellScript(_ url: URL) {
@@ -396,12 +463,88 @@ struct SidebarView: View {
         }
     }
 
-    // MARK: - Network section
+    // MARK: - Network section rows
+
+    private func networkVolumeRow(_ volume: NetworkVolume) -> some View {
+        let url = volume.url
+        return HStack(spacing: 6) {
+            if settings.networkStatusIndicator {
+                Circle().fill(Color.green).frame(width: 7, height: 7)
+            }
+            Image(systemName: "externaldrive.fill.badge.wifi")
+                .font(.system(size: 11))
+                .frame(width: 16)
+                .foregroundStyle(Color.accentColor.opacity(0.7))
+            Text(volume.name)
+                .font(.system(size: 12))
+                .lineLimit(1)
+            Spacer(minLength: 2)
+            Button {
+                networkMonitor.eject(volume)
+            } label: {
+                Image(systemName: "eject.fill")
+                    .font(.system(size: 10))
+                    .frame(width: 14, height: 14)
+            }
+            .buttonStyle(.borderless)
+            .foregroundStyle(.secondary)
+            .help("Eject \(volume.name)")
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background {
+            RoundedRectangle(cornerRadius: 5)
+                .fill(hoveredURL == url ? Color.primary.opacity(0.08) : Color.clear)
+        }
+        .contentShape(Rectangle())
+        .onHover { isHovering in hoveredURL = isHovering ? url : nil }
+        .onTapGesture { onNavigate(url) }
+    }
+
+    private func pinnedServerRow(_ urlString: String) -> some View {
+        let isMounted = networkMonitor.isMounted(urlString)
+        let displayName = URL(string: urlString)?.host ?? urlString
+        return HStack(spacing: 6) {
+            if settings.networkStatusIndicator {
+                Circle().fill(isMounted ? Color.green : Color.secondary.opacity(0.5))
+                    .frame(width: 7, height: 7)
+            }
+            Image(systemName: "pin.fill")
+                .font(.system(size: 11))
+                .frame(width: 16)
+                .foregroundStyle(Color.accentColor.opacity(0.7))
+            Text(displayName)
+                .font(.system(size: 12))
+                .lineLimit(1)
+            Spacer(minLength: 2)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background {
+            RoundedRectangle(cornerRadius: 5)
+                .fill(Color.clear)
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            if let url = URL(string: urlString) { NSWorkspace.shared.open(url) }
+        }
+        .contextMenu {
+            Button("Connect Now") {
+                if let url = URL(string: urlString) { NSWorkspace.shared.open(url) }
+            }
+            Button("Remove from Pinned", role: .destructive) {
+                settings.pinnedNetworkURLs.removeAll { $0 == urlString }
+            }
+        }
+    }
 
     private var connectToServerRow: some View {
         Button {
             connectAddress = "smb://"
             connectError = nil
+            pinThisServer = false
             showConnectToServer = true
         } label: {
             HStack(spacing: 6) {
@@ -427,7 +570,11 @@ struct SidebarView: View {
             connectError = "Enter a valid server address, e.g. smb://server/share"
             return
         }
+        if pinThisServer && !settings.pinnedNetworkURLs.contains(raw) {
+            settings.pinnedNetworkURLs.append(raw)
+        }
         connectError = nil
+        pinThisServer = false
         showConnectToServer = false
         NSWorkspace.shared.open(url)
     }

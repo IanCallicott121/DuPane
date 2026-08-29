@@ -583,7 +583,7 @@
     <div class="logo-icon">DP</div>
     <div>
       <div class="sidebar-logo-text">DuPane</div>
-      <div class="sidebar-logo-sub">User Guide v1.51</div>
+      <div class="sidebar-logo-sub">User Guide v1.52</div>
     </div>
   </div>
 
@@ -973,8 +973,25 @@
       <p>The sidebar also includes a <strong>Tags</strong> section when Finder tags are present in the loaded panes or Spotlight results. The full tag row is clickable. Click a tag to filter both panes to items with that tag; selected tags keep a highlighted background. Click the only selected tag again to clear the filter. <kbd>⌘</kbd>-click additional tags to include more than one tag in the filter.</p>
 
       <h3>Network</h3>
-      <p>When <strong>Settings → Sidebar → Show Network section</strong> is enabled (the default), a <strong>Network</strong> section appears at the bottom of the sidebar containing a <strong>Connect to Server…</strong> row.</p>
-      <p>Clicking <strong>Connect to Server…</strong> opens a sheet where you can type a server address — for example <code>smb://server/share</code>, <code>afp://server/share</code>, or <code>nfs://server/path</code>. Press <kbd>⏎</kbd> or click <strong>Connect</strong>. macOS handles authentication (prompting for credentials if the share is not already in Keychain) and mounts the share under <code>/Volumes/</code>. Once mounted, the share appears in the Finder sidebar and can be navigated to from either pane.</p>
+      <p>When <strong>Settings → Sidebar → Show Network section</strong> is enabled (the default), a <strong>Network</strong> section appears at the bottom of the sidebar. Each sub-feature can be toggled individually in <strong>Settings → Network</strong>.</p>
+
+      <h4>Mounted network volumes</h4>
+      <p>Any currently-mounted network share (SMB, AFP, NFS, WebDAV, etc.) appears in the Network section with its volume name. Click an entry to navigate the active pane to the share root. An <strong>Eject</strong> button unmounts the share cleanly via <code>NSWorkspace</code>. The list updates automatically when shares are mounted or unmounted. Toggle with <strong>Settings → Network → Show mounted network volumes</strong>.</p>
+
+      <h4>Status indicator</h4>
+      <p>A small coloured dot precedes each network entry: <span style="color:green">●</span> green for a currently-mounted share, and <span style="color:gray">●</span> grey for a pinned server that is not yet mounted. Toggle with <strong>Settings → Network → Show status indicator</strong>.</p>
+
+      <h4>Pinned servers</h4>
+      <p>Tick <strong>Pin this server</strong> in the Connect to Server sheet before clicking Connect to save the server URL to a persistent list. Pinned servers appear in the Network section even when not mounted — click one to attempt a connection, or right-click for <strong>Connect Now</strong> / <strong>Remove from Pinned</strong>. Toggle visibility with <strong>Settings → Network → Show pinned servers</strong>.</p>
+
+      <h4>Connect to Server</h4>
+      <p>Click <strong>Connect to Server…</strong> to open the connection sheet. Type a server address — for example <code>smb://server/share</code>, <code>afp://server/share</code>, or <code>nfs://server/path</code> — and press <kbd>⏎</kbd> or click <strong>Connect</strong>. macOS handles authentication (prompting for credentials if the share is not already in Keychain) and mounts the share under <code>/Volumes/</code>.</p>
+
+      <h4>Bonjour discovery</h4>
+      <p>When <strong>Settings → Network → Bonjour discovery in Connect sheet</strong> is on, the Connect sheet scans the local network for SMB (<code>_smb._tcp</code>) and AFP (<code>_afpovertcp._tcp</code>) services using Bonjour. Discovered servers appear in a scrollable list — click any entry to populate the address field automatically. Browsing starts when the sheet opens and stops on close.</p>
+
+      <h4>Auto-reconnect on launch</h4>
+      <p>When <strong>Settings → Network → Auto-reconnect pinned servers on launch</strong> is on (default off), DuPane silently attempts to mount each pinned server at startup. This works seamlessly when credentials are stored in the macOS Keychain from a previous connection.</p>
 
       <h3>Adding Bookmarks</h3>
       <p>There are two ways to add a bookmark:</p>
@@ -1632,7 +1649,7 @@
     <strong>DuPane</strong> · Dual-Pane File Manager for macOS
   </div>
   <div style="color:var(--text2);">
-    User Guide · Version 1.51 · Build 309 · macOS 13+
+    User Guide · Version 1.52 · Build 313 · macOS 13+
   </div>
 </footer>
 

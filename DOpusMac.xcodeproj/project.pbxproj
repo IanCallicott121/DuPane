@@ -33,6 +33,7 @@
 		B12EE5E58C43627F1074686A /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = B62D456E0AEAAA0841607BBA /* AppSettings.swift */; };
 		B1FB6D8205F8FA765A53A1C3 /* AppNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40AB477693CC07066740989C /* AppNotifications.swift */; };
 		C0799D0B25F9B95126879A45 /* CustomActionsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA07523AA716E51CC23B5B69 /* CustomActionsSettingsView.swift */; };
+		C1724A8D3043183E00BCC548 /* NetworkVolumeMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1724A8C3043183E00BCC548 /* NetworkVolumeMonitor.swift */; };
 		C45D7429D0F95157EE630D30 /* TextPromptSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA62FE014CE065E9A734479 /* TextPromptSheet.swift */; };
 		C8E234C93CF748E42BDC141B /* DOpusMacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7188031451E636B5A4568872 /* DOpusMacApp.swift */; };
 		C9F9F1137AAF6E5359EEC891 /* RowMouseEventView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 066DA313A81C17892873C1BB /* RowMouseEventView.swift */; };
@@ -92,6 +93,7 @@
 		B62D456E0AEAAA0841607BBA /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		B874EB778361B16B48408DBD /* FolderCompareService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderCompareService.swift; sourceTree = "<group>"; };
 		BB1FCAFC159B3C62AA703FF4 /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
+		C1724A8C3043183E00BCC548 /* NetworkVolumeMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkVolumeMonitor.swift; sourceTree = "<group>"; };
 		C534937EB26425817278A948 /* ColumnResizeHandle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColumnResizeHandle.swift; sourceTree = "<group>"; };
 		CF5FDA5A85DB03DB98022E7B /* PaneStatusFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaneStatusFormatter.swift; sourceTree = "<group>"; };
 		D19B8EAD7096D1EF1069DCBE /* project.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = project.yml; sourceTree = "<group>"; };
@@ -213,6 +215,7 @@
 				E00B8C44B2618F3C7EF4964A /* SidebarModel.swift */,
 				23C9DF73718E87AA7638F2E3 /* SmartMetadataService.swift */,
 				29981D0AB79444E1ABC9730B /* SortKey.swift */,
+				C1724A8C3043183E00BCC548 /* NetworkVolumeMonitor.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -357,6 +360,7 @@
 				8978AE51E421FF3B8D0D1629 /* FileOperationService.swift in Sources */,
 				D0E2E22018B7EA6033A1ABB2 /* FileRowView.swift in Sources */,
 				6AA5508C4E62AE2500C55EB7 /* FolderCompareService.swift in Sources */,
+				C1724A8D3043183E00BCC548 /* NetworkVolumeMonitor.swift in Sources */,
 				DF326056ADE6624DAFB145A1 /* FolderSizeView.swift in Sources */,
 				359724AAB6DC2C1959768C64 /* FolderSizeViewModel.swift in Sources */,
 				5AE9F3D68C8A93B444D66EF0 /* GlobalToolbar.swift in Sources */,

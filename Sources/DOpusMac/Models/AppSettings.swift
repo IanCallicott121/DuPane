@@ -234,6 +234,25 @@ final class AppSettings: ObservableObject {
     @Published var showNetworkSection: Bool {
         didSet { UserDefaults.standard.set(showNetworkSection, forKey: "showNetworkSection") }
     }
+    // Network sub-features (each individually toggleable)
+    @Published var networkShowMountedVolumes: Bool {
+        didSet { UserDefaults.standard.set(networkShowMountedVolumes, forKey: "networkShowMountedVolumes") }
+    }
+    @Published var networkBonjourDiscovery: Bool {
+        didSet { UserDefaults.standard.set(networkBonjourDiscovery, forKey: "networkBonjourDiscovery") }
+    }
+    @Published var networkPinnedLocations: Bool {
+        didSet { UserDefaults.standard.set(networkPinnedLocations, forKey: "networkPinnedLocations") }
+    }
+    @Published var networkAutoReconnect: Bool {
+        didSet { UserDefaults.standard.set(networkAutoReconnect, forKey: "networkAutoReconnect") }
+    }
+    @Published var networkStatusIndicator: Bool {
+        didSet { UserDefaults.standard.set(networkStatusIndicator, forKey: "networkStatusIndicator") }
+    }
+    @Published var pinnedNetworkURLs: [String] {
+        didSet { UserDefaults.standard.set(pinnedNetworkURLs, forKey: "pinnedNetworkURLs") }
+    }
 
     init() {
         fileDeleteNoConfirm = UserDefaults.standard.bool(forKey: "fileDeleteNoConfirm")
@@ -289,6 +308,12 @@ final class AppSettings: ObservableObject {
         foldersFirst = UserDefaults.standard.object(forKey: "foldersFirst").map { ($0 as? Bool) ?? true } ?? true
         showTimeInDate = UserDefaults.standard.object(forKey: "showTimeInDate").map { ($0 as? Bool) ?? true } ?? true
         showNetworkSection = UserDefaults.standard.object(forKey: "showNetworkSection").map { ($0 as? Bool) ?? true } ?? true
+        networkShowMountedVolumes = UserDefaults.standard.object(forKey: "networkShowMountedVolumes").map { ($0 as? Bool) ?? true } ?? true
+        networkBonjourDiscovery = UserDefaults.standard.object(forKey: "networkBonjourDiscovery").map { ($0 as? Bool) ?? true } ?? true
+        networkPinnedLocations = UserDefaults.standard.object(forKey: "networkPinnedLocations").map { ($0 as? Bool) ?? true } ?? true
+        networkAutoReconnect = UserDefaults.standard.object(forKey: "networkAutoReconnect").map { ($0 as? Bool) ?? false } ?? false
+        networkStatusIndicator = UserDefaults.standard.object(forKey: "networkStatusIndicator").map { ($0 as? Bool) ?? true } ?? true
+        pinnedNetworkURLs = UserDefaults.standard.stringArray(forKey: "pinnedNetworkURLs") ?? []
     }
 
     var hiddenColumns: Set<String> {

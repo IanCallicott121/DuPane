@@ -2,12 +2,6 @@
 
 
 ## Next items
-- **Network — advanced features** (each individually togglable in Settings > Network):
-  - Sidebar Network section — enumerate currently-mounted network volumes from /Volumes/ (filter by isVolumeKey + isNetworkKey), auto-refresh via NSWorkspace volume-mount/unmount notifications, eject button per entry
-  - Bonjour discovery — NetServiceBrowser scanning SMB (_smb._tcp) and AFP (_afpovertcp._tcp), displayed as a browsable list inside the Connect sheet
-  - Pinned network locations — bookmark a server URL (not a mounted path) so DuPane can attempt to remount on launch or on demand
-  - Auto-reconnect on launch — silently attempt to remount pinned servers at startup (works when credentials are in Keychain)
-  - Status indicator — coloured dot on sidebar network entries showing reachable/unreachable (background TCP ping to port 445/548)
 
 
 ## Clarifications
@@ -22,6 +16,18 @@
 ---
 
 ## Done
+### Build 313 — Advanced network features (2026-08-29)
+
+- **Mounted network volumes** — the Network sidebar section now enumerates all mounted network shares (SMB, AFP, NFS, etc.) detected via `statfs`/`MNT_LOCAL` flag. Each entry shows the share name with a green status dot (when status indicator is on) and an Eject button that calls `NSWorkspace.unmountAndEjectDevice`. The list auto-refreshes on `NSWorkspace.didMountNotification` / `didUnmountNotification`.
+- **Bonjour discovery** — the Connect to Server sheet shows a "Discovered Servers" list populated by `NetServiceBrowser` scanning `_smb._tcp` and `_afpovertcp._tcp` on the local network. Clicking a discovered server fills the URL field. Browsing starts when the sheet opens and stops on close.
+- **Pinned network locations** — in the Connect sheet a "Pin this server" toggle (when Settings > Network > Show pinned servers is on) adds the URL to a persistent list (`pinnedNetworkURLs` in UserDefaults). Pinned servers appear in the Network sidebar section with a pin icon and gray status dot. Tapping connects; right-click offers Connect Now / Remove from Pinned.
+- **Auto-reconnect on launch** — when Settings > Network > Auto-reconnect pinned servers on launch is on (default off), `NetworkVolumeMonitor` calls `NSWorkspace.open` for each pinned URL at startup. Credentials in Keychain allow silent reconnection.
+- **Status indicator** — a 7 pt coloured dot precedes network entries: green for mounted volumes, gray for pinned-but-unmounted servers. Toggled via Settings > Network > Show status indicator.
+- **Settings > Network section** — five individual toggles under the Network heading (only shown when Show Network section is on): Mounted volumes, Status indicator, Pinned servers, Bonjour discovery, Auto-reconnect.
+- **`NetworkVolumeMonitor` model** — new `ObservableObject` (`NetworkVolumeMonitor.swift`) encapsulating all the above logic. Types: `NetworkVolume` (Identifiable by URL), `BonjourServer` (Identifiable by scheme+host).
+- **20 new tests** in `Build310Tests.swift`: 5 × `NetworkVolume`, 5 × `BonjourServer`, 7 × `AppSettings` network defaults & persistence, 3 × `NetworkVolumeMonitor` unit.
+- **238 tests, 0 failures.**
+
 ### Build 309 — Connect to Server (2026-08-29)
 
 - **Connect to Server** — a "Network" section appears in the sidebar (when Settings > Sidebar > "Show Network section" is on). The "Connect to Server…" row opens a sheet with a URL text field (pre-filled "smb://"). On confirm, `NSWorkspace.shared.open(url)` sends the URL to macOS, which prompts for credentials and mounts the share. Basic URL validation is shown inline.
