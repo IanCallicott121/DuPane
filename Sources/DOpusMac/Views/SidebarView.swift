@@ -175,7 +175,7 @@ struct SidebarView: View {
                 .onDisappear { networkMonitor.stopBonjourBrowsing() }
         }
         .onAppear {
-            if settings.showNetworkSection && settings.networkShowMountedVolumes {
+            if settings.showNetworkSection {
                 networkMonitor.startMonitoring(
                     autoReconnect: settings.networkAutoReconnect,
                     pinnedURLs: settings.pinnedNetworkURLs
@@ -239,6 +239,13 @@ struct SidebarView: View {
             }
             Text("macOS will prompt for credentials if required. The mounted share will appear in /Volumes/.")
                 .font(.system(size: 11)).foregroundStyle(.secondary)
+            if !networkMonitor.suppressedPaths.isEmpty {
+                Button("Show previously hidden network volumes (\(networkMonitor.suppressedPaths.count))") {
+                    networkMonitor.clearSuppressedPaths()
+                }
+                .font(.system(size: 11))
+                .foregroundStyle(.secondary)
+            }
             HStack {
                 Spacer()
                 Button("Cancel") { showConnectToServer = false; connectError = nil }
@@ -499,16 +506,6 @@ struct SidebarView: View {
                 .font(.system(size: 12))
                 .lineLimit(1)
             Spacer(minLength: 2)
-            Button {
-                networkMonitor.eject(volume)
-            } label: {
-                Image(systemName: "eject.fill")
-                    .font(.system(size: 10))
-                    .frame(width: 14, height: 14)
-            }
-            .buttonStyle(.borderless)
-            .foregroundStyle(.secondary)
-            .help("Eject \(volume.name)")
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
@@ -522,19 +519,9 @@ struct SidebarView: View {
         .onTapGesture { onNavigate(url) }
         .contextMenu {
             let urlString = url.absoluteString
-            let alreadyPinned = settings.pinnedNetworkURLs.contains(urlString)
-            if settings.networkPinnedLocations {
-                Button(alreadyPinned ? "Remove from Pinned" : "Pin to Network Sidebar") {
-                    if alreadyPinned {
-                        settings.pinnedNetworkURLs.removeAll { $0 == urlString }
-                    } else {
-                        settings.pinnedNetworkURLs.append(urlString)
-                    }
-                }
-            }
-            Divider()
-            Button("Eject \(volume.name)", role: .destructive) {
-                networkMonitor.eject(volume)
+            Button("Remove Network", role: .destructive) {
+                settings.pinnedNetworkURLs.removeAll { $0 == urlString }
+                networkMonitor.ejectAndRemove(volume)
             }
         }
     }
@@ -619,13 +606,17 @@ struct SidebarView: View {
 
     private func connectToServer() {
         let raw = connectAddress.trimmingCharacters(in: .whitespaces)
-        guard let url = URL(string: raw), url.scheme != nil else {
+        guard let url = URL(string: raw), let scheme = url.scheme, !scheme.isEmpty, url.host != nil else {
             connectError = "Enter a valid server address, e.g. smb://server/share"
             return
         }
         connectError = nil
+        networkMonitor.clearSuppressedPaths()
         showConnectToServer = false
         NSWorkspace.shared.open(url)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+            networkMonitor.refresh()
+        }
     }
 }
 

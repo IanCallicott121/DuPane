@@ -9,7 +9,6 @@
 
 
 ## Pending
-- SMB network shares
 - Bug - no icloud on the mac air
 - complete the re-name to DuPane from DOpus
 

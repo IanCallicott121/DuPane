@@ -19,6 +19,8 @@ final class NetworkVolumeMonitor: ObservableObject {
     @Published var mountedVolumes: [NetworkVolume] = []
     @Published var bonjourServers: [BonjourServer] = []
 
+    private static let suppressedPathsKey = "suppressedNetworkPaths"
+    @Published private(set) var suppressedPaths: Set<String> = Set(UserDefaults.standard.stringArray(forKey: suppressedPathsKey) ?? [])
     private var mountToken: Any?
     private var unmountToken: Any?
     private var smbBrowser: NetServiceBrowser?
@@ -28,18 +30,20 @@ final class NetworkVolumeMonitor: ObservableObject {
 
     func startMonitoring(autoReconnect: Bool = false, pinnedURLs: [String] = []) {
         refresh()
-        mountToken = NotificationCenter.default.addObserver(
+        let nc = NSWorkspace.shared.notificationCenter
+        mountToken = nc.addObserver(
             forName: NSWorkspace.didMountNotification, object: nil, queue: .main
         ) { [weak self] _ in self?.refresh() }
-        unmountToken = NotificationCenter.default.addObserver(
+        unmountToken = nc.addObserver(
             forName: NSWorkspace.didUnmountNotification, object: nil, queue: .main
         ) { [weak self] _ in self?.refresh() }
         if autoReconnect { reconnectPinned(pinnedURLs) }
     }
 
     func stopMonitoring() {
-        if let t = mountToken { NotificationCenter.default.removeObserver(t); mountToken = nil }
-        if let t = unmountToken { NotificationCenter.default.removeObserver(t); unmountToken = nil }
+        let nc = NSWorkspace.shared.notificationCenter
+        if let t = mountToken { nc.removeObserver(t); mountToken = nil }
+        if let t = unmountToken { nc.removeObserver(t); unmountToken = nil }
     }
 
     func startBonjourBrowsing() {
@@ -53,19 +57,34 @@ final class NetworkVolumeMonitor: ObservableObject {
         bonjourServers = []
     }
 
+    private static let networkFSTypes: Set<String> = ["smbfs", "afpfs", "nfs", "nfs4", "webdav", "ftpfs"]
+
     func refresh() {
         let opts: FileManager.VolumeEnumerationOptions = [.skipHiddenVolumes]
         let urls = FileManager.default.mountedVolumeURLs(includingResourceValuesForKeys: nil, options: opts) ?? []
         mountedVolumes = urls.compactMap { url in
+            guard !suppressedPaths.contains(url.path) else { return nil }
             var stat = statfs()
             guard statfs(url.path, &stat) == 0 else { return nil }
-            guard (stat.f_flags & UInt32(MNT_LOCAL)) == 0 else { return nil }
+            let fsType = withUnsafeBytes(of: stat.f_fstypename) { raw in
+                String(bytes: raw.prefix(while: { $0 != 0 }), encoding: .utf8) ?? ""
+            }
+            guard Self.networkFSTypes.contains(fsType) else { return nil }
             return NetworkVolume(url: url)
         }
     }
 
-    func eject(_ volume: NetworkVolume) {
+    func ejectAndRemove(_ volume: NetworkVolume) {
+        suppressedPaths.insert(volume.url.path)
+        UserDefaults.standard.set(Array(suppressedPaths), forKey: Self.suppressedPathsKey)
         try? NSWorkspace.shared.unmountAndEjectDevice(at: volume.url)
+        mountedVolumes.removeAll { $0.id == volume.id }
+    }
+
+    func clearSuppressedPaths() {
+        suppressedPaths = []
+        UserDefaults.standard.removeObject(forKey: Self.suppressedPathsKey)
+        refresh()
     }
 
     func mountedVolume(for pinnedURLString: String) -> NetworkVolume? {
@@ -110,8 +129,9 @@ final class NetworkVolumeMonitor: ObservableObject {
     }
 
     deinit {
-        if let t = mountToken { NotificationCenter.default.removeObserver(t) }
-        if let t = unmountToken { NotificationCenter.default.removeObserver(t) }
+        let nc = NSWorkspace.shared.notificationCenter
+        if let t = mountToken { nc.removeObserver(t) }
+        if let t = unmountToken { nc.removeObserver(t) }
     }
 }
 
