@@ -65,8 +65,14 @@ final class NetworkVolumeMonitor: ObservableObject {
     }
 
     func eject(_ volume: NetworkVolume) {
-        let url = volume.url
-        Task.detached { try? NSWorkspace.shared.unmountAndEjectDevice(at: url) }
+        try? NSWorkspace.shared.unmountAndEjectDevice(at: volume.url)
+    }
+
+    func mountedVolume(for pinnedURLString: String) -> NetworkVolume? {
+        guard let pinned = URL(string: pinnedURLString) else { return nil }
+        let share = pinned.lastPathComponent.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        guard !share.isEmpty else { return nil }
+        return mountedVolumes.first { $0.name.caseInsensitiveCompare(share) == .orderedSame }
     }
 
     func reconnectPinned(_ pinnedURLs: [String]) {

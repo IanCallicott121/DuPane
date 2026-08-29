@@ -253,6 +253,9 @@ final class AppSettings: ObservableObject {
     @Published var pinnedNetworkURLs: [String] {
         didSet { UserDefaults.standard.set(pinnedNetworkURLs, forKey: "pinnedNetworkURLs") }
     }
+    @Published var pinnedNetworkNames: [String: String] {
+        didSet { UserDefaults.standard.set(pinnedNetworkNames, forKey: "pinnedNetworkNames") }
+    }
 
     init() {
         fileDeleteNoConfirm = UserDefaults.standard.bool(forKey: "fileDeleteNoConfirm")
@@ -314,6 +317,7 @@ final class AppSettings: ObservableObject {
         networkAutoReconnect = UserDefaults.standard.object(forKey: "networkAutoReconnect").map { ($0 as? Bool) ?? false } ?? false
         networkStatusIndicator = UserDefaults.standard.object(forKey: "networkStatusIndicator").map { ($0 as? Bool) ?? true } ?? true
         pinnedNetworkURLs = UserDefaults.standard.stringArray(forKey: "pinnedNetworkURLs") ?? []
+        pinnedNetworkNames = (UserDefaults.standard.dictionary(forKey: "pinnedNetworkNames") as? [String: String]) ?? [:]
     }
 
     var hiddenColumns: Set<String> {

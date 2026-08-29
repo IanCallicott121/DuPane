@@ -21,6 +21,8 @@ struct SidebarView: View {
     @State private var showConnectToServer = false
     @State private var connectAddress = "smb://"
     @State private var connectError: String? = nil
+    @State private var renamingPinnedURL: String? = nil
+    @State private var renamingPinnedText = ""
 
 
     // MARK: - Visible places (filtered by settings)
@@ -112,6 +114,28 @@ struct SidebarView: View {
                         .strokeBorder(Color.accentColor.opacity(0.55), lineWidth: 2)
                         .allowsHitTesting(false)
                 }
+            }
+        }
+        .sheet(isPresented: Binding(
+            get: { renamingPinnedURL != nil },
+            set: { if !$0 { renamingPinnedURL = nil } }
+        )) {
+            if let urlString = renamingPinnedURL {
+                TextPromptSheet(
+                    title: "Rename Pinned Server",
+                    text: $renamingPinnedText,
+                    confirmLabel: "Rename",
+                    onConfirm: {
+                        let trimmed = renamingPinnedText.trimmingCharacters(in: .whitespacesAndNewlines)
+                        if trimmed.isEmpty {
+                            settings.pinnedNetworkNames.removeValue(forKey: urlString)
+                        } else {
+                            settings.pinnedNetworkNames[urlString] = trimmed
+                        }
+                        renamingPinnedURL = nil
+                    },
+                    onCancel: { renamingPinnedURL = nil }
+                )
             }
         }
         .sheet(isPresented: Binding(
@@ -516,11 +540,13 @@ struct SidebarView: View {
     }
 
     private func pinnedServerRow(_ urlString: String) -> some View {
-        let isMounted = networkMonitor.isMounted(urlString)
-        let displayName = URL(string: urlString)?.host ?? urlString
+        let mounted = networkMonitor.mountedVolume(for: urlString)
+        let displayName = settings.pinnedNetworkNames[urlString]
+            ?? URL(string: urlString)?.host
+            ?? urlString
         return HStack(spacing: 6) {
             if settings.networkStatusIndicator {
-                Circle().fill(isMounted ? Color.green : Color.secondary.opacity(0.5))
+                Circle().fill(mounted != nil ? Color.green : Color.secondary.opacity(0.5))
                     .frame(width: 7, height: 7)
             }
             Image(systemName: "pin.fill")
@@ -541,14 +567,29 @@ struct SidebarView: View {
         }
         .contentShape(Rectangle())
         .onTapGesture {
-            if let url = URL(string: urlString) { NSWorkspace.shared.open(url) }
+            if let vol = mounted {
+                onNavigate(vol.url)
+            } else if let url = URL(string: urlString) {
+                NSWorkspace.shared.open(url)
+            }
         }
         .contextMenu {
-            Button("Connect Now") {
-                if let url = URL(string: urlString) { NSWorkspace.shared.open(url) }
+            if let vol = mounted {
+                Button("Open in Pane") { onNavigate(vol.url) }
+            } else {
+                Button("Connect Now") {
+                    if let url = URL(string: urlString) { NSWorkspace.shared.open(url) }
+                }
+            }
+            Button("Rename\u{2026}") {
+                renamingPinnedText = settings.pinnedNetworkNames[urlString]
+                    ?? URL(string: urlString)?.host
+                    ?? urlString
+                renamingPinnedURL = urlString
             }
             Button("Remove from Pinned", role: .destructive) {
                 settings.pinnedNetworkURLs.removeAll { $0 == urlString }
+                settings.pinnedNetworkNames.removeValue(forKey: urlString)
             }
         }
     }
