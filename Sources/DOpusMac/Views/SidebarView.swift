@@ -21,7 +21,7 @@ struct SidebarView: View {
     @State private var showConnectToServer = false
     @State private var connectAddress = "smb://"
     @State private var connectError: String? = nil
-    @State private var pinThisServer = false
+
 
     // MARK: - Visible places (filtered by settings)
 
@@ -213,15 +213,11 @@ struct SidebarView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 6))
                 }
             }
-            if settings.networkPinnedLocations {
-                Toggle("Pin this server", isOn: $pinThisServer)
-                    .font(.system(size: 12))
-            }
             Text("macOS will prompt for credentials if required. The mounted share will appear in /Volumes/.")
                 .font(.system(size: 11)).foregroundStyle(.secondary)
             HStack {
                 Spacer()
-                Button("Cancel") { showConnectToServer = false; connectError = nil; pinThisServer = false }
+                Button("Cancel") { showConnectToServer = false; connectError = nil }
                 Button("Connect") { connectToServer() }
                     .keyboardShortcut(.defaultAction)
                     .disabled(connectAddress.trimmingCharacters(in: .whitespaces).isEmpty)
@@ -500,6 +496,23 @@ struct SidebarView: View {
         .contentShape(Rectangle())
         .onHover { isHovering in hoveredURL = isHovering ? url : nil }
         .onTapGesture { onNavigate(url) }
+        .contextMenu {
+            let urlString = url.absoluteString
+            let alreadyPinned = settings.pinnedNetworkURLs.contains(urlString)
+            if settings.networkPinnedLocations {
+                Button(alreadyPinned ? "Remove from Pinned" : "Pin to Network Sidebar") {
+                    if alreadyPinned {
+                        settings.pinnedNetworkURLs.removeAll { $0 == urlString }
+                    } else {
+                        settings.pinnedNetworkURLs.append(urlString)
+                    }
+                }
+            }
+            Divider()
+            Button("Eject \(volume.name)", role: .destructive) {
+                networkMonitor.eject(volume)
+            }
+        }
     }
 
     private func pinnedServerRow(_ urlString: String) -> some View {
@@ -544,7 +557,6 @@ struct SidebarView: View {
         Button {
             connectAddress = "smb://"
             connectError = nil
-            pinThisServer = false
             showConnectToServer = true
         } label: {
             HStack(spacing: 6) {
@@ -570,11 +582,7 @@ struct SidebarView: View {
             connectError = "Enter a valid server address, e.g. smb://server/share"
             return
         }
-        if pinThisServer && !settings.pinnedNetworkURLs.contains(raw) {
-            settings.pinnedNetworkURLs.append(raw)
-        }
         connectError = nil
-        pinThisServer = false
         showConnectToServer = false
         NSWorkspace.shared.open(url)
     }
