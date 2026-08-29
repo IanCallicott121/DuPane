@@ -1,4 +1,4 @@
-name: DOpusMac
+name: DuPane
 options:
   bundleIdPrefix: local
   deploymentTarget:
@@ -12,11 +12,11 @@ fileGroups:
   - project.yml
 
 targets:
-  DOpusMac:
+  DuPane:
     type: application
     platform: macOS
     sources:
-      - path: Sources/DOpusMac
+      - path: Sources/DuPane
     postBuildScripts:
       - name: "Increment Build Number"
         showEnvVarsInLog: false
@@ -31,7 +31,7 @@ targets:
     settings:
       base:
         SYMROOT: $(SRCROOT)/build
-        PRODUCT_BUNDLE_IDENTIFIER: local.DOpusMac
+        PRODUCT_BUNDLE_IDENTIFIER: local.DuPane
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "1"
         SWIFT_VERSION: "5.9"
@@ -41,7 +41,7 @@ targets:
         ENABLE_USER_SCRIPT_SANDBOXING: NO
         GENERATE_INFOPLIST_FILE: NO
         INFOPLIST_FILE: Resources/Info.plist
-        CODE_SIGN_ENTITLEMENTS: Resources/DOpusMac.entitlements
+        CODE_SIGN_ENTITLEMENTS: Resources/DuPane.entitlements
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
       configs:
         Debug:
@@ -50,33 +50,33 @@ targets:
         Release:
           DEBUG_INFORMATION_FORMAT: "dwarf-with-dsym"
 
-  DOpusMacEndToEndUITests:
+  DuPaneEndToEndUITests:
     type: bundle.ui-testing
     platform: macOS
     sources:
-      - path: UITests/DOpusMacEndToEndUITests
+      - path: UITests/DuPaneEndToEndUITests
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: local.DOpusMac.EndToEndUITests
+        PRODUCT_BUNDLE_IDENTIFIER: local.DuPane.EndToEndUITests
         SWIFT_VERSION: "5.9"
-        TEST_TARGET_NAME: DOpusMac
+        TEST_TARGET_NAME: DuPane
         GENERATE_INFOPLIST_FILE: YES
     dependencies:
-      - target: DOpusMac
+      - target: DuPane
         embed: false
 
 schemes:
-  DOpusMac:
+  DuPane:
     build:
       targets:
-        DOpusMac: all
-        DOpusMacEndToEndUITests: testing
+        DuPane: all
+        DuPaneEndToEndUITests: testing
     run:
       config: Debug
     test:
       config: Debug
       targets:
-        - name: DOpusMacEndToEndUITests
+        - name: DuPaneEndToEndUITests
           parallelizable: false
     profile:
       config: Release

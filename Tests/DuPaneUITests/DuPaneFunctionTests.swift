@@ -1,9 +1,9 @@
 import Foundation
 import XCTest
-@testable import DOpusMac
+@testable import DuPane
 // All tests [must] unless marked [optional]. See Build268Tests.swift for tagging convention.
 
-final class DOpusMacFunctionTests: XCTestCase {
+final class DuPaneFunctionTests: XCTestCase {
     private var fixture: FilePaneFixture!
 
     override func setUpWithError() throws {
@@ -19,7 +19,7 @@ final class DOpusMacFunctionTests: XCTestCase {
     }
 
     func testLaunchConfigurationDefaultsToDownloadsAndComputerRoot() {
-        let configuration = AppLaunchConfiguration.current(arguments: ["DOpusMac"])
+        let configuration = AppLaunchConfiguration.current(arguments: ["DuPane"])
 
         XCTAssertEqual(configuration.leftPaneURL, FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Downloads"))
         XCTAssertNil(configuration.rightPaneURL)
@@ -27,7 +27,7 @@ final class DOpusMacFunctionTests: XCTestCase {
 
     func testLaunchConfigurationUsesExplicitPaneURLs() {
         let configuration = AppLaunchConfiguration.current(arguments: [
-            "DOpusMac",
+            "DuPane",
             "--left-pane-url", fixture.leftPaneURL.path,
             "--right-pane-url", fixture.rightPaneURL.path
         ])
@@ -1014,7 +1014,7 @@ final class TabbedPaneStateTests: XCTestCase {
         tabs.setTabLabel("Pinned Startup", at: 1)
         tabs.setTabPinned(true, at: 1)
 
-        let configuration = AppLaunchConfiguration.current(arguments: ["DOpusMac"])
+        let configuration = AppLaunchConfiguration.current(arguments: ["DuPane"])
 
         XCTAssertTrue(configuration.leftTabURLs.contains { $0 == pinnedURL })
         XCTAssertFalse(configuration.leftTabURLs.contains { $0 == unpinnedURL })
@@ -1495,7 +1495,7 @@ final class FolderSizeViewModelTests: XCTestCase {
     }
 
     func testAppLaunchConfigurationLeftTabURLsContainsFirstURL() {
-        let configuration = AppLaunchConfiguration.current(arguments: ["DOpusMac"])
+        let configuration = AppLaunchConfiguration.current(arguments: ["DuPane"])
         XCTAssertFalse(configuration.leftTabURLs.isEmpty)
         XCTAssertEqual(configuration.leftPaneURL, configuration.leftTabURLs.first ?? nil)
     }

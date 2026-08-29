@@ -1,6 +1,6 @@
 import XCTest
 
-final class DOpusMacClickTests: XCTestCase {
+final class DuPaneClickTests: XCTestCase {
     private var fixture: FilePaneFixture!
     private var harness: ClickSelectionHarness!
 

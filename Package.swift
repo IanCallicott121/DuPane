@@ -2,26 +2,26 @@
 import PackageDescription
 
 let package = Package(
-    name: "DOpusMac",
+    name: "DuPane",
     platforms: [.macOS(.v13)],
     targets: [
         .target(
-            name: "DOpusMac",
-            path: "Sources/DOpusMac",
-            exclude: ["DOpusMacApp.swift"],
+            name: "DuPane",
+            path: "Sources/DuPane",
+            exclude: ["DuPaneApp.swift"],
             linkerSettings: [
                 .linkedFramework("QuickLookUI", .when(platforms: [.macOS]))
             ]
         ),
         .testTarget(
-            name: "DOpusMacUITests",
-            dependencies: ["DOpusMac"],
-            path: "Tests/DOpusMacUITests"
+            name: "DuPaneUITests",
+            dependencies: ["DuPane"],
+            path: "Tests/DuPaneUITests"
         ),
         .testTarget(
-            name: "DOpusMacEndToEndUITests",
+            name: "DuPaneEndToEndUITests",
             dependencies: [],
-            path: "UITests/DOpusMacEndToEndUITests"
+            path: "UITests/DuPaneEndToEndUITests"
         )
     ]
 )

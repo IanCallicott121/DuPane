@@ -1,6 +1,6 @@
 import Foundation
 import XCTest
-@testable import DOpusMac
+@testable import DuPane
 
 // Test tagging convention used across the test suite:
 // All tests are [must] unless individually marked [optional].

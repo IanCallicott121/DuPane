@@ -1,9 +1,9 @@
 # /Opus — Claude Code Instructions
 
 ## Project overview
-macOS dual-pane file manager built with SwiftUI. Sources live in `Sources/DOpusMac/`
+macOS dual-pane file manager built with SwiftUI. Sources live in `Sources/DuPane/`
 (used by both Xcode via `project.yml`/XcodeGen and SPM tests via `Package.swift`).
-`DOpusMac/DOpusMac/` in the Xcode project navigator maps to the same physical files.
+`DuPane/DuPane/` in the Xcode project navigator maps to the same physical files.
 Use `XcodeWrite` / `XcodeRead` MCP tools — they resolve paths correctly and keep the
 Xcode project in sync.
 
@@ -17,13 +17,13 @@ Xcode project in sync.
 - Save relevant memories (patterns, decisions, user preferences) using the memory system.
 
 ## Build & test workflow
-- Build: use `BuildProject` MCP tool targeting `DOpusMac`.
-- Tests: `swift test --filter DOpusMacUITests` (SPM unit tests). All 100 tests pass; 0 failures.
+- Build: use `BuildProject` MCP tool targeting `DuPane`.
+- Tests: `swift test --filter DuPaneUITests` (SPM unit tests). All 100 tests pass; 0 failures.
 - Fix all build errors before declaring work done.
 - update the build number in settings > about and in the user manual
 
 ## Post-build checklist — run after every build that completes a feature or fix
-1. **Run all tests** — `swift test --filter DOpusMacUITests`. All tests must pass, including any new ones written for this build. Fix failures before proceeding.
+1. **Run all tests** — `swift test --filter DuPaneUITests`. All tests must pass, including any new ones written for this build. Fix failures before proceeding.
 2. **Update `Docs/UserGuide.html`** — reflect every UI or feature change: new/removed settings, changed keyboard shortcuts, corrected descriptions, new sections. Bump the version string in the sidebar and footer.
 3. **Update `Docs/TODO.md`** — move every completed "Next items" entry into the **Done** section under the new build number and today's date. Remove the completed entries from "Next items". Add any new issues discovered during this build to "Next items".
 

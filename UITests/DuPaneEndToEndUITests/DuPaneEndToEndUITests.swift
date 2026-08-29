@@ -1,6 +1,6 @@
 import XCTest
 
-final class DOpusMacEndToEndUITests: XCTestCase {
+final class DuPaneEndToEndUITests: XCTestCase {
     private var fixture: EndToEndFixture!
     private var app: XCUIApplication!
 
@@ -8,17 +8,17 @@ final class DOpusMacEndToEndUITests: XCTestCase {
         try super.setUpWithError()
         continueAfterFailure = false
         #if SWIFT_PACKAGE
-        // XCUIApplication requires DOpusMac.app to be built and placed next to
+        // XCUIApplication requires DuPane.app to be built and placed next to
         // this test bundle in the build products directory. When running the
         // package test plan without the app scheme, the bundle won't exist and
         // the test host reports "No target application path specified". Skip
         // cleanly instead of failing.
-        let productsDir = Bundle(for: DOpusMacEndToEndUITests.self).bundleURL
+        let productsDir = Bundle(for: DuPaneEndToEndUITests.self).bundleURL
             .deletingLastPathComponent()
         let appExists = FileManager.default.fileExists(
-            atPath: productsDir.appendingPathComponent("DOpusMac.app").path
+            atPath: productsDir.appendingPathComponent("DuPane.app").path
         )
-        try XCTSkipUnless(appExists, "Build DOpusMac.app first — run via Xcode with the app scheme")
+        try XCTSkipUnless(appExists, "Build DuPane.app first — run via Xcode with the app scheme")
         #endif
         fixture = try EndToEndFixture()
         app = XCUIApplication()
@@ -322,7 +322,7 @@ private final class EndToEndFixture {
     init(fileManager: FileManager = .default) throws {
         self.fileManager = fileManager
         rootURL = fileManager.temporaryDirectory
-            .appendingPathComponent("DOpusMacEndToEndUITests-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("DuPaneEndToEndUITests-\(UUID().uuidString)", isDirectory: true)
         leftPaneURL = rootURL.appendingPathComponent("left-pane", isDirectory: true)
         rightPaneURL = rootURL.appendingPathComponent("right-pane", isDirectory: true)
 

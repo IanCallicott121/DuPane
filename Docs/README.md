@@ -59,7 +59,7 @@ trashes actual files.
 **Open and run in Xcode**
 
 ```
-File → Open… → DOpusMac.xcodeproj
+File → Open… → DuPane.xcodeproj
 ⌘R to build and run
 ```
 
@@ -74,14 +74,14 @@ xcodegen generate
 **Run primitive tests without Xcode**
 
 ```bash
-cd DOpusMac
+cd DuPane
 swift test
 ```
 
 **Run end-to-end UI tests**
 
-Open `DOpusMac.xcodeproj` in Xcode and press ⌘U, or use the Test navigator.
-The UI test scheme (`DOpusMacEndToEndUITests`) launches a real instance of the
+Open `DuPane.xcodeproj` in Xcode and press ⌘U, or use the Test navigator.
+The UI test scheme (`DuPaneEndToEndUITests`) launches a real instance of the
 app against a temporary fixture directory.
 
 **Test run policy**
@@ -89,7 +89,7 @@ app against a temporary fixture directory.
 Use `swift test --disable-sandbox` for the standard no-UI suite. Run the
 critical UI subset after functional-area changes, broad change sets, or any
 request for full tests. Critical UI tests are tagged by the `testCritical`
-method-name prefix in `DOpusMacEndToEndUITests`; run the whole UI suite when a
+method-name prefix in `DuPaneEndToEndUITests`; run the whole UI suite when a
 change touches launch, accessibility, file-list input, dialogs, or Xcode project
 test configuration.
 
@@ -102,15 +102,15 @@ System Settings → Privacy & Security → Files and Folders.
 ## Project structure
 
 ```
-DOpusMac/
+DuPane/
   project.yml                — xcodegen spec; edit this, then run xcodegen generate
-  DOpusMac.xcodeproj         — generated Xcode project; do not hand-edit
+  DuPane.xcodeproj         — generated Xcode project; do not hand-edit
   Package.swift              — library + primitive test targets for swift test
   Resources/
     Info.plist               — bundle ID, display name, privacy usage strings
-    DOpusMac.entitlements    — app-sandbox = false
-  Sources/DOpusMac/
-    DOpusMacApp.swift          — @main entry point (Xcode app target only)
+    DuPane.entitlements    — app-sandbox = false
+  Sources/DuPane/
+    DuPaneApp.swift          — @main entry point (Xcode app target only)
     Models/
       FileItem.swift           — value type for a file or folder
       FileOperationService.swift — move, copy, trash, create folder, rename
@@ -129,8 +129,8 @@ DOpusMac/
       DividerBadge.swift
       TextPromptSheet.swift    — shared sheet for New Folder and Rename prompts
       RowMouseEventView.swift  — NSView overlay that captures mouse-down events
-  Tests/DOpusMacUITests/       — primitive unit, click, function, and latency tests
+  Tests/DuPaneUITests/       — primitive unit, click, function, and latency tests
   UITests/
-    DOpusMacEndToEndUITests/   — XCUIApplication end-to-end tests (Xcode only)
+    DuPaneEndToEndUITests/   — XCUIApplication end-to-end tests (Xcode only)
   TODO.md                    — work log: completed items and remaining tasks
 ```

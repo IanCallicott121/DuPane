@@ -1,6 +1,6 @@
 import Foundation
 import XCTest
-@testable import DOpusMac
+@testable import DuPane
 
 final class FolderCompareServiceTests: XCTestCase {
     private var fixture: FilePaneFixture!

@@ -1,6 +1,6 @@
 import Foundation
 import XCTest
-@testable import DOpusMac
+@testable import DuPane
 
 // MARK: - DuplicateFinderViewModelTests (8 tests)
 

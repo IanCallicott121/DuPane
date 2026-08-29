@@ -15,10 +15,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "74D681D1EE56FDC67E22CE35"
-               BuildableName = "DOpusMac.app"
-               BlueprintName = "DOpusMac"
-               ReferencedContainer = "container:DOpusMac.xcodeproj">
+               BlueprintIdentifier = "D7D64C8BB3FEAB3D1D3EAFFF"
+               BuildableName = "DuPane.app"
+               BlueprintName = "DuPane"
+               ReferencedContainer = "container:DuPane.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
@@ -29,10 +29,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "1A3FB2B79BE00A17BFA702E6"
-               BuildableName = "DOpusMacEndToEndUITests.xctest"
-               BlueprintName = "DOpusMacEndToEndUITests"
-               ReferencedContainer = "container:DOpusMac.xcodeproj">
+               BlueprintIdentifier = "E71C08061148E1E266288E9A"
+               BuildableName = "DuPaneEndToEndUITests.xctest"
+               BlueprintName = "DuPaneEndToEndUITests"
+               ReferencedContainer = "container:DuPane.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -46,10 +46,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "74D681D1EE56FDC67E22CE35"
-            BuildableName = "DOpusMac.app"
-            BlueprintName = "DOpusMac"
-            ReferencedContainer = "container:DOpusMac.xcodeproj">
+            BlueprintIdentifier = "D7D64C8BB3FEAB3D1D3EAFFF"
+            BuildableName = "DuPane.app"
+            BlueprintName = "DuPane"
+            ReferencedContainer = "container:DuPane.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
@@ -58,10 +58,10 @@
             parallelizable = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "1A3FB2B79BE00A17BFA702E6"
-               BuildableName = "DOpusMacEndToEndUITests.xctest"
-               BlueprintName = "DOpusMacEndToEndUITests"
-               ReferencedContainer = "container:DOpusMac.xcodeproj">
+               BlueprintIdentifier = "E71C08061148E1E266288E9A"
+               BuildableName = "DuPaneEndToEndUITests.xctest"
+               BlueprintName = "DuPaneEndToEndUITests"
+               ReferencedContainer = "container:DuPane.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -82,10 +82,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "74D681D1EE56FDC67E22CE35"
-            BuildableName = "DOpusMac.app"
-            BlueprintName = "DOpusMac"
-            ReferencedContainer = "container:DOpusMac.xcodeproj">
+            BlueprintIdentifier = "D7D64C8BB3FEAB3D1D3EAFFF"
+            BuildableName = "DuPane.app"
+            BlueprintName = "DuPane"
+            ReferencedContainer = "container:DuPane.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>
@@ -101,10 +101,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "74D681D1EE56FDC67E22CE35"
-            BuildableName = "DOpusMac.app"
-            BlueprintName = "DOpusMac"
-            ReferencedContainer = "container:DOpusMac.xcodeproj">
+            BlueprintIdentifier = "D7D64C8BB3FEAB3D1D3EAFFF"
+            BuildableName = "DuPane.app"
+            BlueprintName = "DuPane"
+            ReferencedContainer = "container:DuPane.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>

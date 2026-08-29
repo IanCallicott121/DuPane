@@ -2,7 +2,7 @@ import SwiftUI
 import AppKit
 
 @main
-struct DOpusMacApp: App {
+struct DuPaneApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var settings = AppSettings()
 

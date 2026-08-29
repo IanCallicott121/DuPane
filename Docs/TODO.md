@@ -10,7 +10,7 @@
 
 ## Pending
 - Bug - no icloud on the mac air
-- complete the re-name to DuPane from DOpus
+- complete the re-name to DuPane from DuPane
 
 ---
 
@@ -59,7 +59,7 @@
 
 ### Build 249 — DuPane rename, themes, date format, icon toggle, first-launch defaults, Recents, Places, Go to Path, type-ahead (2026-08-23)
 
-- **App renamed to DuPane** — `Info.plist` CFBundleName and CFBundleDisplayName updated to "DuPane". All user-visible strings in menus ("Open DOpusMac User Guide" → "Open DuPane User Guide"), usage descriptions, and documentation updated. Code identifiers unchanged (user will relocate project later). Bundle ID unchanged.
+- **App renamed to DuPane** — `Info.plist` CFBundleName and CFBundleDisplayName updated to "DuPane". All user-visible strings in menus ("Open DuPaneMac User Guide" → "Open DuPane User Guide"), usage descriptions, and documentation updated. Code identifiers unchanged (user will relocate project later). Bundle ID unchanged.
 - **Window size persistence** — First launch: window maximises to fill the screen. Subsequent launches: window frame restored from `mainWindowFrame` UserDefaults key (saved in `applicationWillTerminate`). Implemented in `AppDelegate`.
 - **First-launch defaults** — Default font size 14pt (was 12pt). Default visible columns: Name, Size, Modified (Kind and Info hidden by default, stored as "Info,Kind" in `hiddenColumnsRaw`). Default column widths: Size 80pt, Modified 110pt (was 74/92pt) — wide enough for "31 Dec 2025" at 14pt monospaced.
 - **5 new themes** — `AppColorScheme` gains `.ocean`, `.country`, `.earth`, `.fire`, `.vivid` cases. Each defines `preferredColorScheme` (light or dark) and `accentColor`. Applied via `.accentColor()` and `.preferredColorScheme()` on the root WindowGroup view. Ocean: dark/cyan, Country: light/forest-green, Earth: light/terracotta, Fire: dark/fire-red, Vivid: light/purple. Settings picker changed to `.menu` style to accommodate 8 items.

@@ -3,7 +3,7 @@
 // Run from the project root: swift Scripts/make_icon.swift
 import AppKit
 
-let outputDir = "Sources/DOpusMac/Assets.xcassets/AppIcon.appiconset"
+let outputDir = "Sources/DuPane/Assets.xcassets/AppIcon.appiconset"
 
 let sizes: [(name: String, px: Int)] = [
     ("icon_16x16",       16),

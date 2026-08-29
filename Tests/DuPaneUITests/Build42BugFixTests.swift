@@ -1,6 +1,6 @@
 import Foundation
 import XCTest
-@testable import DOpusMac
+@testable import DuPane
 
 /// Tests covering the Critical and Major bug fixes from Build 42.
 final class Build42BugFixTests: XCTestCase {

@@ -1,7 +1,7 @@
 import Darwin
 import Foundation
 import XCTest
-@testable import DOpusMac
+@testable import DuPane
 
 enum TestPane: String {
     case left, right
@@ -134,7 +134,7 @@ enum TestAppBundleBuilderError: Error, CustomStringConvertible {
     var description: String {
         switch self {
         case .executableNotFound(let paths):
-            return "Unable to find the built DOpusMac executable. Checked: \(paths.joined(separator: ", "))"
+            return "Unable to find the built DuPane executable. Checked: \(paths.joined(separator: ", "))"
         case .invalidInfoPlist:
             return "Unable to create the generated test app Info.plist."
         }
@@ -142,13 +142,13 @@ enum TestAppBundleBuilderError: Error, CustomStringConvertible {
 }
 
 struct TestAppBundleBuilder {
-    private static let executableName = "DOpusMac"
-    private static let bundleIdentifier = "local.DOpusMac.UITests"
+    private static let executableName = "DuPane"
+    private static let bundleIdentifier = "local.DuPane.UITests"
 
     static func makeAppBundle(testBundle: Bundle, fileManager: FileManager = .default) throws -> URL {
         let executableURL = try findExecutable(testBundle: testBundle, fileManager: fileManager)
         let rootURL = fileManager.temporaryDirectory
-            .appendingPathComponent("DOpusMacUITests", isDirectory: true)
+            .appendingPathComponent("DuPaneUITests", isDirectory: true)
         let appURL = rootURL.appendingPathComponent("\(executableName).app", isDirectory: true)
         let contentsURL = appURL.appendingPathComponent("Contents", isDirectory: true)
         let macOSURL = contentsURL.appendingPathComponent("MacOS", isDirectory: true)
@@ -232,13 +232,13 @@ struct TestAppBundleBuilder {
         <plist version="1.0">
         <dict>
             <key>CFBundleDisplayName</key>
-            <string>DOpusMac</string>
+            <string>DuPane</string>
             <key>CFBundleExecutable</key>
             <string>\(executableName)</string>
             <key>CFBundleIdentifier</key>
             <string>\(bundleIdentifier)</string>
             <key>CFBundleName</key>
-            <string>DOpusMac</string>
+            <string>DuPane</string>
             <key>CFBundlePackageType</key>
             <string>APPL</string>
             <key>CFBundleShortVersionString</key>
@@ -288,7 +288,7 @@ final class FilePaneFixture {
 
     init(
         fileManager: FileManager = .default,
-        rootName: String = "DOpusMacFunctionTests-\(UUID().uuidString)",
+        rootName: String = "DuPaneFunctionTests-\(UUID().uuidString)",
         baseURL: URL? = nil
     ) throws {
         self.fileManager = fileManager

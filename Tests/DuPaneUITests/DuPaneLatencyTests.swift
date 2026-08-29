@@ -1,8 +1,8 @@
 import XCTest
-@testable import DOpusMac
+@testable import DuPane
 // All tests in this file are [optional] — performance budgets, run periodically.
 
-final class DOpusMacLatencyTests: XCTestCase {
+final class DuPaneLatencyTests: XCTestCase {
 
     // 1 000 clicks must complete in under 10 ms (10 µs / click).
     // Pure in-memory set/array work lands well under 1 ms; this budget exists
@@ -95,7 +95,7 @@ final class DOpusMacLatencyTests: XCTestCase {
     // [optional]
     func testFolderLoadLatencyFor500Files() async throws {
         let tempDir = FileManager.default.temporaryDirectory
-            .appendingPathComponent("DOpusMacLatency-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("DuPaneLatency-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: tempDir) }
 

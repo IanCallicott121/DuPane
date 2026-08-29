@@ -1,6 +1,6 @@
 import Foundation
 import XCTest
-@testable import DOpusMac
+@testable import DuPane
 
 // MARK: - NetworkVolume (5 tests)
 
