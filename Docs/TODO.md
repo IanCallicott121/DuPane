@@ -22,9 +22,8 @@
 ---
 
 ## Done
-### Build 309 — Sidebar right-click highlight fix + Connect to Server (2026-08-29)
+### Build 309 — Connect to Server (2026-08-29)
 
-- **Sidebar right-click highlight** — right-clicking a Recents, Places, or Bookmarks row now keeps the row highlighted while the context menu is open. Implemented via `SidebarMenuObserver` (an `ObservableObject`) that listens to `NSMenu.didBeginTrackingNotification` / `NSMenu.didEndTrackingNotification` to lock the highlighted row URL while a menu is visible. All three row types check both `hoveredURL` (mouse-over) and `menuObserver.contextMenuURL` (context-menu lock).
 - **Connect to Server** — a "Network" section appears in the sidebar (when Settings > Sidebar > "Show Network section" is on). The "Connect to Server…" row opens a sheet with a URL text field (pre-filled "smb://"). On confirm, `NSWorkspace.shared.open(url)` sends the URL to macOS, which prompts for credentials and mounts the share. Basic URL validation is shown inline.
 - **218 tests, 0 failures.**
 

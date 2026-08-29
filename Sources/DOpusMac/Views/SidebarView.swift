@@ -12,7 +12,6 @@ struct SidebarView: View {
     let selectedTags: Set<String>
     let onNavigate: (URL) -> Void
     let onTagSelected: (String, Bool) -> Void
-    @StateObject private var menuObserver = SidebarMenuObserver()
     @State private var hoveredURL: URL? = nil
     @State private var renamingBookmark: URL? = nil
     @State private var renameBookmarkText = ""
@@ -162,8 +161,7 @@ struct SidebarView: View {
             .padding(24)
             .frame(width: 400)
         }
-        .onAppear { menuObserver.startObserving() }
-        .onDisappear { menuObserver.stopObserving() }
+
     }
 
     private func executeShellScript(_ url: URL) {
@@ -214,13 +212,10 @@ struct SidebarView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background {
             RoundedRectangle(cornerRadius: 5)
-                .fill(hoveredURL == url || menuObserver.contextMenuURL == url ? Color.primary.opacity(0.08) : Color.clear)
+                .fill(hoveredURL == url ? Color.primary.opacity(0.08) : Color.clear)
         }
         .contentShape(Rectangle())
-        .onHover { isHovering in
-            hoveredURL = isHovering ? url : nil
-            menuObserver.setHovered(isHovering ? url : nil)
-        }
+        .onHover { isHovering in hoveredURL = isHovering ? url : nil }
         .onTapGesture { onNavigate(url) }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(name)
@@ -245,13 +240,10 @@ struct SidebarView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background {
             RoundedRectangle(cornerRadius: 5)
-                .fill(hoveredURL == url || menuObserver.contextMenuURL == url ? Color.primary.opacity(0.08) : Color.clear)
+                .fill(hoveredURL == url ? Color.primary.opacity(0.08) : Color.clear)
         }
         .contentShape(Rectangle())
-        .onHover { isHovering in
-            hoveredURL = isHovering ? url : nil
-            menuObserver.setHovered(isHovering ? url : nil)
-        }
+        .onHover { isHovering in hoveredURL = isHovering ? url : nil }
         .onTapGesture { onNavigate(url) }
         .contextMenu {
             Button("Remove from Recents") {
@@ -307,7 +299,7 @@ struct SidebarView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background {
             RoundedRectangle(cornerRadius: 5)
-                .fill(hoveredURL == url || menuObserver.contextMenuURL == url ? Color.primary.opacity(0.08) : Color.clear)
+                .fill(hoveredURL == url ? Color.primary.opacity(0.08) : Color.clear)
         }
         .contentShape(Rectangle())
         .onTapGesture {
@@ -321,10 +313,7 @@ struct SidebarView: View {
                 NSWorkspace.shared.open(url)
             }
         }
-        .onHover { isHovering in
-            hoveredURL = isHovering ? url : nil
-            menuObserver.setHovered(isHovering ? url : nil)
-        }
+        .onHover { isHovering in hoveredURL = isHovering ? url : nil }
         .contextMenu {
             Button("Rename\u{2026}") {
                 renameBookmarkText = model.displayName(for: url)
@@ -441,44 +430,6 @@ struct SidebarView: View {
         connectError = nil
         showConnectToServer = false
         NSWorkspace.shared.open(url)
-    }
-}
-
-// MARK: - Sidebar menu observer (context-menu highlight lock)
-
-private final class SidebarMenuObserver: ObservableObject {
-    @Published var contextMenuURL: URL? = nil
-    private var hoveredURL: URL? = nil
-    private var beganToken: Any?
-    private var endedToken: Any?
-
-    func setHovered(_ url: URL?) { hoveredURL = url }
-
-    func startObserving() {
-        beganToken = NotificationCenter.default.addObserver(
-            forName: NSMenu.didBeginTrackingNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            self?.contextMenuURL = self?.hoveredURL
-        }
-        endedToken = NotificationCenter.default.addObserver(
-            forName: NSMenu.didEndTrackingNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            self?.contextMenuURL = nil
-        }
-    }
-
-    func stopObserving() {
-        if let t = beganToken { NotificationCenter.default.removeObserver(t); beganToken = nil }
-        if let t = endedToken { NotificationCenter.default.removeObserver(t); endedToken = nil }
-    }
-
-    deinit {
-        if let t = beganToken { NotificationCenter.default.removeObserver(t) }
-        if let t = endedToken { NotificationCenter.default.removeObserver(t) }
     }
 }
 
