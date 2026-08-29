@@ -2,7 +2,7 @@ import Foundation
 import XCTest
 @testable import DOpusMac
 
-// MARK: - DuplicateFinderViewModelTests (6 tests)
+// MARK: - DuplicateFinderViewModelTests (8 tests)
 
 @MainActor
 final class DuplicateFinderViewModelTests: XCTestCase {
@@ -63,6 +63,20 @@ final class DuplicateFinderViewModelTests: XCTestCase {
         XCTAssertTrue(vm.groups.isEmpty, "No groups expected for distinct files")
     }
 
+    func testVerifiedDuplicateGroupsRejectSameLengthDifferentContent() throws {
+        let url1 = dir.appendingPathComponent("first.txt")
+        let url2 = dir.appendingPathComponent("second.txt")
+        let url3 = dir.appendingPathComponent("third.txt")
+        try "same bytes".write(to: url1, atomically: true, encoding: .utf8)
+        try "same bytes".write(to: url2, atomically: true, encoding: .utf8)
+        try "diff bytes".write(to: url3, atomically: true, encoding: .utf8)
+
+        let groups = DuplicateFinderViewModel.verifiedDuplicateGroups(for: [url1, url2, url3])
+
+        XCTAssertEqual(groups.count, 1)
+        XCTAssertEqual(Set(groups[0]), [url1, url2])
+    }
+
     func testDuplicateScanSkipsZeroByteFiles() async throws {
         // Two empty files — were false positives before Build 42 fix
         FileManager.default.createFile(atPath: dir.appendingPathComponent("empty1.txt").path, contents: nil)
@@ -83,7 +97,9 @@ final class DuplicateFinderViewModelTests: XCTestCase {
         try content.write(to: url1, atomically: true, encoding: .utf8)
         try content.write(to: url2, atomically: true, encoding: .utf8)
 
-        let vm = DuplicateFinderViewModel()
+        let vm = DuplicateFinderViewModel { urls in
+            FileOperationResult(succeeded: urls.count, errors: [], resultingURLs: urls)
+        }
         vm.startScan(at: dir)
         try await waitForDone(vm)
 
@@ -96,6 +112,20 @@ final class DuplicateFinderViewModelTests: XCTestCase {
         // One URL removed — group should shrink; if only one left, the group is gone
         let remaining = vm.groups.flatMap { $0 }
         XCTAssertFalse(remaining.contains(toTrash), "Trashed URL must be removed from all groups")
+    }
+
+    func testDuplicateMoveToTrashFailureKeepsURLAndReportsError() {
+        let missing = dir.appendingPathComponent("missing.txt")
+        let existing = dir.appendingPathComponent("existing.txt")
+        let vm = DuplicateFinderViewModel { _ in
+            FileOperationResult(succeeded: 0, errors: ["Trash failed"], resultingURLs: [])
+        }
+        vm.groups = [[missing, existing]]
+
+        vm.moveToTrash(missing)
+
+        XCTAssertEqual(vm.groups, [[missing, existing]])
+        XCTAssertNotNil(vm.errorMessage)
     }
 
     func testDuplicateCancelResetsPhaseToIdle() async throws {

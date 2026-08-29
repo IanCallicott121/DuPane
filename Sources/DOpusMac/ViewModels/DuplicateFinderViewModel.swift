@@ -10,11 +10,17 @@ final class DuplicateFinderViewModel: ObservableObject {
     @Published var scannedFiles: Int = 0
     @Published var hashedFiles: Int = 0
     @Published var filesToHash: Int = 0
+    @Published var errorMessage: String?
 
     private var scanTask: Task<Void, Never>?
+    private let trash: ([URL]) -> FileOperationResult
 
     var totalDuplicateCount: Int { groups.reduce(0) { $0 + $1.count - 1 } }
     var totalWastedBytes: Int64 = 0
+
+    init(trash: @escaping ([URL]) -> FileOperationResult = { FileOperationService.trash(urls: $0) }) {
+        self.trash = trash
+    }
 
     func startScan(at rootURL: URL) {
         scanTask?.cancel()
@@ -24,6 +30,7 @@ final class DuplicateFinderViewModel: ObservableObject {
         hashedFiles = 0
         filesToHash = 0
         totalWastedBytes = 0
+        errorMessage = nil
 
         let vm = self
         scanTask = Task.detached(priority: .userInitiated) {
@@ -48,7 +55,11 @@ final class DuplicateFinderViewModel: ObservableObject {
     }
 
     func moveToTrash(_ url: URL) {
-        try? FileManager.default.trashItem(at: url, resultingItemURL: nil)
+        let result = trash([url])
+        guard result.hasSucceeded else {
+            errorMessage = result.lastError ?? "Couldn't move \(url.lastPathComponent) to Trash."
+            return
+        }
         groups = groups.compactMap { group in
             let remaining = group.filter { $0 != url }
             return remaining.isEmpty ? nil : remaining
@@ -116,9 +127,10 @@ final class DuplicateFinderViewModel: ObservableObject {
 
         var wastedBytes: Int64 = 0
 
-        let allGroups: [[URL]] = hashMap.values.compactMap { urls in
-            guard urls.count > 1 else { return nil }
-            let sorted = urls.sorted { $0.path < $1.path }
+        let allGroups: [[URL]] = hashMap.values.flatMap { urls in
+            verifiedDuplicateGroups(for: urls)
+        }.map { group in
+            let sorted = group.sorted { $0.path < $1.path }
             if let size = try? sorted[0].resourceValues(forKeys: [.fileSizeKey]).fileSize {
                 wastedBytes += Int64(size) * Int64(sorted.count - 1)
             }
@@ -126,6 +138,44 @@ final class DuplicateFinderViewModel: ObservableObject {
         }.sorted { $0[0].lastPathComponent < $1[0].lastPathComponent }
 
         return ScanResult(groups: allGroups, wastedBytes: wastedBytes)
+    }
+
+    nonisolated static func verifiedDuplicateGroups(for urls: [URL]) -> [[URL]] {
+        let sorted = urls.sorted { $0.path < $1.path }
+        var groups: [[URL]] = []
+
+        for url in sorted {
+            if let index = groups.firstIndex(where: { filesHaveSameContents(url, $0[0]) }) {
+                groups[index].append(url)
+            } else {
+                groups.append([url])
+            }
+        }
+
+        return groups.filter { $0.count > 1 }
+    }
+
+    nonisolated static func filesHaveSameContents(_ first: URL, _ second: URL) -> Bool {
+        guard first != second else { return true }
+        let keys: Set<URLResourceKey> = [.fileSizeKey]
+        guard let firstSize = try? first.resourceValues(forKeys: keys).fileSize,
+              let secondSize = try? second.resourceValues(forKeys: keys).fileSize,
+              firstSize == secondSize,
+              let firstHandle = try? FileHandle(forReadingFrom: first),
+              let secondHandle = try? FileHandle(forReadingFrom: second) else {
+            return false
+        }
+        defer {
+            try? firstHandle.close()
+            try? secondHandle.close()
+        }
+
+        while true {
+            let firstChunk = firstHandle.readData(ofLength: 1024 * 1024)
+            let secondChunk = secondHandle.readData(ofLength: 1024 * 1024)
+            guard firstChunk == secondChunk else { return false }
+            if firstChunk.isEmpty { return true }
+        }
     }
 
     // FNV-1a 64-bit hash — reads in 1 MB chunks so large files don't load entirely into RAM.

@@ -12,11 +12,15 @@ struct SidebarView: View {
     let selectedTags: Set<String>
     let onNavigate: (URL) -> Void
     let onTagSelected: (String, Bool) -> Void
-    @State private var hoveredBookmark: URL? = nil
+    @StateObject private var menuObserver = SidebarMenuObserver()
+    @State private var hoveredURL: URL? = nil
     @State private var renamingBookmark: URL? = nil
     @State private var renameBookmarkText = ""
     @State private var pendingShellScript: URL? = nil
     @State private var isFolderDropTargeted = false
+    @State private var showConnectToServer = false
+    @State private var connectAddress = "smb://"
+    @State private var connectError: String? = nil
 
     // MARK: - Visible places (filtered by settings)
 
@@ -73,6 +77,11 @@ struct SidebarView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
+
+                if settings.showNetworkSection {
+                    sectionHeader("Network")
+                    connectToServerRow
+                }
                 Spacer(minLength: 12)
             }
         }
@@ -123,6 +132,38 @@ struct SidebarView: View {
         } message: { scriptURL in
             Text("\u{201C}\(scriptURL.lastPathComponent)\u{201D} is a shell script and could modify or delete files. Run it?")
         }
+        .sheet(isPresented: $showConnectToServer) {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Connect to Server")
+                    .font(.headline)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Server Address:")
+                        .font(.system(size: 12))
+                        .foregroundStyle(.secondary)
+                    TextField("smb://server/share", text: $connectAddress)
+                        .textFieldStyle(.roundedBorder)
+                        .font(.system(size: 12, design: .monospaced))
+                        .onSubmit { connectToServer() }
+                }
+                if let err = connectError {
+                    Text(err).font(.system(size: 11)).foregroundStyle(.red)
+                }
+                Text("macOS will prompt for credentials if required. The mounted share will appear in /Volumes/.")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+                HStack {
+                    Spacer()
+                    Button("Cancel") { showConnectToServer = false; connectError = nil }
+                    Button("Connect") { connectToServer() }
+                        .keyboardShortcut(.defaultAction)
+                        .disabled(connectAddress.trimmingCharacters(in: .whitespaces).isEmpty)
+                }
+            }
+            .padding(24)
+            .frame(width: 400)
+        }
+        .onAppear { menuObserver.startObserving() }
+        .onDisappear { menuObserver.stopObserving() }
     }
 
     private func executeShellScript(_ url: URL) {
@@ -171,7 +212,15 @@ struct SidebarView: View {
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
         .frame(maxWidth: .infinity, alignment: .leading)
+        .background {
+            RoundedRectangle(cornerRadius: 5)
+                .fill(hoveredURL == url || menuObserver.contextMenuURL == url ? Color.primary.opacity(0.08) : Color.clear)
+        }
         .contentShape(Rectangle())
+        .onHover { isHovering in
+            hoveredURL = isHovering ? url : nil
+            menuObserver.setHovered(isHovering ? url : nil)
+        }
         .onTapGesture { onNavigate(url) }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(name)
@@ -194,7 +243,15 @@ struct SidebarView: View {
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
         .frame(maxWidth: .infinity, alignment: .leading)
+        .background {
+            RoundedRectangle(cornerRadius: 5)
+                .fill(hoveredURL == url || menuObserver.contextMenuURL == url ? Color.primary.opacity(0.08) : Color.clear)
+        }
         .contentShape(Rectangle())
+        .onHover { isHovering in
+            hoveredURL = isHovering ? url : nil
+            menuObserver.setHovered(isHovering ? url : nil)
+        }
         .onTapGesture { onNavigate(url) }
         .contextMenu {
             Button("Remove from Recents") {
@@ -234,7 +291,7 @@ struct SidebarView: View {
             Spacer(minLength: 2)
             Button {
                 model.removeBookmark(url)
-                if hoveredBookmark == url { hoveredBookmark = nil }
+                if hoveredURL == url { hoveredURL = nil }
             } label: {
                 Image(systemName: "xmark.circle.fill")
                     .font(.system(size: 11))
@@ -242,12 +299,16 @@ struct SidebarView: View {
             }
             .buttonStyle(.borderless)
             .foregroundStyle(.secondary)
-            .opacity(hoveredBookmark == url ? 1 : 0)
-            .animation(.easeInOut(duration: 0.12), value: hoveredBookmark == url)
+            .opacity(hoveredURL == url ? 1 : 0)
+            .animation(.easeInOut(duration: 0.12), value: hoveredURL == url)
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
         .frame(maxWidth: .infinity, alignment: .leading)
+        .background {
+            RoundedRectangle(cornerRadius: 5)
+                .fill(hoveredURL == url || menuObserver.contextMenuURL == url ? Color.primary.opacity(0.08) : Color.clear)
+        }
         .contentShape(Rectangle())
         .onTapGesture {
             let resolved = (try? URL(resolvingAliasFileAt: url)) ?? url
@@ -261,7 +322,8 @@ struct SidebarView: View {
             }
         }
         .onHover { isHovering in
-            hoveredBookmark = isHovering ? url : nil
+            hoveredURL = isHovering ? url : nil
+            menuObserver.setHovered(isHovering ? url : nil)
         }
         .contextMenu {
             Button("Rename\u{2026}") {
@@ -343,6 +405,80 @@ struct SidebarView: View {
         case "gray", "grey":  return .gray
         default:              return .accentColor
         }
+    }
+
+    // MARK: - Network section
+
+    private var connectToServerRow: some View {
+        Button {
+            connectAddress = "smb://"
+            connectError = nil
+            showConnectToServer = true
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "network")
+                    .font(.system(size: 11))
+                    .frame(width: 16)
+                    .foregroundStyle(Color.accentColor.opacity(0.7))
+                Text("Connect to Server\u{2026}")
+                    .font(.system(size: 12))
+                    .lineLimit(1)
+                Spacer(minLength: 2)
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func connectToServer() {
+        let raw = connectAddress.trimmingCharacters(in: .whitespaces)
+        guard let url = URL(string: raw), url.scheme != nil else {
+            connectError = "Enter a valid server address, e.g. smb://server/share"
+            return
+        }
+        connectError = nil
+        showConnectToServer = false
+        NSWorkspace.shared.open(url)
+    }
+}
+
+// MARK: - Sidebar menu observer (context-menu highlight lock)
+
+private final class SidebarMenuObserver: ObservableObject {
+    @Published var contextMenuURL: URL? = nil
+    private var hoveredURL: URL? = nil
+    private var beganToken: Any?
+    private var endedToken: Any?
+
+    func setHovered(_ url: URL?) { hoveredURL = url }
+
+    func startObserving() {
+        beganToken = NotificationCenter.default.addObserver(
+            forName: NSMenu.didBeginTrackingNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.contextMenuURL = self?.hoveredURL
+        }
+        endedToken = NotificationCenter.default.addObserver(
+            forName: NSMenu.didEndTrackingNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.contextMenuURL = nil
+        }
+    }
+
+    func stopObserving() {
+        if let t = beganToken { NotificationCenter.default.removeObserver(t); beganToken = nil }
+        if let t = endedToken { NotificationCenter.default.removeObserver(t); endedToken = nil }
+    }
+
+    deinit {
+        if let t = beganToken { NotificationCenter.default.removeObserver(t) }
+        if let t = endedToken { NotificationCenter.default.removeObserver(t) }
     }
 }
 

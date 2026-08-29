@@ -88,6 +88,33 @@ final class Build42BugFixTests: XCTestCase {
         XCTAssertEqual(try String(contentsOf: destFile, encoding: .utf8), "original content")
     }
 
+    func testCopyFolderOverwriteRestoresDestinationAfterPartialCopyFailure() throws {
+        let destination = try fixture.createFolder(named: "Shared", in: .right)
+        let original = destination.appendingPathComponent("original.txt")
+        try "original".write(to: original, atomically: true, encoding: .utf8)
+
+        let source = try fixture.createFolder(named: "Shared", in: .left)
+        try "partial".write(to: source.appendingPathComponent("partial.txt"), atomically: true, encoding: .utf8)
+        let blocked = source.appendingPathComponent("blocked.txt")
+        try "blocked".write(to: blocked, atomically: true, encoding: .utf8)
+        try FileManager.default.setAttributes([.posixPermissions: 0], ofItemAtPath: blocked.path)
+        defer { try? FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: blocked.path) }
+
+        let item = makeItem(name: "Shared", in: .left, isDirectory: true)
+
+        let result = FileOperationService.moveOrCopy(
+            files: [item],
+            to: fixture.rightPaneURL,
+            isMove: false,
+            conflictResolution: .overwrite
+        )
+
+        XCTAssertEqual(result.succeeded, 0)
+        XCTAssertFalse(result.errors.isEmpty)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: original.path), "Original destination must be restored")
+        XCTAssertEqual(try String(contentsOf: original, encoding: .utf8), "original")
+    }
+
     // MARK: - Medium: createFolder validation
 
     func testCreateFolderRejectsEmptyName() {
@@ -100,6 +127,54 @@ final class Build42BugFixTests: XCTestCase {
 
     func testCreateFolderRejectsNameContainingSlash() {
         XCTAssertThrowsError(try FileOperationService.createFolder(named: "a/b", in: fixture.leftPaneURL))
+    }
+
+    func testCreateFileRejectsNameContainingSlash() {
+        XCTAssertThrowsError(try FileOperationService.createFile(named: "a/b", in: fixture.leftPaneURL))
+    }
+
+    func testCreateFileRejectsParentTraversalName() {
+        let escapedURL = fixture.rootURL.appendingPathComponent("escaped.txt")
+
+        XCTAssertThrowsError(try FileOperationService.createFile(named: "../escaped.txt", in: fixture.leftPaneURL))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: escapedURL.path))
+        XCTAssertThrowsError(try FileOperationService.createFile(named: "..", in: fixture.leftPaneURL))
+    }
+
+    // MARK: - Medium: archive extraction safety
+
+    func testArchiveExtractionRejectsUnsafePaths() {
+        XCTAssertThrowsError(try ArchiveExtractionSafety.validatedFileEntries(from: ["../outside.txt"]))
+        XCTAssertThrowsError(try ArchiveExtractionSafety.validatedFileEntries(from: ["/tmp/outside.txt"]))
+        XCTAssertThrowsError(try ArchiveExtractionSafety.validatedFileEntries(from: ["safe/../outside.txt"]))
+        XCTAssertThrowsError(try ArchiveExtractionSafety.validatedFileEntries(from: ["safe\\outside.txt"]))
+    }
+
+    func testArchiveExtractionDetectsSymbolicLinks() {
+        let listing = """
+        Archive: sample.zip
+        ?rw-------  2.0 unx        5 b-        5 stor 26-Aug-29 08:10 plain.txt
+        lrwxrwxrwx  2.0 unx        4 b-        4 stor 80-Jan-01 00:00 link target
+        2 files, 9 bytes uncompressed, 9 bytes compressed:  0.0%
+        """
+
+        XCTAssertEqual(ArchiveExtractionSafety.symbolicLinkEntries(from: listing), ["link target"])
+    }
+
+    func testArchiveExtractionConflictsUseValidatedRelativeEntries() throws {
+        try fixture.createFolder(named: "nested", in: .right)
+        try "existing".write(
+            to: fixture.rightPaneURL.appendingPathComponent("nested/existing.txt"),
+            atomically: true,
+            encoding: .utf8
+        )
+        let entries = try ArchiveExtractionSafety.validatedFileEntries(
+            from: ["nested/", "nested/existing.txt", "nested/new.txt"]
+        )
+
+        let conflicts = ArchiveExtractionSafety.conflicts(for: entries, in: fixture.rightPaneURL)
+
+        XCTAssertEqual(conflicts, ["nested/existing.txt"])
     }
 
     // MARK: - Major: FolderCompareService duplicate filename safety

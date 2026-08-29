@@ -15,6 +15,20 @@ struct DuplicateFinderView: View {
             footer
         }
         .frame(width: 680, height: 520)
+        .alert("Duplicate Finder", isPresented: errorBinding) {
+            Button("OK") {}
+        } message: {
+            Text(viewModel.errorMessage ?? "")
+        }
+    }
+
+    private var errorBinding: Binding<Bool> {
+        Binding(
+            get: { viewModel.errorMessage != nil },
+            set: { newValue in
+                if !newValue { viewModel.errorMessage = nil }
+            }
+        )
     }
 
     // MARK: - Header

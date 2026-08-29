@@ -8,6 +8,7 @@ struct SettingsView: View {
         Form {
             Section("Files") {
                 Toggle("Skip confirmation when deleting files", isOn: $settings.fileDeleteNoConfirm)
+                Toggle("Show custom shell command notice", isOn: $settings.showCustomShellCommandNotice)
             }
             Section("Folders") {
                 Toggle("Skip confirmation when deleting folders", isOn: $settings.directoryDeleteNoConfirm)
@@ -44,6 +45,7 @@ struct SettingsView: View {
             Section("Sidebar") {
                 Toggle("Show Places section", isOn: $settings.showSidebarPlaces)
                 Toggle("Show Recents section", isOn: $settings.showSidebarRecents)
+                Toggle("Show Network section", isOn: $settings.showNetworkSection)
             }
             Section("Sidebar places") {
                 placesRow("Home")

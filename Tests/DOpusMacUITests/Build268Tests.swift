@@ -243,7 +243,13 @@ final class TabbedPaneStateFoldersFirstTests: XCTestCase {
 
 final class AppSettingsNewDefaultsTests: XCTestCase {
     func testNewBoolSettingsDefaultToTrue() {
-        let keys = ["showSidebarPlaces", "showSidebarRecents", "foldersFirst", "showTimeInDate"]
+        let keys = [
+            "showSidebarPlaces",
+            "showSidebarRecents",
+            "foldersFirst",
+            "showTimeInDate",
+            "showCustomShellCommandNotice"
+        ]
         keys.forEach { UserDefaults.standard.removeObject(forKey: $0) }
         defer { keys.forEach { UserDefaults.standard.removeObject(forKey: $0) } }
 
@@ -252,6 +258,7 @@ final class AppSettingsNewDefaultsTests: XCTestCase {
         XCTAssertTrue(settings.showSidebarRecents, "showSidebarRecents must default true")
         XCTAssertTrue(settings.foldersFirst, "foldersFirst must default true")
         XCTAssertTrue(settings.showTimeInDate, "showTimeInDate must default true")
+        XCTAssertTrue(settings.showCustomShellCommandNotice, "showCustomShellCommandNotice must default true")
     }
 }
 

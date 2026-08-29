@@ -4,10 +4,18 @@ import SwiftUI
 struct CommandRunnerView: View {
     @Binding var isVisible: Bool
     let workingDirectory: URL?
+    @EnvironmentObject private var settings: AppSettings
     @State private var command = ""
     @State private var output = ""
     @State private var isRunning = false
+    @State private var pendingCommand: PendingShellCommand?
     @FocusState private var fieldFocused: Bool
+
+    private struct PendingShellCommand: Identifiable {
+        let id = UUID()
+        let command: String
+        let workingDirectory: URL?
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -23,6 +31,7 @@ struct CommandRunnerView: View {
                     .font(.system(size: 12, design: .monospaced))
                     .focused($fieldFocused)
                     .padding(.vertical, 6)
+                    .accessibilityIdentifier("command-runner-field")
                 if isRunning {
                     ProgressView().scaleEffect(0.65).padding(.horizontal, 8)
                 } else {
@@ -34,6 +43,7 @@ struct CommandRunnerView: View {
                     .buttonStyle(.plain)
                     .disabled(command.isEmpty)
                     .padding(.horizontal, 8)
+                    .accessibilityIdentifier("command-runner-run-button")
                 }
                 Button { isVisible = false } label: {
                     Image(systemName: "chevron.down")
@@ -61,6 +71,19 @@ struct CommandRunnerView: View {
             }
         }
         .onAppear { fieldFocused = true }
+        .alert("Run Shell Command?", isPresented: Binding(
+            get: { pendingCommand != nil },
+            set: { if !$0 { pendingCommand = nil } }
+        ), presenting: pendingCommand) { pending in
+            Button("Run") { execute(pending) }
+            Button("Don't Show Again") {
+                settings.showCustomShellCommandNotice = false
+                execute(pending)
+            }
+            Button("Cancel", role: .cancel) { pendingCommand = nil }
+        } message: { _ in
+            Text("Commands run through your login shell in the active folder. They can modify, move, or delete files, so only run commands you trust.")
+        }
     }
 
     private var promptLabel: String {
@@ -71,10 +94,21 @@ struct CommandRunnerView: View {
     private func run() {
         let cmd = command.trimmingCharacters(in: .whitespaces)
         guard !cmd.isEmpty, !isRunning else { return }
+        let pending = PendingShellCommand(command: cmd, workingDirectory: workingDirectory)
+        if settings.showCustomShellCommandNotice {
+            pendingCommand = pending
+        } else {
+            execute(pending)
+        }
+    }
+
+    private func execute(_ pending: PendingShellCommand) {
+        pendingCommand = nil
         isRunning = true
         output = ""
         let shell = ProcessInfo.processInfo.environment["SHELL"] ?? "/bin/zsh"
-        let wd = workingDirectory
+        let wd = pending.workingDirectory
+        let cmd = pending.command
 
         Task.detached(priority: .userInitiated) {
             do {

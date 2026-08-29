@@ -3,10 +3,12 @@ import SwiftUI
 struct CustomActionsSettingsView: View {
     @ObservedObject var model: CustomActionsModel
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var settings: AppSettings
     @State private var selectedID: UUID? = nil
     @State private var editName = ""
     @State private var editCommand = ""
     @State private var isEditingExisting = false
+    @State private var showShellCommandNotice = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -160,5 +162,16 @@ struct CustomActionsSettingsView: View {
             .padding(.vertical, 10)
         }
         .frame(width: 580, height: 380)
+        .onAppear {
+            showShellCommandNotice = settings.showCustomShellCommandNotice
+        }
+        .alert("Custom Shell Commands", isPresented: $showShellCommandNotice) {
+            Button("OK") {}
+            Button("Don't Show Again") {
+                settings.showCustomShellCommandNotice = false
+            }
+        } message: {
+            Text("Custom actions run through your login shell in the active folder. They can modify, move, or delete files, so only save commands you trust.")
+        }
     }
 }

@@ -2,8 +2,12 @@
 
 
 ## Next items
-
-  
+- **Network — advanced features** (each individually togglable in Settings > Network):
+  - Sidebar Network section — enumerate currently-mounted network volumes from /Volumes/ (filter by isVolumeKey + isNetworkKey), auto-refresh via NSWorkspace volume-mount/unmount notifications, eject button per entry
+  - Bonjour discovery — NetServiceBrowser scanning SMB (_smb._tcp) and AFP (_afpovertcp._tcp), displayed as a browsable list inside the Connect sheet
+  - Pinned network locations — bookmark a server URL (not a mounted path) so DuPane can attempt to remount on launch or on demand
+  - Auto-reconnect on launch — silently attempt to remount pinned servers at startup (works when credentials are in Keychain)
+  - Status indicator — coloured dot on sidebar network entries showing reachable/unreachable (background TCP ping to port 445/548)
 
 
 ## Clarifications
@@ -13,11 +17,22 @@
 ## Pending
 - SMB network shares
 - Bug - no icloud on the mac air
-
+- complete the re-name to DuPane from DOpus
 
 ---
 
 ## Done
+### Build 309 — Sidebar right-click highlight fix + Connect to Server (2026-08-29)
+
+- **Sidebar right-click highlight** — right-clicking a Recents, Places, or Bookmarks row now keeps the row highlighted while the context menu is open. Implemented via `SidebarMenuObserver` (an `ObservableObject`) that listens to `NSMenu.didBeginTrackingNotification` / `NSMenu.didEndTrackingNotification` to lock the highlighted row URL while a menu is visible. All three row types check both `hoveredURL` (mouse-over) and `menuObserver.contextMenuURL` (context-menu lock).
+- **Connect to Server** — a "Network" section appears in the sidebar (when Settings > Sidebar > "Show Network section" is on). The "Connect to Server…" row opens a sheet with a URL text field (pre-filled "smb://"). On confirm, `NSWorkspace.shared.open(url)` sends the URL to macOS, which prompts for credentials and mounts the share. Basic URL validation is shown inline.
+- **218 tests, 0 failures.**
+
+### Build 307 — Sidebar row hover highlights (2026-08-29)
+
+- **Sidebar hover highlight** — hovering over any Places, Recents, or Bookmarks row now shows a subtle rounded-rectangle background, making it clear which item is under the cursor when right-clicking for the context menu. All three row types share a unified `hoveredURL` state; Bookmarks retain the existing hover-reveal xmark button behaviour.
+- **218 tests, 0 failures.**
+
 ### Build 269 — 21 new tests, [optional] tagging across all test files (2026-08-28)
 
 - **21 new [must] tests in Build268Tests.swift** — `PaneState.duplicate()` (4 tests: extension, no-extension, auto-increment, multi-item), `SidebarModel` recents (4: prepend, dedup, cap-12, clearRecents), `FileRowView.formatDate(showTime:)` (6: nil→"—", medium no-time, medium+time, ISO date-only, ISO+time, relative today+time), `PaneState.foldersFirst=false` (2), `TabbedPaneState.foldersFirst` propagation (2), `AppSettings` new defaults (1: all 4 new bool fields), `PaneState` new flag defaults (2).

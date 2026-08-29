@@ -207,14 +207,40 @@ final class DOpusMacEndToEndUITests: XCTestCase {
     }
 
     @MainActor
-    private func launchApp() {
+    func testShellCommandNoticeAppearsBeforeCommandRunnerExecution() throws {
+        launchApp(extraArguments: ["-showCustomShellCommandNotice", "YES"])
+        clickToolbarButton("toolbar-terminal-button")
+
+        let commandField = app.textFields.matching(NSPredicate(format: "placeholderValue == %@", "Command…")).firstMatch
+        XCTAssertTrue(commandField.waitForExistence(timeout: 5))
+        commandField.click()
+        commandField.typeText("printf hello")
+        let runButton = app.buttons["Arrow Right Circle"]
+        XCTAssertTrue(runButton.waitForExistence(timeout: 5))
+        runButton.click()
+
+        XCTAssertTrue(app.staticTexts["Run Shell Command?"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Run"].exists)
+        XCTAssertTrue(app.buttons["Don't Show Again"].exists)
+        let alert = app.sheets.firstMatch
+        XCTAssertTrue(alert.buttons["Cancel"].exists)
+        alert.buttons["Cancel"].click()
+    }
+
+    @MainActor
+    private func launchApp(extraArguments: [String] = []) {
         app.launchArguments = [
+            "-ApplePersistenceIgnoreState",
+            "YES",
             "--left-pane-url", fixture.leftPaneURL.path,
             "--right-pane-url", fixture.rightPaneURL.path
-        ]
+        ] + extraArguments
         app.launch()
-        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 5))
-        XCTAssertTrue(app.windows.firstMatch.waitForExistence(timeout: 5))
+        app.activate()
+        XCTAssertTrue(
+            app.descendants(matching: .any)["left-pane"].waitForExistence(timeout: 10),
+            "Expected the main DuPane UI to be accessible after launch. App state: \(app.state.rawValue)\n\(app.debugDescription)"
+        )
     }
 
     @MainActor

@@ -127,12 +127,14 @@ struct GlobalToolbar: View {
                 toolbarLabel("Actions", icon: "bolt.circle")
                     .foregroundStyle(Color.secondary)
             }
+            .accessibilityIdentifier("toolbar-custom-actions-button")
             .help("Manage Custom Actions")
 
             Button(action: onToggleTerminal) {
                 toolbarLabel("Terminal", icon: isTerminalShown ? "terminal.fill" : "terminal")
                     .foregroundStyle(isTerminalShown ? Color.accentColor : Color.secondary)
             }
+            .accessibilityIdentifier("toolbar-terminal-button")
             .help("Toggle command runner (⌥`)")
 
             Button(action: onToggleFollow) {

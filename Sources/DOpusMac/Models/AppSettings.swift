@@ -151,6 +151,9 @@ final class AppSettings: ObservableObject {
     @Published var directoryDeleteNoConfirm: Bool {
         didSet { UserDefaults.standard.set(directoryDeleteNoConfirm, forKey: "directoryDeleteNoConfirm") }
     }
+    @Published var showCustomShellCommandNotice: Bool {
+        didSet { UserDefaults.standard.set(showCustomShellCommandNotice, forKey: "showCustomShellCommandNotice") }
+    }
     // Display
     @Published var showHiddenFiles: Bool {
         didSet { UserDefaults.standard.set(showHiddenFiles, forKey: "showHiddenFiles") }
@@ -227,10 +230,17 @@ final class AppSettings: ObservableObject {
     @Published var showTimeInDate: Bool {
         didSet { UserDefaults.standard.set(showTimeInDate, forKey: "showTimeInDate") }
     }
+    // Network section in sidebar
+    @Published var showNetworkSection: Bool {
+        didSet { UserDefaults.standard.set(showNetworkSection, forKey: "showNetworkSection") }
+    }
 
     init() {
         fileDeleteNoConfirm = UserDefaults.standard.bool(forKey: "fileDeleteNoConfirm")
         directoryDeleteNoConfirm = UserDefaults.standard.bool(forKey: "directoryDeleteNoConfirm")
+        showCustomShellCommandNotice = UserDefaults.standard.object(forKey: "showCustomShellCommandNotice").map {
+            ($0 as? Bool) ?? true
+        } ?? true
         showHiddenFiles = UserDefaults.standard.bool(forKey: "showHiddenFiles")
         showHiddenFolders = UserDefaults.standard.bool(forKey: "showHiddenFolders")
         // Default true: show extensions (matches pre-existing behaviour)
@@ -278,6 +288,7 @@ final class AppSettings: ObservableObject {
         showSidebarRecents = UserDefaults.standard.object(forKey: "showSidebarRecents").map { ($0 as? Bool) ?? true } ?? true
         foldersFirst = UserDefaults.standard.object(forKey: "foldersFirst").map { ($0 as? Bool) ?? true } ?? true
         showTimeInDate = UserDefaults.standard.object(forKey: "showTimeInDate").map { ($0 as? Bool) ?? true } ?? true
+        showNetworkSection = UserDefaults.standard.object(forKey: "showNetworkSection").map { ($0 as? Bool) ?? true } ?? true
     }
 
     var hiddenColumns: Set<String> {

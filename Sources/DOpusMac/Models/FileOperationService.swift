@@ -21,19 +21,14 @@ enum FileOperationService {
 
     @discardableResult
     static func createFolder(named rawName: String, in baseURL: URL) throws -> URL {
-        let name = rawName.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !name.isEmpty else { throw CocoaError(.fileWriteInvalidFileName) }
-        guard !name.contains("/") else { throw CocoaError(.fileWriteInvalidFileName) }
-        let newURL = baseURL.appendingPathComponent(name)
+        let newURL = try validatedNewItemURL(named: rawName, in: baseURL)
         try FileManager.default.createDirectory(at: newURL, withIntermediateDirectories: false)
         return newURL
     }
 
     @discardableResult
     static func createFile(named rawName: String, in baseURL: URL) throws -> URL {
-        let name = rawName.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !name.isEmpty else { throw CocoaError(.fileWriteInvalidFileName) }
-        let newURL = baseURL.appendingPathComponent(name)
+        let newURL = try validatedNewItemURL(named: rawName, in: baseURL)
         guard !FileManager.default.fileExists(atPath: newURL.path) else {
             throw CocoaError(.fileWriteFileExists)
         }
@@ -59,9 +54,9 @@ enum FileOperationService {
         onProgress: ((Int, Int) -> Void)? = nil
     ) -> FileOperationResult {
         // Guard: refuse to copy/move a folder into its own subtree
-        let dstPath = destinationFolder.standardizedFileURL.path
+        let dstPath = destinationFolder.standardizedFileURL.resolvingSymlinksInPath().path
         for file in files where file.isDirectory {
-            let srcPath = file.url.standardizedFileURL.path
+            let srcPath = file.url.standardizedFileURL.resolvingSymlinksInPath().path
             if dstPath == srcPath || dstPath.hasPrefix(srcPath + "/") {
                 return FileOperationResult(
                     succeeded: 0,
@@ -134,7 +129,15 @@ enum FileOperationService {
                 resultingURLs.append(destination)
             } catch {
                 if let backup = backupURL {
-                    try? FileManager.default.moveItem(at: backup, to: destination)
+                    do {
+                        try restoreBackup(backup, to: destination)
+                    } catch {
+                        errors.append(
+                            "Couldn't restore the original '\(destination.lastPathComponent)' after a failed \(isMove ? "move" : "copy"). " +
+                            "The backup is still at \(backup.path): \(error.localizedDescription)"
+                        )
+                        continue
+                    }
                 }
                 errors.append("Couldn't \(isMove ? "move" : "copy") \(file.name): \(error.localizedDescription)")
             }
@@ -199,6 +202,28 @@ enum FileOperationService {
     private static func sameFileLocation(_ first: URL, _ second: URL) -> Bool {
         first.standardizedFileURL.resolvingSymlinksInPath().path ==
             second.standardizedFileURL.resolvingSymlinksInPath().path
+    }
+
+    private static func validatedNewItemURL(named rawName: String, in baseURL: URL) throws -> URL {
+        let name = rawName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty else { throw CocoaError(.fileWriteInvalidFileName) }
+        guard !name.contains("/") && !name.contains("\0") else { throw CocoaError(.fileWriteInvalidFileName) }
+
+        let newURL = baseURL.appendingPathComponent(name)
+        let standardized = newURL.standardizedFileURL
+        guard sameFileLocation(standardized.deletingLastPathComponent(), baseURL),
+              standardized.lastPathComponent == name else {
+            throw CocoaError(.fileWriteInvalidFileName)
+        }
+        return newURL
+    }
+
+    private static func restoreBackup(_ backup: URL, to destination: URL) throws {
+        let fileManager = FileManager.default
+        if fileManager.fileExists(atPath: destination.path) {
+            try fileManager.removeItem(at: destination)
+        }
+        try fileManager.moveItem(at: backup, to: destination)
     }
 
     private static let defaultTrashHandler: TrashHandler = { url in

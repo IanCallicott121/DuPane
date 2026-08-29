@@ -41,6 +41,14 @@ struct PaneView: View {
     @State private var pendingDropIsMove: Bool = false
     @State private var pendingDropSourceURL: URL? = nil
     @State private var showDropConflictAlert = false
+    @State private var pendingCustomActionRun: PendingCustomActionRun?
+
+    private struct PendingCustomActionRun: Identifiable {
+        let id = UUID()
+        let action: CustomAction
+        let selectedFiles: [URL]
+        let workingDirectory: URL?
+    }
 
     private var panelBgColor: Color {
         if let themed = settings.appColorScheme.panelBackground { return themed }
@@ -133,6 +141,19 @@ struct PaneView: View {
             Button("Cancel", role: .cancel) { clearDropConflictState() }
         } message: {
             Text(dropConflictAlertMessage)
+        }
+        .alert("Run Custom Shell Command?", isPresented: Binding(
+            get: { pendingCustomActionRun != nil },
+            set: { if !$0 { pendingCustomActionRun = nil } }
+        ), presenting: pendingCustomActionRun) { pending in
+            Button("Run") { executeCustomAction(pending) }
+            Button("Don't Show Again") {
+                settings.showCustomShellCommandNotice = false
+                executeCustomAction(pending)
+            }
+            Button("Cancel", role: .cancel) { pendingCustomActionRun = nil }
+        } message: { _ in
+            Text("Custom actions run through your login shell in the active folder. They can modify, move, or delete files, so only run actions you trust.")
         }
         .onChange(of: pane.items, perform: { newItems in
             metadataService.loadIfNeeded(for: newItems)
@@ -781,7 +802,11 @@ struct PaneView: View {
                 Button(action.name) {
                     let selected = pane.selectedItems
                     let targets = selected.isEmpty ? [item] : selected
-                    action.run(selectedFiles: targets.map { $0.url }, workingDirectory: pane.currentURL)
+                    requestCustomActionRun(
+                        action,
+                        selectedFiles: targets.map { $0.url },
+                        workingDirectory: pane.currentURL
+                    )
                 }
             }
         }
@@ -1103,6 +1128,24 @@ struct PaneView: View {
         try? (url as NSURL).setResourceValue(tags as NSArray, forKey: .tagNamesKey)
     }
 
+    private func requestCustomActionRun(_ action: CustomAction, selectedFiles: [URL], workingDirectory: URL?) {
+        let pending = PendingCustomActionRun(
+            action: action,
+            selectedFiles: selectedFiles,
+            workingDirectory: workingDirectory
+        )
+        if settings.showCustomShellCommandNotice {
+            pendingCustomActionRun = pending
+        } else {
+            executeCustomAction(pending)
+        }
+    }
+
+    private func executeCustomAction(_ pending: PendingCustomActionRun) {
+        pendingCustomActionRun = nil
+        pending.action.run(selectedFiles: pending.selectedFiles, workingDirectory: pending.workingDirectory)
+    }
+
     // MARK: - File operations
 
     private func duplicateItems(_ urls: [URL]) {
@@ -1199,14 +1242,40 @@ struct PaneView: View {
                 return
             }
 
-            let output = listResult.stdout
-            let entries = output.components(separatedBy: "\n")
-                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-                .filter { !$0.isEmpty && !$0.hasSuffix("/") }
-
-            let conflicts = entries.filter { entry in
-                FileManager.default.fileExists(atPath: dir.appendingPathComponent(entry).path)
+            let infoResult: ProcessExecutionResult
+            do {
+                infoResult = try await ProcessRunner.run(
+                    executableURL: URL(fileURLWithPath: "/usr/bin/unzip"),
+                    arguments: ["-Z", "-l", url.path]
+                )
+            } catch {
+                await MainActor.run {
+                    pane.errorMessage = "Couldn't inspect archive metadata: \(error.localizedDescription)"
+                }
+                return
             }
+            guard infoResult.terminationStatus == 0 else {
+                await MainActor.run {
+                    pane.errorMessage = Self.processErrorMessage(action: "inspect archive metadata", result: infoResult)
+                }
+                return
+            }
+
+            let entries = ArchiveExtractionSafety.listedEntryNames(from: listResult.stdout)
+            let fileEntries: [String]
+            do {
+                fileEntries = try ArchiveExtractionSafety.validatedFileEntries(from: entries)
+                if let symlink = ArchiveExtractionSafety.symbolicLinkEntries(from: infoResult.stdout).first {
+                    throw ArchiveExtractionSafetyError.unsupportedSymbolicLink(symlink)
+                }
+            } catch {
+                await MainActor.run {
+                    pane.errorMessage = "Couldn't uncompress: \(error.localizedDescription)"
+                }
+                return
+            }
+
+            let conflicts = ArchiveExtractionSafety.conflicts(for: fileEntries, in: dir)
 
             await MainActor.run {
                 if conflicts.isEmpty {

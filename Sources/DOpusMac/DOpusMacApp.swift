@@ -61,6 +61,11 @@ struct DOpusMacApp: App {
 /// Ensures normal app behaviour (Dock icon, frontmost window) when running
 /// as a plain Swift Package executable without a signed .app bundle.
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    private enum WindowRestore {
+        static let minimumSize = NSSize(width: 640, height: 400)
+        static let minimumVisibleSize = NSSize(width: 160, height: 120)
+    }
+
     private var keyEventMonitor: Any?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -70,8 +75,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         for window in NSApp.windows {
             window.titleVisibility = .hidden
             window.tabbingMode = .disallowed
-            if let frameStr = UserDefaults.standard.string(forKey: "mainWindowFrame") {
-                window.setFrame(NSRectFromString(frameStr), display: true)
+            if let frameStr = UserDefaults.standard.string(forKey: "mainWindowFrame"),
+               let restoredFrame = usableRestoredWindowFrame(from: frameStr) {
+                window.setFrame(restoredFrame, display: true)
             } else if let screen = NSScreen.main {
                 window.setFrame(screen.visibleFrame, display: true)
             }
@@ -93,5 +99,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         for window in NSApp.windows {
             UserDefaults.standard.set(NSStringFromRect(window.frame), forKey: "mainWindowFrame")
         }
+    }
+
+    private func usableRestoredWindowFrame(from frameString: String) -> NSRect? {
+        let frame = NSRectFromString(frameString)
+        guard frame.origin.x.isFinite,
+              frame.origin.y.isFinite,
+              frame.width.isFinite,
+              frame.height.isFinite,
+              frame.width >= WindowRestore.minimumSize.width,
+              frame.height >= WindowRestore.minimumSize.height
+        else {
+            return nil
+        }
+
+        for screen in NSScreen.screens {
+            let visibleArea = frame.intersection(screen.visibleFrame)
+            if visibleArea.width >= WindowRestore.minimumVisibleSize.width,
+               visibleArea.height >= WindowRestore.minimumVisibleSize.height {
+                return frame
+            }
+        }
+
+        return nil
     }
 }
