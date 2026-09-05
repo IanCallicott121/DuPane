@@ -100,7 +100,7 @@ struct FileRowView: View {
             }
         case "Modified":
             columnCell(name, alignment: .leading) {
-                Text(Self.formatDate(item.modified, style: settings.dateFormatStyle, showTime: settings.showTimeInDate))
+                Text(Self.formatDate(item.modified, style: settings.dateFormatStyle, timeStyle: settings.timeFormatStyle))
                     .font(.system(size: fsMeta, design: .monospaced))
                     .foregroundStyle(.secondary)
             }
@@ -241,36 +241,37 @@ struct FileRowView: View {
         return ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)
     }
 
-    static func formatDate(_ date: Date?, style: DateFormatStyle = .medium, showTime: Bool = false) -> String {
+    static func formatDate(_ date: Date?, style: DateFormatStyle = .medium, timeStyle: TimeFormatStyle = .none) -> String {
         guard let date else { return "—" }
+        let timeSuffix: String = {
+            guard let fmt = timeStyle.formatString else { return "" }
+            let f = DateFormatter()
+            if timeStyle.usesPOSIXLocale { f.locale = Locale(identifier: "en_US_POSIX") }
+            f.dateFormat = " " + fmt
+            return f.string(from: date)
+        }()
         switch style {
         case .short:
             let f = DateFormatter()
-            f.dateFormat = showTime ? "dd/MM/yy HH:mm" : "dd/MM/yy"
-            return f.string(from: date)
+            f.dateFormat = "dd/MM/yy"
+            return f.string(from: date) + timeSuffix
         case .medium:
             let f = DateFormatter()
-            f.dateFormat = showTime ? "d MMM yyyy HH:mm" : "d MMM yyyy"
-            return f.string(from: date)
+            f.dateFormat = "d MMM yyyy"
+            return f.string(from: date) + timeSuffix
         case .long:
             let f = DateFormatter()
             f.dateStyle = .long
-            f.timeStyle = showTime ? .short : .none
-            return f.string(from: date)
+            f.timeStyle = .none
+            return f.string(from: date) + timeSuffix
         case .iso:
             let f = DateFormatter()
-            f.dateFormat = showTime ? "yyyy-MM-dd HH:mm" : "yyyy-MM-dd"
-            return f.string(from: date)
+            f.dateFormat = "yyyy-MM-dd"
+            return f.string(from: date) + timeSuffix
         case .relative:
             let cal = Calendar.current
-            let timeStr: String = {
-                let f = DateFormatter()
-                f.dateFormat = " HH:mm"
-                return f.string(from: date)
-            }()
-            let suffix = showTime ? timeStr : ""
-            if cal.isDateInToday(date) { return "Today\(suffix)" }
-            if cal.isDateInYesterday(date) { return "Yesterday\(suffix)" }
+            if cal.isDateInToday(date) { return "Today\(timeSuffix)" }
+            if cal.isDateInYesterday(date) { return "Yesterday\(timeSuffix)" }
             let days = cal.dateComponents([.day], from: date, to: Date()).day ?? 0
             if days < 7 { return "\(days)d ago" }
             if days < 30 { return "\(days / 7)w ago" }

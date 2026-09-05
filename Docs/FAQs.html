@@ -185,7 +185,7 @@
 
       <div class="faq-item">
         <div class="faq-q">The breadcrumb path is truncated — how do I see the full path?</div>
-        <div class="faq-a"><p>The breadcrumb auto-scrolls to show the deepest (current) folder. Scroll the breadcrumb horizontally to see ancestor folders, or hover over any segment to see its full name. The status bar at the bottom also shows the complete path of the selected item.</p></div>
+        <div class="faq-a"><p>The breadcrumb auto-scrolls to show the deepest (current) folder. Scroll the breadcrumb horizontally to see ancestor folders, or hover over any segment to see its full name. The status bar at the bottom shows the item count and selection size; use <strong>Get Info</strong> (right-click → Get Info…) to see the full path of a specific file.</p></div>
       </div>
     </section>
 
@@ -203,7 +203,7 @@
 
       <div class="faq-item">
         <div class="faq-q">How do I close a tab?</div>
-        <div class="faq-a"><p>Click the <strong>×</strong> button on the tab, or press <kbd>⌘⇧W</kbd>. Pinned tabs cannot be closed until unpinned.</p></div>
+        <div class="faq-a"><p>Click the <strong>×</strong> button on the tab, or press <kbd>⌘W</kbd>. Pinned tabs cannot be closed until unpinned.</p></div>
       </div>
 
       <div class="faq-item">
@@ -244,7 +244,7 @@
 
       <div class="faq-item">
         <div class="faq-q">How do I reorder my bookmarks?</div>
-        <div class="faq-a"><p>Drag a bookmark row up or down in the sidebar to reorder it. You can also right-click a bookmark → <strong>Move Up</strong> or <strong>Move Down</strong>.</p></div>
+        <div class="faq-a"><p>Right-click a bookmark in the sidebar → <strong>Move Up</strong> or <strong>Move Down</strong> to shift it one position in the list.</p></div>
       </div>
 
       <div class="faq-item">
@@ -385,7 +385,7 @@
 
       <div class="faq-item">
         <div class="faq-q">How do I switch to dark mode?</div>
-        <div class="faq-a"><p>Open <strong>Settings</strong> → Display → Appearance → choose <strong>Dark</strong>. Or choose <strong>System</strong> to follow macOS's current appearance. The change applies immediately without relaunch.</p></div>
+        <div class="faq-a"><p>Open <strong>Settings</strong> (<kbd>⌘,</kbd>) → Appearance → <strong>Mode</strong> → choose <strong>Dark</strong>. Or choose <strong>System</strong> to follow macOS's current appearance. The change applies immediately without relaunch.</p></div>
       </div>
 
       <div class="faq-item">
@@ -419,7 +419,15 @@
 
       <div class="faq-item">
         <div class="faq-q">How do I change the date format in the Modified column?</div>
-        <div class="faq-a"><p>Open <strong>Settings</strong> (<kbd>⌘,</kbd>) → Display → <strong>Date format</strong>. Choose from: <strong>Short</strong> (31/12/25), <strong>Medium</strong> (31 Dec 2025 — default), <strong>Long</strong> (December 31, 2025), <strong>ISO</strong> (2025-12-31), or <strong>Relative</strong> (Today, Yesterday, 3d ago). The change applies to both panes immediately.</p></div>
+        <div class="faq-a">
+          <p>Open <strong>Settings</strong> (<kbd>⌘,</kbd>) → Display → <strong>Date format</strong>. Choose from: <strong>Short</strong> (31/12/25), <strong>Medium</strong> (31 Dec 2025 — default), <strong>Long</strong> (December 31, 2025), <strong>ISO</strong> (2025-12-31), or <strong>Relative</strong> (Today, Yesterday, 3d ago).</p>
+          <p>To also show a time, use <strong>Time in date modified</strong> directly below. Options: <strong>None</strong> (date only), <strong>12-hour</strong> (2:35 PM), <strong>12-hour + seconds</strong> (2:35:22 PM), <strong>24-hour</strong> (14:35 — default), or <strong>24-hour + seconds</strong> (14:35:22).</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">How do I back up my settings or move them to another Mac?</div>
+        <div class="faq-a"><p>Open the <strong>DuPane</strong> menu → <strong>Export Settings…</strong> to save all preferences to a <code>.json</code> file. On the other Mac, use <strong>DuPane menu → Import Settings…</strong> to restore them. All settings apply immediately without a restart.</p></div>
       </div>
 
       <div class="faq-item">
@@ -435,14 +443,21 @@
       <div class="faq-item">
         <div class="faq-q">How do Places and Recents in the sidebar work?</div>
         <div class="faq-a">
-          <p><strong>Places</strong> shows fixed system locations (Home, Applications, Desktop, Documents, Downloads). Choose which ones appear in <strong>Settings → Sidebar Places</strong>.</p>
+          <p><strong>Places</strong> shows fixed system locations (Home, Applications, Desktop, Documents, Downloads). If iCloud Drive or OneDrive is configured on your Mac, those folders also appear here automatically. Choose which ones are visible in <strong>Settings → Sidebar Places</strong>.</p>
           <p><strong>Recents</strong> automatically tracks the last 12 folders you visited in either pane. The most recent is always at the top. Right-click any entry to remove it, or click <strong>Clear Recents</strong> at the bottom of the section to reset the list.</p>
         </div>
       </div>
     </section>
 
+    <hr class="divider">
     <section class="faq-section" id="network">
-      <h2>Network &amp; Servers</h2>
+      <div class="section-label">Advanced</div>
+      <h2>Network, Servers &amp; External Drives</h2>
+
+      <div class="faq-item">
+        <div class="faq-q">My external USB/Thunderbolt drives don't appear — where do I find them?</div>
+        <div class="faq-a"><p>External drives appear in the <strong>Locations</strong> section of the sidebar, which shows automatically when a drive is attached and disappears when all drives are ejected. Click any drive to navigate to it. Right-click → <strong>Eject</strong> to unmount safely.</p></div>
+      </div>
 
       <div class="faq-item">
         <div class="faq-q">How do I connect to a network share (SMB, AFP, NFS)?</div>
@@ -461,14 +476,14 @@
       <div class="faq-item">
         <div class="faq-q">How do I unmount (eject) a network share?</div>
         <div class="faq-a">
-          <p>Mounted shares appear in the <strong>Network</strong> sidebar section. Click the <strong>Eject</strong> button (⏏) on the right of any mounted-volume row. DuPane calls <code>NSWorkspace.unmountAndEjectDevice</code> which cleanly disconnects the share.</p>
+          <p>Right-click the mounted share in the <strong>Network</strong> sidebar section and choose <strong>Eject</strong>. DuPane unmounts the share cleanly and removes it from the list.</p>
         </div>
       </div>
 
       <div class="faq-item">
         <div class="faq-q">Can I save a server address so I don't have to type it every time?</div>
         <div class="faq-a">
-          <p>Yes — once a share is mounted it appears in the Network sidebar section. Right-click it and choose <strong>Pin to Network Sidebar</strong>. The server URL is saved persistently and the entry stays in the sidebar even when the share is not mounted. Click it any time to reconnect, or right-click for <strong>Remove from Pinned</strong>.</p>
+          <p>Yes — once a share is mounted, right-click it in the Network sidebar section and choose <strong>Pin to Network Sidebar</strong>. The server URL is saved persistently and the entry stays in the sidebar even when not mounted. Click it to reconnect, or right-click for <strong>Rename…</strong> or <strong>Remove from Pinned</strong>.</p>
         </div>
       </div>
 
@@ -493,7 +508,7 @@
 
 <footer>
   <div><strong>DuPane</strong> · Dual-Pane File Manager for macOS</div>
-  <div>FAQs · Build 313 · macOS 13+</div>
+  <div>FAQs · Build 367 · macOS 13+</div>
 </footer>
 
 </body>

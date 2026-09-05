@@ -26,7 +26,11 @@ struct SettingsView: View {
                         Text(style.label).tag(style)
                     }
                 }
-                Toggle("Show time in date modified", isOn: $settings.showTimeInDate)
+                Picker("Time in date modified", selection: $settings.timeFormatStyle) {
+                    ForEach(TimeFormatStyle.allCases, id: \.self) { style in
+                        Text(style.label).tag(style)
+                    }
+                }
             }
             Section("Appearance") {
                 Picker("Theme", selection: $settings.appColorScheme) {
@@ -62,6 +66,12 @@ struct SettingsView: View {
                 placesRow("Desktop")
                 placesRow("Documents")
                 placesRow("Downloads")
+                if FileManager.default.fileExists(atPath: NSHomeDirectory() + "/Library/Mobile Documents/com~apple~CloudDocs") {
+                    placesRow("iCloud Drive")
+                }
+                if FileManager.default.fileExists(atPath: NSHomeDirectory() + "/OneDrive") {
+                    placesRow("OneDrive")
+                }
             }
             Section("Startup folders") {
                 startupRow(label: "Left pane",

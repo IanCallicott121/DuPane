@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import UniformTypeIdentifiers
 
 @main
 struct DuPaneApp: App {
@@ -30,6 +31,15 @@ struct DuPaneApp: App {
                 }
             }
             CommandGroup(replacing: .windowArrangement) {}
+            CommandGroup(replacing: .appSettings) {
+                Button("Settings…") {
+                    NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+                }
+                .keyboardShortcut(",", modifiers: .command)
+                Divider()
+                Button("Export Settings…") { exportSettings() }
+                Button("Import Settings…") { importSettings() }
+            }
         }
 
         Settings {
@@ -56,6 +66,30 @@ struct DuPaneApp: App {
 
     private func openUserGuide() { openDoc("UserGuide.html") }
     private func openFAQs() { openDoc("FAQs.html") }
+
+    private func exportSettings() {
+        guard let data = settings.exportedData() else { return }
+        let panel = NSSavePanel()
+        panel.title = "Export DuPane Settings"
+        panel.nameFieldStringValue = "DuPane Settings"
+        panel.allowedContentTypes = [.json]
+        panel.isExtensionHidden = false
+        if panel.runModal() == .OK, let url = panel.url {
+            try? data.write(to: url)
+        }
+    }
+
+    private func importSettings() {
+        let panel = NSOpenPanel()
+        panel.title = "Import DuPane Settings"
+        panel.allowedContentTypes = [.json]
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        if panel.runModal() == .OK, let url = panel.url,
+           let data = try? Data(contentsOf: url) {
+            settings.applyImport(from: data)
+        }
+    }
 }
 
 /// Ensures normal app behaviour (Dock icon, frontmost window) when running

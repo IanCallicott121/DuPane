@@ -17,6 +17,7 @@ struct BonjourServer: Identifiable, Equatable {
 
 final class NetworkVolumeMonitor: ObservableObject {
     @Published var mountedVolumes: [NetworkVolume] = []
+    @Published var externalVolumes: [NetworkVolume] = []
     @Published var bonjourServers: [BonjourServer] = []
 
     private static let suppressedPathsKey = "suppressedNetworkPaths"
@@ -58,20 +59,32 @@ final class NetworkVolumeMonitor: ObservableObject {
     }
 
     private static let networkFSTypes: Set<String> = ["smbfs", "afpfs", "nfs", "nfs4", "webdav", "ftpfs"]
+    private static let externalFSTypes: Set<String> = ["apfs", "hfs", "msdos", "exfat", "ntfs", "ufsd_NTFS", "ufsd_ExtFS", "udf", "cd9660"]
 
     func refresh() {
         let opts: FileManager.VolumeEnumerationOptions = [.skipHiddenVolumes]
         let urls = FileManager.default.mountedVolumeURLs(includingResourceValuesForKeys: nil, options: opts) ?? []
-        mountedVolumes = urls.compactMap { url in
-            guard !suppressedPaths.contains(url.path) else { return nil }
+        var network: [NetworkVolume] = []
+        var external: [NetworkVolume] = []
+        for url in urls {
             var stat = statfs()
-            guard statfs(url.path, &stat) == 0 else { return nil }
+            guard statfs(url.path, &stat) == 0 else { continue }
             let fsType = withUnsafeBytes(of: stat.f_fstypename) { raw in
                 String(bytes: raw.prefix(while: { $0 != 0 }), encoding: .utf8) ?? ""
             }
-            guard Self.networkFSTypes.contains(fsType) else { return nil }
-            return NetworkVolume(url: url)
+            if Self.networkFSTypes.contains(fsType) {
+                guard !suppressedPaths.contains(url.path) else { continue }
+                network.append(NetworkVolume(url: url))
+            } else if Self.externalFSTypes.contains(fsType), url.path.hasPrefix("/Volumes/") {
+                external.append(NetworkVolume(url: url))
+            }
         }
+        mountedVolumes = network
+        externalVolumes = external
+    }
+
+    func ejectExternal(_ volume: NetworkVolume) {
+        try? NSWorkspace.shared.unmountAndEjectDevice(at: volume.url)
     }
 
     func ejectAndRemove(_ volume: NetworkVolume) {

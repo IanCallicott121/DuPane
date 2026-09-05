@@ -42,6 +42,14 @@ struct SidebarView: View {
                     }
                 }
 
+                // External drives (USB, Thunderbolt, etc.)
+                if !networkMonitor.externalVolumes.isEmpty {
+                    sectionHeader("Locations")
+                    ForEach(networkMonitor.externalVolumes) { volume in
+                        externalVolumeRow(volume)
+                    }
+                }
+
                 // User bookmarks
                 if !model.bookmarks.isEmpty {
                     sectionHeader("Bookmarks")
@@ -519,9 +527,47 @@ struct SidebarView: View {
         .onTapGesture { onNavigate(url) }
         .contextMenu {
             let urlString = url.absoluteString
-            Button("Remove Network", role: .destructive) {
+            Button("Open in Pane") { onNavigate(url) }
+            if !settings.pinnedNetworkURLs.contains(urlString) {
+                Button("Pin to Network Sidebar") {
+                    settings.pinnedNetworkURLs.append(urlString)
+                }
+            }
+            Divider()
+            Button("Eject", role: .destructive) {
                 settings.pinnedNetworkURLs.removeAll { $0 == urlString }
                 networkMonitor.ejectAndRemove(volume)
+            }
+        }
+    }
+
+    private func externalVolumeRow(_ volume: NetworkVolume) -> some View {
+        let url = volume.url
+        return HStack(spacing: 6) {
+            Image(systemName: "externaldrive.fill")
+                .font(.system(size: 11))
+                .frame(width: 16)
+                .foregroundStyle(Color.accentColor.opacity(0.7))
+            Text(volume.name)
+                .font(.system(size: 12))
+                .lineLimit(1)
+            Spacer(minLength: 2)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background {
+            RoundedRectangle(cornerRadius: 5)
+                .fill(hoveredURL == url ? Color.primary.opacity(0.08) : Color.clear)
+        }
+        .contentShape(Rectangle())
+        .onHover { isHovering in hoveredURL = isHovering ? url : nil }
+        .onTapGesture { onNavigate(url) }
+        .contextMenu {
+            Button("Open in Pane") { onNavigate(url) }
+            Divider()
+            Button("Eject", role: .destructive) {
+                networkMonitor.ejectExternal(volume)
             }
         }
     }

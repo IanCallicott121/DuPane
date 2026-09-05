@@ -583,7 +583,7 @@
     <div class="logo-icon">DP</div>
     <div>
       <div class="sidebar-logo-text">DuPane</div>
-      <div class="sidebar-logo-sub">User Guide v1.52</div>
+      <div class="sidebar-logo-sub">User Guide v1.0</div>
     </div>
   </div>
 
@@ -664,7 +664,7 @@
     <section class="section" id="overview">
       <div class="section-label">Introduction</div>
       <h2>What is DuPane?</h2>
-      <p class="lead">DuPane is a full-featured, keyboard-driven file manager for macOS power users — a native dual-pane workspace where copy, move, compare, script, and inspect operations are a single keystroke away, without ever touching the mouse or leaving the app.</p>
+      <p class="lead">DuPane is a full-featured file manager for macOS power users — a native dual-pane workspace where copy, move, compare, script, and inspect operations are always within reach. Both keyboard and mouse are fully supported throughout.</p>
 
       <p>Where Finder is built for casual browsing, DuPane is built for <em>work</em>. Every feature is designed to eliminate friction: no window juggling, no switching to Terminal, no hunting for Get Info. The two-pane layout means your source and destination are always visible. The integrated terminal means your shell commands run in-context. Bookmarked folders in the sidebar mean your frequently-used locations are one click away.</p>
 
@@ -677,7 +677,7 @@
         <div class="feature-card">
           <div class="feature-card-icon ic-green">◉</div>
           <h4>Smart Metadata</h4>
-          <p>Dimensions for images, duration for video/audio, line count for code files — loaded in background, always available inline.</p>
+          <p>Dimensions for images, duration for video/audio, line count for code files — shown in the <strong>Info</strong> column (enable it via right-click on any column header), loaded in the background.</p>
         </div>
         <div class="feature-card">
           <div class="feature-card-icon ic-orange">⚡</div>
@@ -707,12 +707,12 @@
         <div class="feature-card">
           <div class="feature-card-icon ic-orange">⊟</div>
           <h4>Column Control</h4>
-          <p>Show, hide, resize, and reorder columns. Per-folder sort preferences. Font size adjustable from 11–16 pt. Everything adapts and persists.</p>
+          <p>Show, hide, resize, and reorder columns. Global sort column and direction. Font size adjustable from 11–16 pt. Everything adapts and persists.</p>
         </div>
       </div>
 
       <h3>Everything customisable, everything persistent</h3>
-      <p>Unlike Finder — where every window forgets your last folder, sort order, and column width — DuPane remembers everything. Your tabs, sort preferences, column widths, sidebar bookmarks, startup folders, colour tags, tab colours, and custom actions all persist across restarts. Start work exactly where you left off.</p>
+      <p>Unlike Finder — where each window starts fresh — DuPane remembers your tabs (including names, colours, and pinned state), column widths and order, sidebar bookmarks, startup folders, and custom actions across restarts. Start work exactly where you left off.</p>
 
       <div class="callout tip">
         <div class="callout-icon">💡</div>
@@ -746,7 +746,7 @@
         <tr><td>Folder disk usage</td><td>Get Info (slow, no chart)</td><td>Live proportional bar chart — top 15 items by size, scanning in background</td></tr>
         <tr><td>Compare two directories</td><td>Not available</td><td>Compare mode: per-row highlights (newer, older, different, only here), one-click sync</td></tr>
         <tr><td>Preview files instantly</td><td>Space for Quick Look (great!)</td><td>Same Space key, without leaving DuPane — multi-file Quick Look with your full selection</td></tr>
-        <tr><td>Adjustable column layout</td><td>Fixed columns per view mode</td><td>Show/hide, resize, reorder columns; adjustable font size; all settings persist per session</td></tr>
+        <tr><td>Adjustable column layout</td><td>Fixed column set in list view (columns resizable but not hideable or reorderable)</td><td>Show/hide, resize, and reorder columns; adjustable font size; all settings persist across restarts</td></tr>
         <tr><td>Colour-tag filtering</td><td>Sidebar shows one tag at a time</td><td>Tag sidebar with multi-tag filter (⌘Click) — filter both panes simultaneously by tag combination</td></tr>
       </table>
 
@@ -755,8 +755,8 @@
       <ul style="color:var(--text2);line-height:2;padding-left:1.4em;">
         <li><strong>Deploying build artefacts?</strong> Split-pane: source on left, server mount on right. Select all, Copy. Done.</li>
         <li><strong>Refactoring a project tree?</strong> Compare mode shows which files differ between two branches (checked out in separate directories). Sync selectively.</li>
-        <li><strong>Batch-renaming generated files?</strong> Custom Action: one <code>for f in $@; do mv "$f" ...</code> line. Run on selection.</li>
-        <li><strong>Checking image assets?</strong> Smart Metadata shows pixel dimensions inline — no need to open each file.</li>
+        <li><strong>Stripping metadata from build outputs?</strong> Custom Action: <code>exiftool -all= $@</code>. One right-click, runs on every selected file.</li>
+        <li><strong>Checking image assets?</strong> Enable the <strong>Info</strong> column (right-click any column header) — pixel dimensions appear inline for every image, no Inspector needed.</li>
         <li><strong>Jumping between multiple projects?</strong> Bookmark each project root — the sidebar gets you there in one click.</li>
         <li><strong>Running git commands?</strong> Command Runner is already in the pane — type <code>git status</code> without opening a separate terminal.</li>
       </ul>
@@ -910,6 +910,9 @@
       <h3>Switching Between Panes</h3>
       <p>Simply click anywhere inside the desired pane. The coloured border shows which pane is active. All toolbar actions (Move, Copy, Delete, New Folder) operate on the <strong>active pane</strong>.</p>
 
+      <h3>Status Bar</h3>
+      <p>Each pane has a status bar at its bottom edge showing the item count, how many items are selected, and the total size of the selection (e.g. <em>24 items, 3 selected (14.2 MB)</em>). When a filter is active it appends <em>(filtered)</em>. When exactly one file is selected, the Smart Metadata value for that file — such as image dimensions, video duration, or line count — appears after a · separator.</p>
+
       <h3>Follow Mode</h3>
       <p>Click the <strong>Follow</strong> button in the toolbar to enable Follow Mode. When active (the button glows blue), any folder you navigate to in the active pane is immediately mirrored to the inactive pane. Enabling Follow Mode also snaps the inactive pane to the active pane's current folder straight away.</p>
       <p>Follow Mode is useful when you want both panes to always show the same directory tree — for example, when exploring a project structure alongside a destination. Click Follow again to turn it off.</p>
@@ -937,7 +940,7 @@
         <tr><td class="shortcut-desc">Reset tab name</td><td class="shortcut-keys">Right-click the tab → <strong>Reset Tab Name</strong> (only shown when a custom name is set)</td></tr>
       </table>
 
-      <p>Right-clicking a tab shows a context menu. <strong>Move to Start / Move Left / Move Right / Move to End</strong> reorder the tab within the strip — options are shown only when they apply (e.g. "Move to Start" is hidden for the first tab). <strong>Pin Tab</strong> captures the tab's current folder, keeps that tab available across launches, and shows a small pin icon in the tab. If you browse elsewhere inside a pinned tab, click the pinned tab again to return to the captured folder. Pinned tabs hide the close button and ignore the close-tab shortcut until you right-click and choose <strong>Unpin Tab</strong>. <strong>Tab Color</strong> tints the tab background with one of eight colours (Red, Orange, Yellow, Green, Blue, Purple, Pink, Graphite); the chosen colour persists across restarts. Choose <strong>None</strong> to clear the tint. <strong>Rename Tab…</strong> opens a prompt where you can type any name for that tab — useful when you have several tabs open in similar folders. The custom name persists across restarts. <strong>Reset Tab Name</strong> removes the custom name and reverts to showing the tab's pinned folder, or the current folder for unpinned tabs.</p>
+      <p>All tab options are available via right-click and are summarised in the table above. Pinned tabs survive restarts and recall their captured folder on click; they hide the close button until unpinned. Tab colours and custom names also persist across restarts.</p>
 
       <div class="callout tip">
         <div class="callout-icon">💡</div>
@@ -965,24 +968,27 @@
       <p>To resize the sidebar, drag the divider between the sidebar and the file panes left or right. The width is saved and restored across restarts. Minimum width is 120 pt, maximum 320 pt.</p>
 
       <h3>Places</h3>
-      <p>The <strong>Places</strong> section shows fixed system locations for instant one-click access: Home, Applications, Desktop, Documents, and Downloads. You can choose which locations appear in <strong>Settings → Sidebar Places</strong> — each can be toggled on or off independently.</p>
+      <p>The <strong>Places</strong> section shows fixed system locations for instant one-click access: Home, Applications, Desktop, Documents, and Downloads. If <strong>iCloud Drive</strong> or <strong>OneDrive</strong> is configured on your Mac, those folders also appear here automatically. You can choose which locations appear in <strong>Settings → Sidebar Places</strong> — each can be toggled on or off independently.</p>
 
       <h3>Recents</h3>
       <p>The <strong>Recents</strong> section automatically tracks the last 12 folders you navigated to in either pane — no configuration needed. The most recently visited folder appears at the top. Right-click any recent item to remove it, or click <strong>Clear Recents</strong> to reset the entire list.</p>
 
       <p>The sidebar also includes a <strong>Tags</strong> section when Finder tags are present in the loaded panes or Spotlight results. The full tag row is clickable. Click a tag to filter both panes to items with that tag; selected tags keep a highlighted background. Click the only selected tag again to clear the filter. <kbd>⌘</kbd>-click additional tags to include more than one tag in the filter.</p>
 
+      <h3>Locations</h3>
+      <p>The <strong>Locations</strong> section appears automatically when external drives are attached — USB drives, Thunderbolt drives, SD cards, and optical media. Click any entry to navigate the active pane to the drive root. Right-click for <strong>Eject</strong> to unmount the drive cleanly. The section disappears when no external drives are connected.</p>
+
       <h3>Network</h3>
       <p>When <strong>Settings → Sidebar → Show Network section</strong> is enabled (the default), a <strong>Network</strong> section appears at the bottom of the sidebar. Each sub-feature can be toggled individually in <strong>Settings → Network</strong>.</p>
 
       <h4>Mounted network volumes</h4>
-      <p>Any currently-mounted network share (SMB, AFP, NFS, WebDAV, etc.) appears in the Network section with its volume name. Click an entry to navigate the active pane to the share root. An <strong>Eject</strong> button unmounts the share cleanly via <code>NSWorkspace</code>. The list updates automatically when shares are mounted or unmounted. Toggle with <strong>Settings → Network → Show mounted network volumes</strong>.</p>
+      <p>Any currently-mounted network share (SMB, AFP, NFS, WebDAV, etc.) appears in the Network section with its volume name. Click an entry to navigate the active pane to the share root. Right-click a mounted share for <strong>Open in Pane</strong>, <strong>Pin to Network Sidebar</strong>, or <strong>Eject</strong> (which unmounts it). The list updates automatically when shares are mounted or unmounted. Toggle with <strong>Settings → Network → Show mounted network volumes</strong>.</p>
 
       <h4>Status indicator</h4>
       <p>A small coloured dot precedes each network entry: <span style="color:green">●</span> green for a currently-mounted share, and <span style="color:gray">●</span> grey for a pinned server that is not yet mounted. Toggle with <strong>Settings → Network → Show status indicator</strong>.</p>
 
       <h4>Pinned servers</h4>
-      <p>Right-click any mounted network volume in the sidebar and choose <strong>Pin to Network Sidebar</strong> to save its URL persistently. Pinned servers appear in the Network section even when not currently mounted — click one to attempt a connection, or right-click for <strong>Connect Now</strong> / <strong>Remove from Pinned</strong>. Toggle visibility with <strong>Settings → Network → Show pinned servers</strong>.</p>
+      <p>Right-click any mounted network volume and choose <strong>Pin to Network Sidebar</strong> to save its URL persistently. Pinned entries stay in the Network section even when not mounted — click one to connect, or right-click for <strong>Connect Now</strong>, <strong>Rename…</strong>, or <strong>Remove from Pinned</strong>. Toggle visibility with <strong>Settings → Network → Show pinned servers</strong>.</p>
 
       <h4>Connect to Server</h4>
       <p>Click <strong>Connect to Server…</strong> to open the connection sheet. Type a server address — for example <code>smb://server/share</code>, <code>afp://server/share</code>, or <code>nfs://server/path</code> — and press <kbd>⏎</kbd> or click <strong>Connect</strong>. macOS handles authentication (prompting for credentials if the share is not already in Keychain) and mounts the share under <code>/Volumes/</code>.</p>
@@ -1128,11 +1134,10 @@
     <section class="section" id="sorting">
       <div class="section-label">Core Features</div>
       <h2>Sorting &amp; Filtering</h2>
-      <p class="lead">DuPane remembers your sort preference for each folder individually, so your code folder always sorts by Name while Downloads stays sorted by Date.</p>
+      <p class="lead">Click any column header to sort; click again to reverse. The active sort column shows a small arrow indicating direction.</p>
 
       <h3>Sorting</h3>
       <p>Click the column headers — <strong>Name</strong>, <strong>Size</strong>, <strong>Kind</strong>, <strong>Modified</strong>, or <strong>Info</strong> — to sort by that column. Click the same column again to reverse the direction. A small arrow shows the current sort direction.</p>
-      <p>DuPane remembers the sort preference per folder, so your code folder stays sorted by Name while Downloads stays sorted by Modified.</p>
 
       <h3>Showing and Hiding Columns</h3>
       <p><strong>Right-click any column header</strong> to reveal a context menu that lets you show or hide the file icon and any of the four optional metadata columns: <strong>Icon</strong>, <strong>Size</strong>, <strong>Kind</strong>, <strong>Modified</strong>, and <strong>Info</strong>. The Name column is always visible. Hiding the Icon column collapses the icon space so the Name column gains the extra room. Column visibility persists across restarts.</p>
@@ -1187,7 +1192,7 @@
 
       <div class="callout tip">
         <div class="callout-icon">💡</div>
-        <p>Select multiple files before pressing Space to flip through them in Quick Look one-by-one.</p>
+        <p>Select multiple files before pressing Space — use <kbd>←</kbd> <kbd>→</kbd> arrow keys inside the Quick Look panel to navigate between them.</p>
       </div>
     </section>
 
@@ -1509,8 +1514,8 @@
           <td>Controls how dates appear in the Modified column. Options: Short (31/12/25), Medium (31 Dec 2025), Long (December 31, 2025), ISO (2025-12-31), Relative (Today, Yesterday, 3d ago).</td>
         </tr>
         <tr>
-          <td>Show time in date modified</td><td>On</td>
-          <td>When on, the Modified column shows the full date and time (e.g. 31 Dec 2025 14:30). When off, only the date is shown.</td>
+          <td>Time in date modified</td><td>24-hour</td>
+          <td>Controls time display in the Modified column. Options: <strong>None</strong> (date only), <strong>12-hour</strong> (2:35 PM), <strong>12-hour + seconds</strong> (2:35:22 PM), <strong>24-hour</strong> (14:35 — default), <strong>24-hour + seconds</strong> (14:35:22).</td>
         </tr>
         <tr>
           <td>Sort folders before files</td><td>On</td>
@@ -1544,7 +1549,10 @@
           <td>Shows the Recents section in the sidebar, listing the last 12 folders you visited. Turn off if you prefer a minimal sidebar.</td>
         </tr>
       </table>
-      <p>Within the Places section, each individual location can be toggled on or off independently. Available locations: <strong>Home</strong>, <strong>Applications</strong>, <strong>Desktop</strong>, <strong>Documents</strong>, <strong>Downloads</strong>. All are enabled by default.</p>
+      <p>Within the Places section, each individual location can be toggled on or off independently. Available locations: <strong>Home</strong>, <strong>Applications</strong>, <strong>Desktop</strong>, <strong>Documents</strong>, <strong>Downloads</strong>. <strong>iCloud Drive</strong> and <strong>OneDrive</strong> appear as additional options when those services are configured on your Mac — both are enabled by default if present.</p>
+
+      <h3>Export &amp; Import Settings</h3>
+      <p>Open the <strong>DuPane</strong> menu → <strong>Export Settings…</strong> to save all your preferences to a <code>.json</code> file. Use <strong>Import Settings…</strong> to restore them — for example when setting up DuPane on a second Mac. All settings apply immediately without a restart.</p>
 
       <h3>Startup Folders</h3>
       <p>Control where each pane opens when DuPane launches. You can set this independently for the left and right panes.</p>
@@ -1649,7 +1657,7 @@
     <strong>DuPane</strong> · Dual-Pane File Manager for macOS
   </div>
   <div style="color:var(--text2);">
-    User Guide · Version 1.52 · Build 313 · macOS 13+
+    User Guide · Version 1.0 · Build 367 · macOS 13+
   </div>
 </footer>
 

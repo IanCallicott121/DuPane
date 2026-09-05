@@ -9,8 +9,6 @@
 
 
 ## Pending
-- Bug - no icloud on the mac air
-- complete the re-name to DuPane from DuPane
 
 ---
 

@@ -204,6 +204,8 @@ struct ContentView: View {
             rightTabs.showHiddenFiles = settings.showHiddenFiles
             leftTabs.showHiddenFolders  = settings.showHiddenFolders
             rightTabs.showHiddenFolders = settings.showHiddenFolders
+            leftTabs.foldersFirst  = settings.foldersFirst
+            rightTabs.foldersFirst = settings.foldersFirst
         }
         .onChange(of: sidebarModel.tags, perform: { tags in
             guard !activeTagFilters.isEmpty else { return }

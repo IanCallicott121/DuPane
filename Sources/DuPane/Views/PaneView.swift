@@ -1023,7 +1023,9 @@ struct PaneView: View {
         let resolved = (try? URL(resolvingAliasFileAt: item.url)) ?? item.url
         let isDir = item.isDirectory ||
             (try? resolved.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true
-        if isDir {
+        if resolved.pathExtension.lowercased() == "app" {
+            NSWorkspace.shared.open(resolved)
+        } else if isDir {
             pane.navigate(to: resolved)
         } else if item.url.pathExtension.lowercased() == "zip" {
             uncompressItem(item.url)
