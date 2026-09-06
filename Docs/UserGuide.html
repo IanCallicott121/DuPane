@@ -608,7 +608,6 @@
     <div class="nav-heading">Smart Features</div>
     <a href="#smart-metadata" class="nav-item">Smart Metadata</a>
     <a href="#command-runner" class="nav-item">Command Runner</a>
-    <a href="#custom-actions" class="nav-item">Actions</a>
     <a href="#folder-size" class="nav-item">Folder Size View</a>
     <a href="#duplicate-finder" class="nav-item">Duplicate Finder</a>
   </div>
@@ -653,7 +652,6 @@
         <li><a href="#tags">Colour Tags</a></li>
         <li><a href="#smart-metadata">Smart Metadata Columns</a></li>
         <li><a href="#command-runner">Command Runner</a></li>
-        <li><a href="#custom-actions">Actions (Custom Scripts)</a></li>
         <li><a href="#folder-size">Folder Size View</a></li>
         <li><a href="#settings">Settings</a></li>
         <li><a href="#shortcuts">Keyboard Shortcuts</a></li>
@@ -678,11 +676,6 @@
           <div class="feature-card-icon ic-green">◉</div>
           <h4>Smart Metadata</h4>
           <p>Dimensions for images, duration for video/audio, line count for code files — shown in the <strong>Info</strong> column (enable it via right-click on any column header), loaded in the background.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-card-icon ic-orange">⚡</div>
-          <h4>Custom Actions</h4>
-          <p>Write one-liner shell scripts that appear in the context menu. <code>$@</code> expands to selected file paths — run any workflow on any file, instantly.</p>
         </div>
         <div class="feature-card">
           <div class="feature-card-icon ic-teal">📑</div>
@@ -741,7 +734,6 @@
         <tr><td>Jump to any folder instantly</td><td>⌘⇧G path dialog (type exact path)</td><td>Click a sidebar bookmark, breadcrumb segment, or press ⌘L to type any path directly</td></tr>
         <tr><td>File metadata inline</td><td>Get Info popup (one file at a time)</td><td>Smart Info column: image dimensions, video duration, code line count — loaded in background, always visible</td></tr>
         <tr><td>Run shell commands</td><td>Switch to Terminal, cd to the folder</td><td>Built-in Command Runner in each pane — commands run in the current directory, output shown inline</td></tr>
-        <tr><td>Automate file operations</td><td>Automator workflows (complex setup)</td><td>Custom Actions: one-liner shell scripts in a text field, <code>$@</code> expands to selected paths</td></tr>
         <tr><td>Full keyboard navigation</td><td>Partial (⌘↑ up, ↩ open)</td><td>⌘[ back, ⌘] forward, ⌘↑ up, ↩ open, ⌘T new tab, ⌘R refresh, Space Quick Look</td></tr>
         <tr><td>Folder disk usage</td><td>Get Info (slow, no chart)</td><td>Live proportional bar chart — top 15 items by size, scanning in background</td></tr>
         <tr><td>Compare two directories</td><td>Not available</td><td>Compare mode: per-row highlights (newer, older, different, only here), one-click sync</td></tr>
@@ -812,7 +804,6 @@
           <div class="mockup-btn">⎘ Copy</div>
           <div class="mockup-btn danger">🗑 Delete</div>
           <div class="mockup-btn">🔖 Bookmark</div>
-          <div class="mockup-btn">⚡ Actions</div>
           <div class="mockup-btn">⎈ Terminal</div>
           <div class="mockup-btn">🔗 Follow</div>
         </div>
@@ -1324,51 +1315,7 @@
 
     <hr class="divider">
 
-    <!-- ─── 13. Custom Actions ─── -->
-    <section class="section" id="custom-actions">
-      <div class="section-label">Smart Features</div>
-      <h2>Actions</h2>
-      <p class="lead">Define your own shell commands and run them on selected files with a single right-click. Actions appear at the bottom of every context menu.</p>
-
-      <h3>Creating an Action</h3>
-      <ol class="steps">
-        <li>Click the <strong>⚡ Actions</strong> button in the toolbar to open the Actions manager.</li>
-        <li>Enter a <strong>Name</strong> (shown in the context menu) and a <strong>Shell command</strong>.</li>
-        <li>Click <strong>Add</strong>. The action is saved and appears immediately in the context menu.</li>
-      </ol>
-
-      <h3>Command Variables</h3>
-      <table class="shortcut-table">
-        <thead><tr><th>Variable</th><th>Expands to</th></tr></thead>
-        <tr><td><code>$@</code></td><td>Space-separated list of selected file paths including filenames (each path is shell-quoted)</td></tr>
-        <tr><td><code>$PWD</code></td><td>The current pane's directory (set automatically by the shell)</td></tr>
-      </table>
-
-      <p>Commands run in a <strong>login shell</strong>, so your <code>$PATH</code>, shell aliases, and functions all work exactly as they do in Terminal.</p>
-
-      <p><strong>Example actions:</strong></p>
-      <div class="terminal-mockup" style="font-size:12px;">
-        <div class="terminal-output" style="padding:14px 16px;">
-          <div style="margin-bottom:8px;"><span style="color:#58a6ff;">Open in VS Code</span> &nbsp;→&nbsp; <span>code $@</span></div>
-          <div style="margin-bottom:8px;"><span style="color:#58a6ff;">Compress selection</span> &nbsp;→&nbsp; <span>zip archive.zip $@</span></div>
-          <div style="margin-bottom:8px;"><span style="color:#58a6ff;">Get image info</span> &nbsp;→&nbsp; <span>sips -g all $@</span></div>
-          <div><span style="color:#58a6ff;">Convert to MP4</span> &nbsp;→&nbsp; <span>ffmpeg -i $@ output.mp4</span></div>
-        </div>
-      </div>
-
-      <h3>Managing Actions</h3>
-      <p>The Actions manager shows <strong>+</strong> / <strong>−</strong> buttons above the list:</p>
-      <ul style="margin:10px 0 14px 20px;font-size:14px;color:var(--text2);line-height:1.7;">
-        <li><strong style="color:var(--text);">+</strong> — clears the form and readies it for a new action</li>
-        <li><strong style="color:var(--text);">Click an action in the list</strong> — selects it and loads its name and command into the edit form for modification</li>
-        <li><strong style="color:var(--text);">−</strong> — deletes the selected action (no undo)</li>
-      </ul>
-      <p>Click <strong>Save</strong> in the edit form to confirm changes. After saving, the form clears automatically and returns to "New Action" ready for the next entry. Click <strong>Cancel</strong> to discard changes without saving.</p>
-    </section>
-
-    <hr class="divider">
-
-    <!-- ─── 14. Folder Size ─── -->
+    <!-- ─── 13. Folder Size ─── -->
     <section class="section" id="folder-size">
       <div class="section-label">Smart Features</div>
       <h2>Folder Size View</h2>
@@ -1657,7 +1604,7 @@
     <strong>DuPane</strong> · Dual-Pane File Manager for macOS
   </div>
   <div style="color:var(--text2);">
-    User Guide · Version 1.0 · Build 367 · macOS 13+
+    User Guide · Version 1.0 · Build 377 · macOS 13+
   </div>
 </footer>
 

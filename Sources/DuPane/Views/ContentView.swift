@@ -12,7 +12,6 @@ struct ContentView: View {
     @StateObject private var leftTabs: TabbedPaneState
     @StateObject private var rightTabs: TabbedPaneState
     @StateObject private var sidebarModel: SidebarModel
-    @StateObject private var customActionsModel: CustomActionsModel
     @EnvironmentObject private var settings: AppSettings
 
     @State private var activePane: PaneSide = .left
@@ -21,7 +20,6 @@ struct ContentView: View {
         let stored = UserDefaults.standard.double(forKey: "sidebarWidth")
         return stored > 0 ? stored : SidebarView.defaultWidth
     }()
-    @State private var showCustomActionsSettings: Bool = false
     @State private var activeTagFilters: Set<String> = []
     @State private var toastMessage: String?
     @State private var showDeleteConfirm = false
@@ -55,7 +53,6 @@ struct ContentView: View {
         _leftTabs  = StateObject(wrappedValue: TabbedPaneState(initialURLs: configuration.leftTabURLs, tabsKey: "leftTabState"))
         _rightTabs = StateObject(wrappedValue: TabbedPaneState(initialURLs: configuration.rightTabURLs, tabsKey: "rightTabState"))
         _sidebarModel = StateObject(wrappedValue: SidebarModel())
-        _customActionsModel = StateObject(wrappedValue: CustomActionsModel())
     }
 
     // MARK: - Body
@@ -85,9 +82,6 @@ struct ContentView: View {
                     onConfirm: performCreateFile,
                     onCancel: { showNewFileSheet = false }
                 )
-            }
-            .sheet(isPresented: $showCustomActionsSettings) {
-                CustomActionsSettingsView(model: customActionsModel)
             }
             .sheet(isPresented: $showDuplicateFinder, onDismiss: { duplicateFinderViewModel.cancel() }) {
                 if let rootURL = duplicateScanURL {
@@ -145,7 +139,6 @@ struct ContentView: View {
                 toolbar
                 panesArea(snapshot: snapshot)
             }
-            .environmentObject(customActionsModel)
             .environmentObject(sidebarModel)
 
         }
@@ -388,7 +381,6 @@ struct ContentView: View {
             onCopy: { self.moveOrCopy(isMove: false) },
             onDelete: requestDelete,
             onRename: { self.active.requestRename = true },
-            onCustomActions: { self.showCustomActionsSettings = true },
             canFindDuplicates: active.currentURL != nil,
             onToggleTerminal: { self.active.showCommandRunner.toggle() },
             onToggleFollow: {

@@ -17,6 +17,7 @@ struct TextPromptSheet: View {
             HStack {
                 Spacer()
                 Button("Cancel", action: onCancel)
+                    .keyboardShortcut(.escape, modifiers: [])
                     .accessibilityIdentifier("text-prompt-cancel-button")
                 Button(confirmLabel, action: onConfirm)
                     .keyboardShortcut(.defaultAction)

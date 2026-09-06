@@ -2,13 +2,6 @@
 
 
 ## Next items
-- Two settings in the menu - remove the first
-- The short-cut key ⌘, does not work to open Settings
-- Remove the Services Menu - not needed
-- Remove the top level Edit, View and Window menus
-- Remove the Actions feature
-- If a dialog panel pops up (e.g. copy conflict) allow the user to dismiss without changes by pressing Escape
-- Help Guide and FAQ do not load / show on Mac Air (html missing)
 
 ## Clarifications
 none
@@ -19,6 +12,16 @@ none
 ---
 
 ## Done
+### Build 377 — Menu cleanup, Actions removal, Escape in dialogs, HTML bundling (2026-09-06)
+
+- **Duplicate Settings menu item removed** — the manual `Button("Settings…")` in `CommandGroup(replacing: .appSettings)` was removed; the `Settings { }` scene now provides the single Settings… entry with ⌘, automatically.
+- **⌘, opens Settings** — fixed as a consequence of removing the conflicting manual button above.
+- **Services menu removed** — `CommandGroup(replacing: .systemServices) {}` added to `DuPaneApp` suppresses the built-in Services menu.
+- **Edit, View, Window menus removed** — `AppDelegate.applicationDidFinishLaunching` removes these three menus from `NSApp.mainMenu` at launch.
+- **Actions feature removed entirely** — `CustomActionsModel.swift` and `CustomActionsSettingsView.swift` deleted. Toolbar button, context menu entries, alert, `requestCustomActionRun`/`executeCustomAction` functions, and the "Show custom shell command notice" Settings toggle all removed from `GlobalToolbar`, `ContentView`, `PaneView`, and `SettingsView`.
+- **Escape dismisses dialog panels** — Cancel button in `TextPromptSheet` gains `.keyboardShortcut(.escape, modifiers: [])` so Escape works in copy-conflict and other prompt dialogs.
+- **Help Guide and FAQ load on all machines** — `openDoc` in `DuPaneApp` now resolves via `Bundle.main.url(forResource:withExtension:)` first. `UserGuide.html` and `FAQs.html` added to the DuPane target's Copy Bundle Resources so they ship inside the app bundle.
+
 ### Build 368 — GitHub CI, contributor infrastructure, .app launch, 12h+seconds time format, iCloud Drive sidebar, menu order fix (2026-09-06)
 
 - **Double-click .app launches app** — `PaneView.open()` intercepts `.app` extension before the `isDir` check and calls `NSWorkspace.shared.open()`, so app bundles launch rather than navigate into the package.

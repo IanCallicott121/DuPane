@@ -24,7 +24,6 @@ struct GlobalToolbar: View {
     let onCopy: () -> Void
     let onDelete: () -> Void
     let onRename: () -> Void
-    let onCustomActions: () -> Void
     let canFindDuplicates: Bool
     let onToggleTerminal: () -> Void
     let onToggleFollow: () -> Void
@@ -122,13 +121,6 @@ struct GlobalToolbar: View {
             }
             .disabled(!bookmarkEnabled)
             .help(isBookmarked ? "Remove Bookmark" : "Add to Sidebar")
-
-            Button(action: onCustomActions) {
-                toolbarLabel("Actions", icon: "bolt.circle")
-                    .foregroundStyle(Color.secondary)
-            }
-            .accessibilityIdentifier("toolbar-custom-actions-button")
-            .help("Manage Custom Actions")
 
             Button(action: onToggleTerminal) {
                 toolbarLabel("Terminal", icon: isTerminalShown ? "terminal.fill" : "terminal")

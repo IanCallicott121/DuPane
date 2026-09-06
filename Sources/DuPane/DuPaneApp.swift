@@ -31,12 +31,8 @@ struct DuPaneApp: App {
                 }
             }
             CommandGroup(replacing: .windowArrangement) {}
+            CommandGroup(replacing: .systemServices) {}
             CommandGroup(replacing: .appSettings) {
-                Button("Settings…") {
-                    NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-                }
-                .keyboardShortcut(",", modifiers: .command)
-                Divider()
                 Button("Export Settings…") { exportSettings() }
                 Button("Import Settings…") { importSettings() }
             }
@@ -48,15 +44,17 @@ struct DuPaneApp: App {
     }
 
     private func openDoc(_ filename: String) {
-        let root = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .appendingPathComponent("Docs")
+        let name = (filename as NSString).deletingPathExtension
+        let ext = (filename as NSString).pathExtension
         let candidates: [URL] = [
-            Bundle.main.bundleURL.deletingLastPathComponent().appendingPathComponent(filename),
+            Bundle.main.url(forResource: name, withExtension: ext),
             Bundle.main.resourceURL?.appendingPathComponent(filename),
-            root.appendingPathComponent(filename)
+            URL(fileURLWithPath: #filePath)
+                .deletingLastPathComponent()
+                .deletingLastPathComponent()
+                .deletingLastPathComponent()
+                .appendingPathComponent("Docs")
+                .appendingPathComponent(filename)
         ].compactMap { $0 }
         for url in candidates where FileManager.default.fileExists(atPath: url.path) {
             NSWorkspace.shared.open(url)
@@ -92,8 +90,6 @@ struct DuPaneApp: App {
     }
 }
 
-/// Ensures normal app behaviour (Dock icon, frontmost window) when running
-/// as a plain Swift Package executable without a signed .app bundle.
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private enum WindowRestore {
         static let minimumSize = NSSize(width: 640, height: 400)
@@ -106,6 +102,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.setActivationPolicy(.regular)
         NSApp.activate(ignoringOtherApps: true)
         NSWindow.allowsAutomaticWindowTabbing = false
+
+        if let mainMenu = NSApp.mainMenu {
+            for title in ["Edit", "View", "Window"] {
+                if let item = mainMenu.item(withTitle: title) {
+                    mainMenu.removeItem(item)
+                }
+            }
+        }
+
         for window in NSApp.windows {
             window.titleVisibility = .hidden
             window.tabbingMode = .disallowed
@@ -118,8 +123,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             window.makeKeyAndOrderFront(nil)
         }
 
-        // Space bar → Quick Look for the active pane's selection.
-        // Skipped when a text field has keyboard focus.
         keyEventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
             guard event.keyCode == 49 else { return event } // 49 = space
             if let fr = NSApp.keyWindow?.firstResponder, fr is NSTextView { return event }
