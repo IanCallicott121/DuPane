@@ -11,7 +11,7 @@ If a dialog panel pops up (e.g. copy conflict) allow the user to dismiss without
 Help Guide and FAQ do not load / show on Mac Air (html missing)
 
 ## Clarifications
-
+none
 
 
 ## Pending
