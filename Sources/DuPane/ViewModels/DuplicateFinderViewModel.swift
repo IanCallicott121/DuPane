@@ -46,6 +46,7 @@ final class DuplicateFinderViewModel: ObservableObject {
                     Task { @MainActor in vm.hashedFiles = count }
                 }
             )
+            guard !Task.isCancelled else { return }
             await MainActor.run {
                 vm.groups = result.groups
                 vm.totalWastedBytes = result.wastedBytes
@@ -171,6 +172,7 @@ final class DuplicateFinderViewModel: ObservableObject {
         }
 
         while true {
+            if Task.isCancelled { return false }
             let firstChunk = firstHandle.readData(ofLength: 1024 * 1024)
             let secondChunk = secondHandle.readData(ofLength: 1024 * 1024)
             guard firstChunk == secondChunk else { return false }
@@ -184,6 +186,7 @@ final class DuplicateFinderViewModel: ObservableObject {
         defer { try? fh.close() }
         var hash: UInt64 = 14695981039346656037
         while true {
+            if Task.isCancelled { return nil }
             let chunk = fh.readData(ofLength: 1024 * 1024)
             if chunk.isEmpty { break }
             for byte in chunk {

@@ -86,6 +86,12 @@ struct SettingsView: View {
         .formStyle(.grouped)
         .frame(width: 460)
         .padding()
+        .background(
+            Button("") { NSApp.sendAction(#selector(NSWindow.performClose(_:)), to: nil, from: nil) }
+                .keyboardShortcut(.escape, modifiers: [])
+                .opacity(0)
+                .allowsHitTesting(false)
+        )
     }
 
     private func placesRow(_ name: String) -> some View {
