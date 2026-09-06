@@ -1,0 +1,21 @@
+name: PR Check
+
+on:
+  pull_request:
+    types: [opened, edited, reopened]
+
+jobs:
+  require-description:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require non-empty PR description
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          # Strip whitespace and template comment lines (<!-- ... -->)
+          stripped=$(echo "$PR_BODY" | sed '/^<!--/,/-->/d' | tr -d '[:space:]')
+          if [ -z "$stripped" ]; then
+            echo "❌ PR description is empty. Please describe what changed and why."
+            exit 1
+          fi
+          echo "✅ PR description present."

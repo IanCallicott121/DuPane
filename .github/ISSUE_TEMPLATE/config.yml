@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: User Guide
+    url: https://github.com/IanCallicott121/DuPane/blob/main/Docs/UserGuide.html
+    about: Read the full user guide before opening an issue
+  - name: FAQs
+    url: https://github.com/IanCallicott121/DuPane/blob/main/Docs/FAQs.html
+    about: Check the FAQs — your question may already be answered
