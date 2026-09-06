@@ -148,30 +148,30 @@ final class FileRowViewFormatDateTests: XCTestCase {
         XCTAssertEqual(FileRowView.formatDate(nil), "—")
     }
 
-    func testMediumStyleOmitsTimeWhenShowTimeFalse() {
-        let result = FileRowView.formatDate(fixedDate, style: .medium, showTime: false)
+    func testMediumStyleOmitsTimeWhenStyleNone() {
+        let result = FileRowView.formatDate(fixedDate, style: .medium, timeStyle: .none)
         XCTAssertFalse(result.contains(":"), "Date-only medium format must not contain ':' — got '\(result)'")
         XCTAssertTrue(result.contains("2025"))
     }
 
-    func testMediumStyleIncludesTimeWhenShowTimeTrue() {
-        let result = FileRowView.formatDate(fixedDate, style: .medium, showTime: true)
-        XCTAssertTrue(result.contains("14:30"), "Medium+time format must contain '14:30' — got '\(result)'")
+    func testMediumStyleIncludesTimeWhen24Hour() {
+        let result = FileRowView.formatDate(fixedDate, style: .medium, timeStyle: .twentyFour)
+        XCTAssertTrue(result.contains("14:30"), "Medium+24h format must contain '14:30' — got '\(result)'")
     }
 
     func testISOStyleDateOnlyFormat() {
-        let result = FileRowView.formatDate(fixedDate, style: .iso, showTime: false)
+        let result = FileRowView.formatDate(fixedDate, style: .iso, timeStyle: .none)
         XCTAssertEqual(result, "2025-12-31")
     }
 
     func testISOStyleDateAndTimeFormat() {
-        let result = FileRowView.formatDate(fixedDate, style: .iso, showTime: true)
+        let result = FileRowView.formatDate(fixedDate, style: .iso, timeStyle: .twentyFour)
         XCTAssertEqual(result, "2025-12-31 14:30")
     }
 
     func testRelativeStyleTodayWithTimeContainsColon() {
         let todayWithTime = Calendar.current.date(bySettingHour: 14, minute: 30, second: 0, of: Date())!
-        let result = FileRowView.formatDate(todayWithTime, style: .relative, showTime: true)
+        let result = FileRowView.formatDate(todayWithTime, style: .relative, timeStyle: .twentyFour)
         XCTAssertTrue(result.hasPrefix("Today"), "Expected 'Today' prefix — got '\(result)'")
         XCTAssertTrue(result.contains(":"), "Expected time separator in '\(result)'")
     }
@@ -247,7 +247,7 @@ final class AppSettingsNewDefaultsTests: XCTestCase {
             "showSidebarPlaces",
             "showSidebarRecents",
             "foldersFirst",
-            "showTimeInDate",
+            "timeFormatStyle",
             "showCustomShellCommandNotice"
         ]
         keys.forEach { UserDefaults.standard.removeObject(forKey: $0) }
@@ -257,7 +257,7 @@ final class AppSettingsNewDefaultsTests: XCTestCase {
         XCTAssertTrue(settings.showSidebarPlaces, "showSidebarPlaces must default true")
         XCTAssertTrue(settings.showSidebarRecents, "showSidebarRecents must default true")
         XCTAssertTrue(settings.foldersFirst, "foldersFirst must default true")
-        XCTAssertTrue(settings.showTimeInDate, "showTimeInDate must default true")
+        XCTAssertNotEqual(settings.timeFormatStyle, .none, "time in date must be enabled by default")
         XCTAssertTrue(settings.showCustomShellCommandNotice, "showCustomShellCommandNotice must default true")
     }
 }
