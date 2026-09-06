@@ -143,53 +143,7 @@ struct ContentView: View {
         return ZStack {
             VStack(spacing: 0) {
                 toolbar
-                HStack(spacing: Layout.paneSpacing) {
-                    if showSidebar {
-                        SidebarView(
-                            model: sidebarModel,
-                            selectedTags: activeTagFilters,
-                            onNavigate: { url in
-                                active.navigate(to: url)
-                            },
-                            onTagSelected: applyTagFilter
-                        )
-                        .frame(width: sidebarWidth)
-                        .overlay(alignment: .trailing) {
-                            SidebarResizeHandle(width: $sidebarWidth)
-                                .frame(width: Layout.resizeHandleWidth)
-                                .offset(x: Layout.resizeHandleWidth / 2)
-                        }
-                        .layoutPriority(1)
-                    }
-                    TabbedPaneView(
-                        tabs: leftTabs,
-                        side: .left,
-                        isActive: activePane == .left,
-                        accentColor: .blue,
-                        otherPaneLabel: pathLabel(rightTabs),
-                        compareStatuses: snapshot?.leftStatuses ?? [:],
-                        compareSummaryText: snapshot?.summary.detailText,
-                        onActivate: { activePane = .left },
-                        onMoveRequested: { activePane = .left; moveOrCopy(isMove: true) },
-                        onCopyRequested: { activePane = .left; moveOrCopy(isMove: false) },
-                        onDeleteRequested: { activePane = .left; requestDelete() }
-                    )
-                    TabbedPaneView(
-                        tabs: rightTabs,
-                        side: .right,
-                        isActive: activePane == .right,
-                        accentColor: .blue,
-                        otherPaneLabel: pathLabel(leftTabs),
-                        compareStatuses: snapshot?.rightStatuses ?? [:],
-                        compareSummaryText: snapshot?.summary.detailText,
-                        onActivate: { activePane = .right },
-                        onMoveRequested: { activePane = .right; moveOrCopy(isMove: true) },
-                        onCopyRequested: { activePane = .right; moveOrCopy(isMove: false) },
-                        onDeleteRequested: { activePane = .right; requestDelete() }
-                    )
-                }
-                .padding(.horizontal, Layout.outerMargin)
-                .padding(.bottom, Layout.outerMargin)
+                panesArea(snapshot: snapshot)
             }
             .environmentObject(customActionsModel)
             .environmentObject(sidebarModel)
@@ -268,63 +222,7 @@ struct ContentView: View {
                 leftTabs.activePaneState.navigate(to: url)
             }
         })
-        .background {
-            Group {
-                Button("New Tab") { activeTabs.openTab() }
-                    .keyboardShortcut("t", modifiers: .command)
-                Button("Close Tab") { activeTabs.closeTab(at: activeTabs.activeTabIndex) }
-                    .keyboardShortcut("w", modifiers: .command)
-                Button("Go Back") { active.goBack() }
-                    .keyboardShortcut("[", modifiers: .command)
-                Button("Go Forward") { active.goForward() }
-                    .keyboardShortcut("]", modifiers: .command)
-                Button("Go Up") { active.goUp() }
-                    .keyboardShortcut(.upArrow, modifiers: .command)
-                Button("Open Selected") { openSelected() }
-                    .keyboardShortcut(.return, modifiers: [])
-                Button("Open Selected") { openSelected() }
-                    .keyboardShortcut(.downArrow, modifiers: .command)
-                Button("Refresh") { active.load() }
-                    .keyboardShortcut("r", modifiers: .command)
-                Button("Select All") { active.selectAll() }
-                    .keyboardShortcut("a", modifiers: .command)
-                Button("Go to Path") { active.requestGoToPath = true }
-                    .keyboardShortcut("l", modifiers: .command)
-                Button("Go to Path") { active.requestGoToPath = true }
-                    .keyboardShortcut("g", modifiers: [.command, .shift])
-                Button("Go Home") { active.navigate(to: FileManager.default.homeDirectoryForCurrentUser) }
-                    .keyboardShortcut("h", modifiers: [.command, .shift])
-                Button("Go Desktop") { active.navigate(to: FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")) }
-                    .keyboardShortcut("d", modifiers: [.command, .shift])
-                Button("Go Documents") { active.navigate(to: FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Documents")) }
-                    .keyboardShortcut("o", modifiers: [.command, .shift])
-                Button("Go Computer") { active.navigate(to: nil) }
-                    .keyboardShortcut("c", modifiers: [.command, .shift])
-                Button("Go Applications") { active.navigate(to: URL(fileURLWithPath: "/Applications")) }
-                    .keyboardShortcut("a", modifiers: [.command, .shift])
-                Button("Go Utilities") { active.navigate(to: URL(fileURLWithPath: "/Applications/Utilities")) }
-                    .keyboardShortcut("u", modifiers: [.command, .shift])
-                Button("Copy to Other Pane") { moveOrCopy(isMove: false) }
-                    .keyboardShortcut("c", modifiers: .command)
-                Button("Move to Other Pane") { moveOrCopy(isMove: true) }
-                    .keyboardShortcut("v", modifiers: .command)
-                Button("Duplicate") { active.duplicate() }
-                    .keyboardShortcut("d", modifiers: .command)
-                Button("Quick Look") {
-                    let urls = active.selectedItems.map { $0.url }
-                    guard !urls.isEmpty else { return }
-                    QuickLookCoordinator.shared.toggle(urls: urls)
-                }
-                .keyboardShortcut(" ", modifiers: [])
-                Button("Get Info") { active.requestGetInfo = true }
-                    .keyboardShortcut("i", modifiers: .command)
-                Button("Focus Filter") { active.requestFocusFilter = true }
-                    .keyboardShortcut("f", modifiers: .command)
-            }
-            .frame(width: 0, height: 0)
-            .opacity(0)
-            .accessibilityHidden(true)
-        }
+        .background { keyboardButtons }
         .overlay(alignment: .bottom) {
             if fileOpVisible, let info = fileOpInfo {
                 VStack(spacing: 4) {
@@ -355,6 +253,113 @@ struct ContentView: View {
                     .padding(.bottom, 34)
                     .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
+        }
+    }
+
+    @ViewBuilder
+    private func panesArea(snapshot: FolderCompareSnapshot?) -> some View {
+        HStack(spacing: Layout.paneSpacing) {
+            if showSidebar {
+                SidebarView(
+                    model: sidebarModel,
+                    selectedTags: activeTagFilters,
+                    onNavigate: { url in active.navigate(to: url) },
+                    onTagSelected: applyTagFilter
+                )
+                .frame(width: sidebarWidth)
+                .overlay(alignment: .trailing) {
+                    SidebarResizeHandle(width: $sidebarWidth)
+                        .frame(width: Layout.resizeHandleWidth)
+                        .offset(x: Layout.resizeHandleWidth / 2)
+                }
+                .layoutPriority(1)
+            }
+            TabbedPaneView(
+                tabs: leftTabs,
+                side: .left,
+                isActive: activePane == .left,
+                accentColor: .blue,
+                otherPaneLabel: pathLabel(rightTabs),
+                compareStatuses: snapshot?.leftStatuses ?? [:],
+                compareSummaryText: snapshot?.summary.detailText,
+                onActivate: { activePane = .left },
+                onMoveRequested: { activePane = .left; moveOrCopy(isMove: true) },
+                onCopyRequested: { activePane = .left; moveOrCopy(isMove: false) },
+                onDeleteRequested: { activePane = .left; requestDelete() }
+            )
+            TabbedPaneView(
+                tabs: rightTabs,
+                side: .right,
+                isActive: activePane == .right,
+                accentColor: .blue,
+                otherPaneLabel: pathLabel(leftTabs),
+                compareStatuses: snapshot?.rightStatuses ?? [:],
+                compareSummaryText: snapshot?.summary.detailText,
+                onActivate: { activePane = .right },
+                onMoveRequested: { activePane = .right; moveOrCopy(isMove: true) },
+                onCopyRequested: { activePane = .right; moveOrCopy(isMove: false) },
+                onDeleteRequested: { activePane = .right; requestDelete() }
+            )
+        }
+        .padding(.horizontal, Layout.outerMargin)
+        .padding(.bottom, Layout.outerMargin)
+    }
+
+    @ViewBuilder
+    private var keyboardButtons: some View {
+        Group {
+            Button("New Tab") { activeTabs.openTab() }
+                .keyboardShortcut("t", modifiers: .command)
+            Button("Close Tab") { activeTabs.closeTab(at: activeTabs.activeTabIndex) }
+                .keyboardShortcut("w", modifiers: .command)
+            Button("Go Back") { active.goBack() }
+                .keyboardShortcut("[", modifiers: .command)
+            Button("Go Forward") { active.goForward() }
+                .keyboardShortcut("]", modifiers: .command)
+            Button("Go Up") { active.goUp() }
+                .keyboardShortcut(.upArrow, modifiers: .command)
+            Button("Open Selected") { openSelected() }
+                .keyboardShortcut(.return, modifiers: [])
+            Button("Open Selected") { openSelected() }
+                .keyboardShortcut(.downArrow, modifiers: .command)
+            Button("Refresh") { active.load() }
+                .keyboardShortcut("r", modifiers: .command)
+            Button("Select All") { active.selectAll() }
+                .keyboardShortcut("a", modifiers: .command)
+            Button("Go to Path") { active.requestGoToPath = true }
+                .keyboardShortcut("l", modifiers: .command)
+        }
+        Group {
+            Button("Go to Path") { active.requestGoToPath = true }
+                .keyboardShortcut("g", modifiers: [.command, .shift])
+            Button("Go Home") { active.navigate(to: FileManager.default.homeDirectoryForCurrentUser) }
+                .keyboardShortcut("h", modifiers: [.command, .shift])
+            Button("Go Desktop") { active.navigate(to: FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")) }
+                .keyboardShortcut("d", modifiers: [.command, .shift])
+            Button("Go Documents") { active.navigate(to: FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Documents")) }
+                .keyboardShortcut("o", modifiers: [.command, .shift])
+            Button("Go Computer") { active.navigate(to: nil) }
+                .keyboardShortcut("c", modifiers: [.command, .shift])
+            Button("Go Applications") { active.navigate(to: URL(fileURLWithPath: "/Applications")) }
+                .keyboardShortcut("a", modifiers: [.command, .shift])
+            Button("Go Utilities") { active.navigate(to: URL(fileURLWithPath: "/Applications/Utilities")) }
+                .keyboardShortcut("u", modifiers: [.command, .shift])
+            Button("Copy to Other Pane") { moveOrCopy(isMove: false) }
+                .keyboardShortcut("c", modifiers: .command)
+            Button("Move to Other Pane") { moveOrCopy(isMove: true) }
+                .keyboardShortcut("v", modifiers: .command)
+            Button("Duplicate") { active.duplicate() }
+                .keyboardShortcut("d", modifiers: .command)
+            Button("Quick Look") {
+                let urls = active.selectedItems.map { $0.url }
+                guard !urls.isEmpty else { return }
+                QuickLookCoordinator.shared.toggle(urls: urls)
+            }
+            .keyboardShortcut(" ", modifiers: [])
+            Button("Get Info") { active.requestGetInfo = true }
+                .keyboardShortcut("i", modifiers: .command)
+            Button("Focus Filter") { active.requestFocusFilter = true }
+                .keyboardShortcut("f", modifiers: .command)
         }
     }
 
