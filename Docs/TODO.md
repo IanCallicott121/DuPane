@@ -2,13 +2,13 @@
 
 
 ## Next items
-two settings in the menu - remove the first
-The short-cut key ,command does not work to get to setting
-Remove the Services Menu - not needed
-Remove the top level Edit, View and Window menus
-Remove the Actions feature
-If a dialog panel pops up (e.g. copy conflict) allow the user to dismiss without changes by pressing Escape
-Help Guide and FAQ do not load / show on Mac Air (html missing)
+- Two settings in the menu - remove the first
+- The short-cut key ⌘, does not work to open Settings
+- Remove the Services Menu - not needed
+- Remove the top level Edit, View and Window menus
+- Remove the Actions feature
+- If a dialog panel pops up (e.g. copy conflict) allow the user to dismiss without changes by pressing Escape
+- Help Guide and FAQ do not load / show on Mac Air (html missing)
 
 ## Clarifications
 none
