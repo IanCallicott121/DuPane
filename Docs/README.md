@@ -1,4 +1,4 @@
-# /Opus
+# /DuPane
 
 A native macOS dual-pane file manager built with SwiftUI, modelled on
 Directory Opus. Real, unsandboxed code that moves, copies, renames, and
