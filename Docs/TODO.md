@@ -3,6 +3,42 @@
 
 ## Next items
 
+### Bug fixes — Critical
+
+- **`SmartMetadataService` unbounded cache** — `cache: [URL: String]` grows forever with no eviction or invalidation on rename/replace. Cap size and add LRU or clear on navigation. (`Models/SmartMetadataService.swift`)
+- **`PaneState` sortPref UserDefaults leak** — every visited folder writes a `"sortPref_<full path>"` key. No cleanup; defaults grow unbounded over time. Add a pruning strategy. (`ViewModels/PaneState.swift`)
+- **`ProcessRunner.run` blocks thread pool** — `process.waitUntilExit()` is synchronous inside an `async` context and blocks a cooperative thread for the full archive operation. Replace with a continuation + `terminationHandler`. (`Models/FileOperationService.swift`)
+- **`FolderSizeViewModel` no cancellation in enumeration** — `directorySize(url:)` recursive loop has no `Task.isCancelled` check; cancelling the sheet leaves the scan running to completion. Add cancellation checks inside the loop. (`ViewModels/FolderSizeViewModel.swift`)
+- **`DuplicateFinderViewModel` progress tasks fire after cancel** — fire-and-forget `Task` closures in progress callbacks capture `vm` strongly and mutate state after the scan is cancelled. Guard with cancellation check or use `AsyncStream`. (`ViewModels/DuplicateFinderViewModel.swift`)
+
+### Bug fixes — Medium
+
+- **`FileOperationService.moveOrCopy` subtree guard aborts entire batch** — guard exits early when any one item would copy into itself; other unrelated items in the batch are never processed. Skip only the offending item. (`Models/FileOperationService.swift`)
+- **`ContentView.showToast` race** — a second toast before the first's `asyncAfter` fires clears the second toast prematurely. Capture and compare the message in the closure. (`Views/ContentView.swift`)
+- **Dead `lastLeftURL`/`lastRightURL` UserDefaults writes** — `ContentView` writes these keys but they are never read (tab-state JSON takes over first). Remove the dead writes. (`Views/ContentView.swift`, `Models/AppLaunchConfiguration.swift`)
+- **`SidebarModel.recordVisit` and `init` block main thread** — `FileManager.fileExists` called synchronously on the main actor per bookmark and per recent URL. Move to a background task. (`Models/SidebarModel.swift`)
+- **`FolderCompareService` directory kind mismatch** — two dirs with the same name compare as `.different` if `localizedTypeDescription` differs (e.g. iCloud alias vs Folder). Exclude `kind` from directory equality. (`Models/FolderCompareService.swift`)
+- **`TabbedPaneView` calls `pane.load()` on every tab switch** — fires a directory read even when tab contents are current, causing unnecessary I/O and flicker. Only load if the tab has never loaded or its URL changed. (`Views/TabbedPaneView.swift`)
+- **`SidebarView` remove-from-recents calls `fileExists` O(n) times** — clear-then-re-record rebuilds the list by calling `recordVisit` for every remaining URL. Add a targeted `removeRecent(_ url:)` method to `SidebarModel`. (`Views/SidebarView.swift`, `Models/SidebarModel.swift`)
+- **`ArchiveExtractionSafety` conflict check misses subdirectory conflicts** — `fileExists` on a path whose intermediate dirs don't exist returns false; only top-level conflicts are detected. (`Models/ArchiveExtractionSafety.swift`)
+- **`NetworkVolumeMonitor` Bonjour delegate mutates `@Published` on background thread** — `BonjourBrowserDelegate` callbacks fire on the `NetServiceBrowser` queue without a `DispatchQueue.main` hop. (`Models/NetworkVolumeMonitor.swift`)
+- **`DuplicateFinderView` resolved groups linger** — after trashing all-but-one duplicate, the kept file stays in the list indefinitely with no dismiss affordance. Add a "Dismiss resolved" or "Rescan" action. (`Views/DuplicateFinderView.swift`)
+- **`ContentView.performDelete` peer-pane nav uses first deleted URL** — if multiple items are deleted and the peer pane is inside a later one, the nav target points to the wrong parent. (`Views/ContentView.swift`)
+
+### Bug fixes — Low / Inconsistencies
+
+- **`FileRowView.formatDate` creates `DateFormatter` per call** — expensive to construct per row per render. Cache as `static` properties. (`Views/FileRowView.swift`)
+- **`finderTagColor` duplicated in three files** — identical `switch name.lowercased()` in `FileRowView`, `SidebarView`, and `PropertiesView`. Extract to a shared function. (`Views/FileRowView.swift`, `Views/SidebarView.swift`, `Views/PropertiesView.swift`)
+- **`SmartMetadataService.lineCount` off-by-one** — `total = count + 1` overcounts by 1 for files ending with a newline (the common case). (`Models/SmartMetadataService.swift`)
+- **`QuickLookCoordinator.toggle` requires double-Space to change selection** — calls `orderOut` when panel is visible with new URLs instead of refreshing in place. (`Views/QuickLookCoordinator.swift`)
+- **`ColumnResizeHandle.anyIsDragging` stuck on missed mouseUp** — static flag never reset if `mouseUp` is missed (focus lost mid-drag), permanently suppressing cursor reset for all handles until restart. (`Views/ColumnResizeHandle.swift`)
+- **`TabbedPaneState.fallbackMetadataIndex` guard too permissive** — accepts count match on `savedLabels` or `savedPins` even when `savedPaths` count doesn't match; can restore metadata to wrong tabs after a tab count change. (`ViewModels/TabbedPaneState.swift`)
+- **`SidebarView.connectToServer` clears suppressed paths on every connect** — `clearSuppressedPaths()` called unconditionally, restoring volumes the user deliberately hid. (`Views/SidebarView.swift`)
+- **`PaneState.rename` / `duplicate` capture `self` strongly in `Task.detached`** — if the tab is closed mid-operation the pane stays alive and `load()` fires on a dead pane. Use `[weak self]`. (`ViewModels/PaneState.swift`)
+- **`AppLaunchConfiguration` command-line URL always `isDirectory: true`** — spurious trailing slash affects path comparisons for file arguments. (`Models/AppLaunchConfiguration.swift`)
+- **`PaneState.duplicate()` with no `currentURL` silently returns** — no user feedback when called at Computer root. (`ViewModels/PaneState.swift`)
+- **`networkBonjourDiscovery` label misleading** — setting labelled "in Connect sheet" also controls sidebar Bonjour browsing. Update label. (`Models/AppSettings.swift`, `Views/SettingsView.swift`)
+
 ## Clarifications
 none
 
