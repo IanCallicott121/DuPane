@@ -18,7 +18,9 @@ Xcode project in sync.
 
 ## Build & test workflow
 - Build: use `BuildProject` MCP tool targeting `DuPane`.
-- Tests: `swift test --filter DuPaneUITests` (SPM unit tests). All 100 tests pass; 0 failures.
+- Tests: `swift test --filter DuPaneUITests` (SPM unit tests). All 234 tests pass; 0 failures.
+  In Xcode, open the DuPane **folder** (not the .xcodeproj) to get the `DuPane-Package`
+  scheme — ⌘U there runs the unit tests. The .xcodeproj scheme only runs the 10 e2e UI tests.
 - Fix all build errors before declaring work done.
 - update the build number in settings > about and in the user manual
 

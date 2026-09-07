@@ -14,8 +14,23 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Build
+      # `shell: bash` sets -o pipefail. Without it a failing command piped into
+      # `tail` reports tail's exit code and the step passes on a broken build.
+      - name: Build (SPM)
+        shell: bash
         run: swift build 2>&1 | tail -5
 
-      - name: Run unit tests
+      - name: Run unit tests (SPM)
+        shell: bash
         run: swift test --filter DuPaneUITests 2>&1
+
+      # Catches a stale DuPane.xcodeproj — SPM reads Package.swift and never
+      # touches the pbxproj, so file references orphaned by a deletion (as in
+      # Build 377) stay invisible to the steps above.
+      - name: Build Xcode project
+        shell: bash
+        run: |
+          xcodebuild -project DuPane.xcodeproj -scheme DuPane \
+            -destination 'platform=macOS' \
+            CODE_SIGNING_ALLOWED=NO \
+            build 2>&1 | tail -20

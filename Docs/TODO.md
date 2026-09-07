@@ -3,6 +3,29 @@
 
 ## Next items
 
+- **`testCriticalRenameFileThroughToolbarSheet` fails** — the only failure in the e2e suite
+  (10 tests, 9 passing). Fails at `DuPaneEndToEndUITests.swift:53`, "XCTAssertTrue failed":
+  after confirming the rename, `left-file-row-renamed-alpha.txt` never appears within 5s.
+  Line 47 passes, so the sheet opens and the name field is found; the confirm button is found
+  and clicked (`clickToolbarButton` asserts existence first and that assertion passes).
+  Prime suspect: line 49 `nameField.typeKey("a", modifierFlags: .command)` is not selecting
+  all. `PaneView.beginRename` preloads the field with the existing name, so if ⌘A no-ops the
+  typed text is inserted alongside "alpha.txt" and the file is renamed to something neither
+  assertion expects — which fits the evidence (the old row would still disappear, the new one
+  never appears). Verify by asserting on the field's value after line 50, or replace the
+  select-all with a clear. Not related to the `PaneView` dead-code removal (app builds clean).
+
+- **CI has been red since Build 377 (unverified — check the Actions tab).** Build 377 deleted
+  `CustomActionsModel.swift` but left `CustomActionsModelTests` in `DuPaneFunctionTests.swift`,
+  so the unit-test target did not compile. `ci.yml` runs `swift build` + `swift test`, so those
+  runs should have been failing. Fixed in this session: the 4 orphaned tests were removed and
+  the class renamed to `ProcessRunnerTests` (its 2 surviving `ProcessRunner` tests were kept).
+  Unit suite now 234 tests, 0 failures.
+- **Stale `.xcodeproj` was committed.** `project.pbxproj` still referenced the two deleted
+  CustomActions source files; a clean clone would fail to build in Xcode. CI never caught it
+  because SPM ignores the pbxproj. 8 lines removed this session — regenerate with `xcodegen`
+  when convenient to confirm it round-trips.
+
 ## Clarifications
 none
 
