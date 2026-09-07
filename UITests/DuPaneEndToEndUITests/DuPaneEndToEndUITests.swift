@@ -46,7 +46,8 @@ final class DuPaneEndToEndUITests: XCTestCase {
         let nameField = app.textFields["text-prompt-name-field"]
         XCTAssertTrue(nameField.waitForExistence(timeout: 5))
         nameField.click()
-        nameField.typeKey("a", modifierFlags: .command)
+        nameField.typeKey(.rightArrow, modifierFlags: .command)
+        nameField.typeKey(.leftArrow, modifierFlags: [.command, .shift])
         nameField.typeText("renamed-alpha.txt")
         clickToolbarButton("text-prompt-confirm-button")
 
