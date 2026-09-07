@@ -69,6 +69,7 @@ final class FolderSizeViewModel: ObservableObject {
         ) else { return 0 }
         var total: Int64 = 0
         for case let fileURL as URL in enumerator {
+            if Task.isCancelled { return total }
             if let size = (try? fileURL.resourceValues(forKeys: [.fileSizeKey]))?.fileSize {
                 total += Int64(size)
             }

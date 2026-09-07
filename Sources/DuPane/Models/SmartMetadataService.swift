@@ -10,6 +10,8 @@ final class SmartMetadataService: ObservableObject {
     private init() {}
 
     @Published private(set) var cache: [URL: String] = [:]
+    private var cacheOrder: [URL] = []
+    private static let cacheMaxSize = 500
     private var pending: Set<URL> = []
 
     func info(for item: FileItem) -> String? { cache[item.url] }
@@ -24,7 +26,14 @@ final class SmartMetadataService: ObservableObject {
                 let result = await Self.compute(url: url, ext: ext)
                 await MainActor.run {
                     self.pending.remove(url)
-                    if let result { self.cache[url] = result }
+                    if let result {
+                        self.cache[url] = result
+                        self.cacheOrder.append(url)
+                        if self.cacheOrder.count > Self.cacheMaxSize {
+                            let oldest = self.cacheOrder.removeFirst()
+                            self.cache.removeValue(forKey: oldest)
+                        }
+                    }
                 }
             }
         }
@@ -73,6 +82,7 @@ final class SmartMetadataService: ObservableObject {
         while true {
             let chunk = fh.readData(ofLength: 65_536)
             guard !chunk.isEmpty else { break }
+            if chunk.contains(0) { return nil }
             hasContent = true
             count += chunk.filter { $0 == newline }.count
             lastByte = chunk[chunk.count - 1]

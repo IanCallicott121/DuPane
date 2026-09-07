@@ -259,14 +259,21 @@ enum ProcessRunner {
         process.standardOutput = outPipe
         process.standardError = errPipe
 
-        try process.run()
-        let stdoutTask = Task.detached {
-            outPipe.fileHandleForReading.readDataToEndOfFile()
+        // Drain pipes concurrently to prevent pipe-buffer-full deadlocks with chatty processes.
+        let stdoutTask = Task.detached { outPipe.fileHandleForReading.readDataToEndOfFile() }
+        let stderrTask = Task.detached { errPipe.fileHandleForReading.readDataToEndOfFile() }
+
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Error>) in
+            process.terminationHandler = { _ in continuation.resume() }
+            do {
+                try process.run()
+            } catch {
+                // Close write ends so the drain tasks unblock on run failure.
+                outPipe.fileHandleForWriting.closeFile()
+                errPipe.fileHandleForWriting.closeFile()
+                continuation.resume(throwing: error)
+            }
         }
-        let stderrTask = Task.detached {
-            errPipe.fileHandleForReading.readDataToEndOfFile()
-        }
-        process.waitUntilExit()
 
         let stdoutData = await stdoutTask.value
         let stderrData = await stderrTask.value

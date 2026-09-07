@@ -241,33 +241,57 @@ struct FileRowView: View {
         return ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)
     }
 
+    private static let dateFormatterShort: DateFormatter = {
+        let f = DateFormatter(); f.dateFormat = "dd/MM/yy"; return f
+    }()
+    private static let dateFormatterMedium: DateFormatter = {
+        let f = DateFormatter(); f.dateFormat = "d MMM yyyy"; return f
+    }()
+    private static let dateFormatterLong: DateFormatter = {
+        let f = DateFormatter(); f.dateStyle = .long; f.timeStyle = .none; return f
+    }()
+    private static let dateFormatterISO: DateFormatter = {
+        let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; return f
+    }()
+    private static let timeFormatter12h: DateFormatter = {
+        let f = DateFormatter(); f.dateFormat = "h:mm a"; return f
+    }()
+    private static let timeFormatter12hSec: DateFormatter = {
+        let f = DateFormatter(); f.dateFormat = "h:mm:ss a"; return f
+    }()
+    private static let timeFormatter24h: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.dateFormat = "HH:mm"
+        return f
+    }()
+    private static let timeFormatter24hSec: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.dateFormat = "HH:mm:ss"
+        return f
+    }()
+
     static func formatDate(_ date: Date?, style: DateFormatStyle = .medium, timeStyle: TimeFormatStyle = .none) -> String {
         guard let date else { return "—" }
         let timeSuffix: String = {
-            guard let fmt = timeStyle.formatString else { return "" }
-            let f = DateFormatter()
-            if timeStyle.usesPOSIXLocale { f.locale = Locale(identifier: "en_US_POSIX") }
-            f.dateFormat = " " + fmt
-            return f.string(from: date)
+            switch timeStyle {
+            case .none: return ""
+            case .twelve: return " " + timeFormatter12h.string(from: date)
+            case .twelveWithSeconds: return " " + timeFormatter12hSec.string(from: date)
+            case .twentyFour: return " " + timeFormatter24h.string(from: date)
+            case .withSeconds: return " " + timeFormatter24hSec.string(from: date)
+            }
         }()
         switch style {
         case .short:
-            let f = DateFormatter()
-            f.dateFormat = "dd/MM/yy"
-            return f.string(from: date) + timeSuffix
+            return dateFormatterShort.string(from: date) + timeSuffix
         case .medium:
-            let f = DateFormatter()
-            f.dateFormat = "d MMM yyyy"
-            return f.string(from: date) + timeSuffix
+            return dateFormatterMedium.string(from: date) + timeSuffix
         case .long:
-            let f = DateFormatter()
-            f.dateStyle = .long
-            f.timeStyle = .none
-            return f.string(from: date) + timeSuffix
+            return dateFormatterLong.string(from: date) + timeSuffix
         case .iso:
-            let f = DateFormatter()
-            f.dateFormat = "yyyy-MM-dd"
-            return f.string(from: date) + timeSuffix
+            return dateFormatterISO.string(from: date) + timeSuffix
         case .relative:
             let cal = Calendar.current
             if cal.isDateInToday(date) { return "Today\(timeSuffix)" }

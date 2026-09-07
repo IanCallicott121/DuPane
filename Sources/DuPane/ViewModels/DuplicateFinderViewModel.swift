@@ -37,17 +37,28 @@ final class DuplicateFinderViewModel: ObservableObject {
             let result = await DuplicateFinderViewModel.scan(
                 rootURL: rootURL,
                 onScanProgress: { count in
-                    Task { @MainActor in vm.scannedFiles = count }
+                    Task { @MainActor [weak vm] in
+                        guard vm?.phase == .scanning else { return }
+                        vm?.scannedFiles = count
+                    }
                 },
                 onHashStart: { total in
-                    Task { @MainActor in vm.filesToHash = total; vm.hashedFiles = 0 }
+                    Task { @MainActor [weak vm] in
+                        guard vm?.phase == .scanning else { return }
+                        vm?.filesToHash = total
+                        vm?.hashedFiles = 0
+                    }
                 },
                 onHashProgress: { count in
-                    Task { @MainActor in vm.hashedFiles = count }
+                    Task { @MainActor [weak vm] in
+                        guard vm?.phase == .scanning else { return }
+                        vm?.hashedFiles = count
+                    }
                 }
             )
             guard !Task.isCancelled else { return }
-            await MainActor.run {
+            await MainActor.run { [weak vm] in
+                guard let vm else { return }
                 vm.groups = result.groups
                 vm.totalWastedBytes = result.wastedBytes
                 vm.phase = .done

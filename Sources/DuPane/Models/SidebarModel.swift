@@ -229,6 +229,15 @@ final class SidebarModel: ObservableObject {
         }
     }
 
+    func removeRecent(_ url: URL) {
+        recentURLs.removeAll { $0 == url }
+        if let data = try? JSONEncoder().encode(recentURLs.map { $0.path }) {
+            UserDefaults.standard.set(data, forKey: SidebarModel.recentsKey)
+        } else {
+            UserDefaults.standard.removeObject(forKey: SidebarModel.recentsKey)
+        }
+    }
+
     func clearRecents() {
         recentURLs = []
         UserDefaults.standard.removeObject(forKey: SidebarModel.recentsKey)
