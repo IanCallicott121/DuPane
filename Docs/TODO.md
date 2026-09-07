@@ -13,6 +13,11 @@
 
 ### Bug fixes — Medium
 
+- **`PaneState.goBack()`/`goForward()` history race** — `canGoBack`/`canGoForward` are checked, then `history[historyIndex]` is accessed; if history is mutated between the guard and the access (async callback), index goes out of bounds. (`ViewModels/PaneState.swift`)
+- **`PaneState.endDeepSearch` cancellation window** — Spotlight results can arrive after `endDeepSearch()` is called but before `spotlightQuery = nil` is set; rapid navigation leaves search state inconsistent. (`ViewModels/PaneState.swift`)
+- **`NetworkVolumeMonitor.ejectAndRemove` ignores unmount failure** — `try? NSWorkspace.unmountAndEjectDevice` failure is silently discarded; volume is removed from `mountedVolumes` even if the unmount didn't succeed, so the sidebar shows it gone while it's still mounted. (`Models/NetworkVolumeMonitor.swift`)
+- **Sync plan not atomic** — `executeSyncPlan()` with `.overwrite` has no transaction log; a crash mid-operation leaves the destination partially overwritten with no way to resume or roll back. (`Views/ContentView.swift`)
+- **Partial trash failure unrecoverable** — `FileOperationService.trash()` collects errors but can't identify which items were successfully trashed before the failure; user has no way to undo the partial deletion. (`Models/FileOperationService.swift`)
 - **`FileOperationService.moveOrCopy` subtree guard aborts entire batch** — guard exits early when any one item would copy into itself; other unrelated items in the batch are never processed. Skip only the offending item. (`Models/FileOperationService.swift`)
 - **`ContentView.showToast` race** — a second toast before the first's `asyncAfter` fires clears the second toast prematurely. Capture and compare the message in the closure. (`Views/ContentView.swift`)
 - **Dead `lastLeftURL`/`lastRightURL` UserDefaults writes** — `ContentView` writes these keys but they are never read (tab-state JSON takes over first). Remove the dead writes. (`Views/ContentView.swift`, `Models/AppLaunchConfiguration.swift`)
@@ -38,6 +43,11 @@
 - **`AppLaunchConfiguration` command-line URL always `isDirectory: true`** — spurious trailing slash affects path comparisons for file arguments. (`Models/AppLaunchConfiguration.swift`)
 - **`PaneState.duplicate()` with no `currentURL` silently returns** — no user feedback when called at Computer root. (`ViewModels/PaneState.swift`)
 - **`networkBonjourDiscovery` label misleading** — setting labelled "in Connect sheet" also controls sidebar Bonjour browsing. Update label. (`Models/AppSettings.swift`, `Views/SettingsView.swift`)
+- **`AppLaunchConfiguration.url()` no existence check** — `URL(fileURLWithPath:isDirectory:true)` is created without verifying the path exists; a non-existent command-line argument is silently passed downstream as a valid directory URL. (`Models/AppLaunchConfiguration.swift`)
+- **`TabbedPaneState` pinned-path restoration has no migration** — `savedPinnedPaths` and `savedPaths` are separate arrays; if their counts diverge (e.g. crash during save) tab metadata is restored to the wrong tabs. (`ViewModels/TabbedPaneState.swift`)
+- **`SmartMetadataService.lineCount` wrong on binary files** — null bytes in files with code extensions (e.g. a `.sh` that is actually binary) stop the read prematurely, producing a wrong line count. Distinct from the off-by-one above. (`Models/SmartMetadataService.swift`)
+- **`UserDefaults` writes have no transaction semantics** — each `@Published` setting's `didSet` writes to `UserDefaults` immediately and independently; rapid successive changes (e.g. import settings) could leave defaults in an inconsistent intermediate state. (`Models/AppSettings.swift`)
+- **`SmartMetadataService.cache` not `Sendable`-verified** — `cache: [URL: String]` is a non-`Sendable` type accessed on `@MainActor`; correct today but fragile against future Swift concurrency strictness or accidental off-actor reads. (`Models/SmartMetadataService.swift`)
 
 ## Clarifications
 none
