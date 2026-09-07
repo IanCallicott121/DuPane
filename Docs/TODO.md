@@ -6,11 +6,7 @@ none yet
 
 ### Bug fixes — Critical
 
-- **`SmartMetadataService` unbounded cache** — `cache: [URL: String]` grows forever with no eviction or invalidation on rename/replace. Cap size and add LRU or clear on navigation. (`Models/SmartMetadataService.swift`)
 - **`PaneState` sortPref UserDefaults leak** — every visited folder writes a `"sortPref_<full path>"` key. No cleanup; defaults grow unbounded over time. Add a pruning strategy. (`ViewModels/PaneState.swift`)
-- **`ProcessRunner.run` blocks thread pool** — `process.waitUntilExit()` is synchronous inside an `async` context and blocks a cooperative thread for the full archive operation. Replace with a continuation + `terminationHandler`. (`Models/FileOperationService.swift`)
-- **`FolderSizeViewModel` no cancellation in enumeration** — `directorySize(url:)` recursive loop has no `Task.isCancelled` check; cancelling the sheet leaves the scan running to completion. Add cancellation checks inside the loop. (`ViewModels/FolderSizeViewModel.swift`)
-- **`DuplicateFinderViewModel` progress tasks fire after cancel** — fire-and-forget `Task` closures in progress callbacks capture `vm` strongly and mutate state after the scan is cancelled. Guard with cancellation check or use `AsyncStream`. (`ViewModels/DuplicateFinderViewModel.swift`)
 
 ### Bug fixes — Medium
 
@@ -23,27 +19,23 @@ none yet
 - **Dead `lastLeftURL`/`lastRightURL` UserDefaults writes** — `ContentView` writes these keys but they are never read (tab-state JSON takes over first). Remove the dead writes. (`Views/ContentView.swift`, `Models/AppLaunchConfiguration.swift`)
 - **`SidebarModel.recordVisit` and `init` block main thread** — `FileManager.fileExists` called synchronously on the main actor per bookmark and per recent URL. Move to a background task. (`Models/SidebarModel.swift`)
 - **`TabbedPaneView` calls `pane.load()` on every tab switch** — fires a directory read even when tab contents are current, causing unnecessary I/O and flicker. Only load if the tab has never loaded or its URL changed. (`Views/TabbedPaneView.swift`)
-- **`SidebarView` remove-from-recents calls `fileExists` O(n) times** — clear-then-re-record rebuilds the list by calling `recordVisit` for every remaining URL. Add a targeted `removeRecent(_ url:)` method to `SidebarModel`. (`Views/SidebarView.swift`, `Models/SidebarModel.swift`)
 - **`NetworkVolumeMonitor` Bonjour delegate mutates `@Published` on background thread** — `BonjourBrowserDelegate` callbacks fire on the `NetServiceBrowser` queue without a `DispatchQueue.main` hop. (`Models/NetworkVolumeMonitor.swift`)
 - **`DuplicateFinderView` resolved groups linger** — after trashing all-but-one duplicate, the kept file stays in the list indefinitely with no dismiss affordance. Add a "Dismiss resolved" or "Rescan" action. (`Views/DuplicateFinderView.swift`)
 - **`ContentView.performDelete` peer-pane nav uses first deleted URL** — if multiple items are deleted and the peer pane is inside a later one, the nav target points to the wrong parent. (`Views/ContentView.swift`)
 
 ### Bug fixes — Low / Inconsistencies
 
-- **`FileRowView.formatDate` creates `DateFormatter` per call** — expensive to construct per row per render. Cache as `static` properties. (`Views/FileRowView.swift`)
 - **`finderTagColor` duplicated in three files** — identical `switch name.lowercased()` in `FileRowView`, `SidebarView`, and `PropertiesView`. Extract to a shared function. (`Views/FileRowView.swift`, `Views/SidebarView.swift`, `Views/PropertiesView.swift`)
 - **`QuickLookCoordinator.toggle` requires double-Space to change selection** — calls `orderOut` when panel is visible with new URLs instead of refreshing in place. (`Views/QuickLookCoordinator.swift`)
 - **`ColumnResizeHandle.anyIsDragging` stuck on missed mouseUp** — static flag never reset if `mouseUp` is missed (focus lost mid-drag), permanently suppressing cursor reset for all handles until restart. (`Views/ColumnResizeHandle.swift`)
 - **`SidebarView.connectToServer` clears suppressed paths on every connect** — `clearSuppressedPaths()` called unconditionally, restoring volumes the user deliberately hid. (`Views/SidebarView.swift`)
 - **`PaneState.rename` / `duplicate` capture `self` strongly in `Task.detached`** — if the tab is closed mid-operation the pane stays alive and `load()` fires on a dead pane. Use `[weak self]`. (`ViewModels/PaneState.swift`)
-- **`AppLaunchConfiguration` command-line URL always `isDirectory: true`** — spurious trailing slash affects path comparisons for file arguments. (`Models/AppLaunchConfiguration.swift`)
 - **`PaneState.duplicate()` with no `currentURL` silently returns** — no user feedback when called at Computer root. (`ViewModels/PaneState.swift`)
 - **`networkBonjourDiscovery` label misleading** — setting labelled "in Connect sheet" also controls sidebar Bonjour browsing. Update label. (`Models/AppSettings.swift`, `Views/SettingsView.swift`)
 - **`AppLaunchConfiguration.url()` no existence check** — `URL(fileURLWithPath:isDirectory:true)` is created without verifying the path exists; a non-existent command-line argument is silently passed downstream as a valid directory URL. (`Models/AppLaunchConfiguration.swift`)
 - **`TabbedPaneState` pinned-path restoration has no migration** — `savedPinnedPaths` and `savedPaths` are separate arrays; if their counts diverge (e.g. crash during save) tab metadata is restored to the wrong tabs. (`ViewModels/TabbedPaneState.swift`)
-- **`SmartMetadataService.lineCount` wrong on binary files** — null bytes in files with code extensions (e.g. a `.sh` that is actually binary) stop the read prematurely, producing a wrong line count. Distinct from the off-by-one above. (`Models/SmartMetadataService.swift`)
-- **`UserDefaults` writes have no transaction semantics** — each `@Published` setting's `didSet` writes to `UserDefaults` immediately and independently; rapid successive changes (e.g. import settings) could leave defaults in an inconsistent intermediate state. (`Models/AppSettings.swift`)
 - **`SmartMetadataService.cache` not `Sendable`-verified** — `cache: [URL: String]` is a non-`Sendable` type accessed on `@MainActor`; correct today but fragile against future Swift concurrency strictness or accidental off-actor reads. (`Models/SmartMetadataService.swift`)
+- **`UserDefaults` writes have no transaction semantics** — each `@Published` setting's `didSet` writes to `UserDefaults` immediately and independently; rapid successive changes (e.g. import settings) could leave defaults in an inconsistent intermediate state. (`Models/AppSettings.swift`)
 
 ## Clarifications
 none
@@ -54,7 +46,19 @@ none
 ---
 
 ## Done
-### Build 389 — 5 bug fixes: directory compare, line count, tab metadata, subtree copy guard, archive conflicts (2026-09-07)
+### Build 391 — 8 bug fixes (2026-09-07)
+
+- **`SmartMetadataService` unbounded cache fixed** — `cacheOrder: [URL]` tracks insertion order; when `cache` exceeds 500 entries the oldest entry is evicted. (`Models/SmartMetadataService.swift`)
+- **`ProcessRunner.run` no longer blocks thread pool** — `waitUntilExit()` replaced with `withCheckedThrowingContinuation` + `terminationHandler`; pipe drains run in detached tasks to prevent buffer-full deadlocks. (`Models/FileOperationService.swift`)
+- **`FolderSizeViewModel` cancellation added** — `Task.isCancelled` checked inside the `directorySize` enumeration loop; scan stops promptly on sheet dismiss. (`ViewModels/FolderSizeViewModel.swift`)
+- **`DuplicateFinderViewModel` progress tasks guarded after cancel** — progress callbacks use `[weak vm]` capture and check `vm?.phase == .scanning` before mutating state; final `MainActor.run` also uses `[weak vm]` with a nil guard. (`ViewModels/DuplicateFinderViewModel.swift`)
+- **`SidebarModel.removeRecent(_ url:)` added** — targeted O(1) removal without rebuilding the list via `recordVisit`. (`Models/SidebarModel.swift`)
+- **`FileRowView.formatDate` static `DateFormatter` cache** — 8 `DateFormatter` instances promoted to `static` properties; no longer allocated per row per render. (`Views/FileRowView.swift`)
+- **`AppLaunchConfiguration` command-line URL `isDirectory` fixed** — `fileExists(atPath:isDirectory:)` now determines the correct flag instead of always passing `true`. (`Models/AppLaunchConfiguration.swift`)
+- **`SmartMetadataService.lineCount` returns `nil` for binary files** — chunk scan returns `nil` on first null byte, preventing wrong line counts for binary files with code extensions. (`Models/SmartMetadataService.swift`)
+- **277 tests, 0 failures.**
+
+### Build 389 — 5 bug fixes: directory compare, line count, tab metadata, subtree guard, archive conflicts (2026-09-07)
 
 - **`FolderCompareService` directory kind mismatch fixed** — `status()` no longer checks `kind` when both items are directories. iCloud Drive reports "iCloud Folder" vs "Folder" for the same directory; this caused false `.different` results. (`Models/FolderCompareService.swift`)
 - **`SmartMetadataService.lineCount` off-by-one fixed** — tracks `lastByte`; does not add +1 when the file already ends with a newline. Files like "line1\nline2\nline3\n" now correctly report "3 lines" instead of "4 lines". (`Models/SmartMetadataService.swift`)
@@ -141,40 +145,39 @@ none
 
 ### Build 249 — DuPane rename, themes, date format, icon toggle, first-launch defaults, Recents, Places, Go to Path, type-ahead (2026-08-23)
 
-- **App renamed to DuPane** — `Info.plist` CFBundleName and CFBundleDisplayName updated to "DuPane". All user-visible strings in menus ("Open DuPaneMac User Guide" → "Open DuPane User Guide"), usage descriptions, and documentation updated. Code identifiers unchanged (user will relocate project later). Bundle ID unchanged.
+- **App renamed to DuPane** — `Info.plist` CFBundleName and CFBundleDisplayName updated to "DuPane". All user-visible strings in menus, usage descriptions, and documentation updated. Code identifiers unchanged. Bundle ID unchanged.
 - **Window size persistence** — First launch: window maximises to fill the screen. Subsequent launches: window frame restored from `mainWindowFrame` UserDefaults key (saved in `applicationWillTerminate`). Implemented in `AppDelegate`.
-- **First-launch defaults** — Default font size 14pt (was 12pt). Default visible columns: Name, Size, Modified (Kind and Info hidden by default, stored as "Info,Kind" in `hiddenColumnsRaw`). Default column widths: Size 80pt, Modified 110pt (was 74/92pt) — wide enough for "31 Dec 2025" at 14pt monospaced.
-- **5 new themes** — `AppColorScheme` gains `.ocean`, `.country`, `.earth`, `.fire`, `.vivid` cases. Each defines `preferredColorScheme` (light or dark) and `accentColor`. Applied via `.accentColor()` and `.preferredColorScheme()` on the root WindowGroup view. Ocean: dark/cyan, Country: light/forest-green, Earth: light/terracotta, Fire: dark/fire-red, Vivid: light/purple. Settings picker changed to `.menu` style to accommodate 8 items.
-- **Date format setting** — `DateFormatStyle` enum added (short/medium/long/iso/relative). `AppSettings.dateFormatStyle` persisted to UserDefaults. `FileRowView.formatDate(_:style:)` takes style parameter, called with `settings.dateFormatStyle`. Medium format changed from `.dateStyle = .medium` to `"d MMM yyyy"` custom format for consistent day-first layout.
-- **File icon show/hide** — "Icon" added to column toggle system. `columnToggleButton("Icon")` in sort-header context menu. `FileRowView` conditionally renders `iconView` based on `!settings.hiddenColumns.contains("Icon")`. Sort-header leading padding and `metadataColumnBudget` both adjusted dynamically: 0 when icon hidden, 28pt when shown — so Name column aligns correctly in header and rows in both states.
-- **Right-click rename** — "Show Folder Sizes" → "Show Folder / File Sizes" in file context menu.
-- **Sidebar Recents** — `SidebarModel.recentURLs: [URL]` (up to 12, persisted in UserDefaults as `sidebar.recentURLs`). `recordVisit(_:)` called from `ContentView.onChange` for both pane URLs. `clearRecents()` clears the list. `SidebarView` shows a "Recents" section with clock icons; right-click removes individual items; "Clear Recents" button at the bottom.
-- **Sidebar Places** — `AppSettings.enabledPlaces: Set<String>` (UserDefaults key `enabledPlaces`, default: Home/Applications/Desktop/Documents/Downloads). `SidebarModel.systemLocations` gains Applications (`/Applications`). `SidebarView` shows a "Places" section (above Recents) filtered by `settings.enabledPlaces`. `SettingsView` has a "Sidebar places" section with five toggles.
-- **189 tests, 0 failures** — updated 3 tests to match new defaults (font 14, column widths 80/110, hidden column defaults).
+- **First-launch defaults** — Default font size 14pt (was 12pt). Default visible columns: Name, Size, Modified (Kind and Info hidden by default). Default column widths: Size 80pt, Modified 110pt.
+- **5 new themes** — `AppColorScheme` gains `.ocean`, `.country`, `.earth`, `.fire`, `.vivid` cases. Ocean: dark/cyan, Country: light/forest-green, Earth: light/terracotta, Fire: dark/fire-red, Vivid: light/purple.
+- **Date format setting** — `DateFormatStyle` enum added (short/medium/long/iso/relative). `AppSettings.dateFormatStyle` persisted to UserDefaults. `FileRowView.formatDate(_:style:)` takes style parameter.
+- **File icon show/hide** — "Icon" added to column toggle system. `FileRowView` conditionally renders `iconView` based on `!settings.hiddenColumns.contains("Icon")`.
+- **Sidebar Recents** — `SidebarModel.recentURLs: [URL]` (up to 12, persisted in UserDefaults). `recordVisit(_:)` called from `ContentView.onChange` for both pane URLs.
+- **Sidebar Places** — `AppSettings.enabledPlaces: Set<String>` (UserDefaults key `enabledPlaces`, default: Home/Applications/Desktop/Documents/Downloads). `SidebarView` shows a "Places" section filtered by `settings.enabledPlaces`.
+- **189 tests, 0 failures** — updated 3 tests to match new defaults.
 - **UserGuide and FAQs** — fully updated: DuPane rename, Places/Recents sidebar sections, date format setting, icon toggle, themes table, Go to Path ⌘L shortcut, type-ahead note, first-launch defaults.
 
 ### Build 51 — Type-ahead file navigation (2026-08-21)
 
-- **Typing selects first matching item** — when a pane is active and no text input has focus, typing any printable character (letters, digits, punctuation) jumps the selection to the first visible item whose name starts with the typed string. Typing quickly (within 600ms) accumulates a multi-character prefix (e.g. typing "r", "e" selects the first item starting with "re"). After 600ms of inactivity the buffer resets. The matched item is scrolled into view. Implemented via `TypeAheadController` (an `@MainActor` class using `NSEvent.addLocalMonitorForEvents`) installed per pane, with `isActive` flag updated via `onChange`. The file list `ScrollView` is wrapped in `ScrollViewReader` for programmatic scrolling. Keypresses are ignored when a text field/text view has first responder (filter box, rename sheet, etc.), or when any modifier beyond Shift/CapsLock is held, or when a special key (arrows, F-keys, delete, etc.) is pressed.
+- **Typing selects first matching item** — when a pane is active and no text input has focus, typing any printable character jumps the selection to the first visible item whose name starts with the typed string. Multi-character prefix accumulated within 600ms. Implemented via `TypeAheadController`.
 - **110 tests, 0 failures** — no new tests (AppKit event monitor + UI scroll, not unit-testable).
 
 ### Build 50 — Go to Path (2026-08-21)
 
-- **⌘L opens "Go to Folder" sheet** — pressing ⌘L (or wiring via ContentView's hidden-button group) on either pane opens a sheet pre-filled with the pane's current path. The user can type or paste any absolute path (tilde expansion supported). On confirm, the path is validated as an existing directory; if not, an error is shown in the status bar. On success the pane navigates to the typed folder. Implemented via `PaneState.requestGoToPath: Bool` (mirrors `requestRename`), handled in `PaneView.onChange` which sets `showGoToPath = true` and seeds the text field, with `commitGoToPath()` doing the validation and navigation.
-- **110 tests, 0 failures** — no new tests (UI sheet + navigation, mirrors rename pattern).
+- **⌘L opens "Go to Folder" sheet** — pressing ⌘L on either pane opens a sheet pre-filled with the pane's current path. Tilde expansion supported. Path validated as existing directory on confirm.
+- **110 tests, 0 failures** — no new tests.
 
 ### Build 49 — Show hidden folders setting (2026-08-21)
 
-- **"Show hidden folders (dot-folders)" toggle in Settings → Display** — independent of the existing "Show hidden files" toggle. When enabled, hidden directories (names starting with `.`) are shown while hidden files remain hidden. When both are enabled, everything is shown. When both are off, all dot-items are hidden. Implemented by passing `showHiddenFolders` through `AppSettings` → `ContentView.onChange` → `TabbedPaneState.showHiddenFolders` (propagates to all tabs) → `PaneState.showHiddenFolders` → `PaneState.loadFolder`. The loader fetches all items when either flag is on, then filters out hidden non-directories when only `showHiddenFolders` is set.
-- **110 tests, 0 failures** — no new tests (UI toggle + filter logic, mirrors existing `showHiddenFiles` pattern).
+- **"Show hidden folders (dot-folders)" toggle in Settings → Display** — independent of the existing "Show hidden files" toggle.
+- **110 tests, 0 failures** — no new tests.
 
 ### Build 48 — Subfolder deep search (2026-08-21)
 
-- **NSMetadataQuery-based subfolder search** — the filter box gains a magnifying glass button (next to the existing × clear button) that appears whenever there is filter text. Clicking it triggers `PaneState.beginDeepSearch(query:)`, which runs an `NSMetadataQuery` scoped to the current folder with a `LIKE[cd]` wildcard predicate. A search banner below the sort header shows "Searching subfolders…" (spinner) while gathering, then "N results in subfolders" when complete. The file list switches to the Spotlight results (bypassing the normal items/filter pipeline). Navigating away, pressing Back/Forward, or clearing the filter text automatically ends search mode (`endDeepSearch`). File operations — open, copy, move, delete — all work on search results. `displayedItems`, `selectedItems`, and `selectedFileItems` all fall back to `searchResults` when in search mode.
-- **Rename returns task for testability** — `PaneState.rename(item:to:)` changed from `func → Void` to `@discardableResult func → Task<Void, Never>?`. Callers that don't care (SwiftUI sheet) ignore the return value; tests can `await` the returned task. Fixed two pre-existing test failures where the rename tests didn't properly await the async operation.
-- **189 tests, 0 failures** — 17 new tests in `DeepSearchTests.swift` covering state machine (isInSearchMode, isSearching, searchResults), navigation exits search mode (navigate/goBack/goForward), displayedItems uses searchResults, selectedItems reads from searchResults, endDeepSearch is idempotent.
+- **NSMetadataQuery-based subfolder search** — filter box gains a magnifying glass button triggering `PaneState.beginDeepSearch(query:)`. Search banner shows progress. File operations work on search results.
+- **Rename returns task for testability** — `PaneState.rename(item:to:)` changed to `@discardableResult func → Task<Void, Never>?`.
+- **189 tests, 0 failures** — 17 new tests in `DeepSearchTests.swift`.
 
 ### Build 47 — iCloud Drive in sidebar (2026-08-21)
 
-- **iCloud Drive appears in sidebar system locations** — `SidebarModel.init` now checks for `~/Library/Mobile Documents/com~apple~CloudDocs` (the standard on-disk path for iCloud Drive on macOS). If present, an "iCloud Drive" entry with `icloud.fill` icon is inserted between Downloads and OneDrive. Alias resolution via `URL(resolvingAliasFileAt:)` is applied as with OneDrive. No entitlements needed — the app is non-sandboxed and can read this path directly.
-- **172 tests, 0 failures** — no new tests (existence check mirrors the existing OneDrive pattern).
+- **iCloud Drive appears in sidebar system locations** — `SidebarModel.init` checks for `~/Library/Mobile Documents/com~apple~CloudDocs`. If present, an "iCloud Drive" entry with `icloud.fill` icon is inserted between Downloads and OneDrive.
+- **172 tests, 0 failures** — no new tests.
