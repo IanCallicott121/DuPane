@@ -105,14 +105,12 @@ final class TabbedPaneStateFallbackMetadataTests: XCTestCase {
 
 @MainActor
 final class PaneStateDuplicateSilentNoOpTests: XCTestCase {
-    func testDuplicateAtComputerRootIsNoOpAndSetsNoError() {
+    func testDuplicateAtComputerRootSetsErrorMessage() {
         let pane = PaneState(initialURL: nil) // nil = virtual Computer root
         XCTAssertNil(pane.currentURL)
         pane.duplicate()
-        // Currently returns silently with no error message and no user feedback.
-        // The test pins this behaviour; a future fix should show a toast instead.
-        XCTAssertNil(pane.errorMessage,
-                     "duplicate() at Computer root returns early — no error is currently surfaced to the user")
+        XCTAssertNotNil(pane.errorMessage,
+                        "duplicate() at Computer root should surface an error message to the user")
     }
 }
 

@@ -100,7 +100,7 @@ struct AppLaunchConfiguration {
         guard valueIdx < arguments.endIndex else { return nil }
         let path = arguments[valueIdx]
         var isDir: ObjCBool = false
-        FileManager.default.fileExists(atPath: path, isDirectory: &isDir)
+        guard FileManager.default.fileExists(atPath: path, isDirectory: &isDir) else { return nil }
         return URL(fileURLWithPath: path, isDirectory: isDir.boolValue)
     }
 }

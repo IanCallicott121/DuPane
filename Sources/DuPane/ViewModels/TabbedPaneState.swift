@@ -405,7 +405,10 @@ final class TabbedPaneState: ObservableObject {
         savedPinnedPaths: [String?]
     ) -> URL? {
         let path: String?
-        if metadataIndex < savedPinnedPaths.count {
+        // Only use savedPinnedPaths when its count matches savedPaths; a mismatch
+        // indicates a partial write (e.g. crash mid-save) and we fall back to savedPaths.
+        let pinnedPathsConsistent = savedPinnedPaths.isEmpty || savedPinnedPaths.count == savedPaths.count
+        if pinnedPathsConsistent, metadataIndex < savedPinnedPaths.count {
             path = savedPinnedPaths[metadataIndex]
         } else if metadataIndex < savedPaths.count {
             path = savedPaths[metadataIndex]

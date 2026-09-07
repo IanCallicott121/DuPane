@@ -174,7 +174,7 @@ struct FileRowView: View {
         HStack(spacing: 2) {
             ForEach(item.tags.prefix(4), id: \.self) { tag in
                 Circle()
-                    .fill(Self.finderTagColor(tag))
+                    .fill(Color.finderTag(tag))
                     .frame(width: 7, height: 7)
             }
         }
@@ -222,19 +222,6 @@ struct FileRowView: View {
     }
 
     // MARK: - Helpers
-
-    private static func finderTagColor(_ name: String) -> Color {
-        switch name.lowercased() {
-        case "red":           return .red
-        case "orange":        return .orange
-        case "yellow":        return .yellow
-        case "green":         return .green
-        case "blue":          return .blue
-        case "purple":        return .purple
-        case "gray", "grey":  return .gray
-        default:              return .accentColor
-        }
-    }
 
     static func formatSize(_ bytes: Int64?) -> String {
         guard let bytes else { return "—" }
@@ -302,6 +289,21 @@ struct FileRowView: View {
             let months = cal.dateComponents([.month], from: date, to: Date()).month ?? 0
             if months < 12 { return "\(months)mo ago" }
             return "\(months / 12)y ago"
+        }
+    }
+}
+
+extension Color {
+    static func finderTag(_ name: String) -> Color {
+        switch name.lowercased() {
+        case "red":           return .red
+        case "orange":        return .orange
+        case "yellow":        return .yellow
+        case "green":         return .green
+        case "blue":          return .blue
+        case "purple":        return .purple
+        case "gray", "grey":  return .gray
+        default:              return .accentColor
         }
     }
 }

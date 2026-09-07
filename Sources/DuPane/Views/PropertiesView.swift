@@ -84,7 +84,7 @@ struct PropertiesView: View {
                 ForEach(item.tags, id: \.self) { tag in
                     HStack(spacing: 4) {
                         Circle()
-                            .fill(finderTagColor(tag))
+                            .fill(Color.finderTag(tag))
                             .frame(width: 9, height: 9)
                         Text(tag)
                             .font(.system(size: 12))
@@ -115,16 +115,4 @@ struct PropertiesView: View {
         return formatter.string(from: date)
     }
 
-    private func finderTagColor(_ name: String) -> Color {
-        switch name.lowercased() {
-        case "red":           return .red
-        case "orange":        return .orange
-        case "yellow":        return .yellow
-        case "green":         return .green
-        case "blue":          return .blue
-        case "purple":        return .purple
-        case "gray", "grey":  return .gray
-        default:              return .accentColor
-        }
-    }
 }

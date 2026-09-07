@@ -55,7 +55,7 @@ struct SettingsView: View {
                     Toggle("Show mounted network volumes", isOn: $settings.networkShowMountedVolumes)
                     Toggle("Show status indicator", isOn: $settings.networkStatusIndicator)
                     Toggle("Show pinned servers", isOn: $settings.networkPinnedLocations)
-                    Toggle("Bonjour discovery in Connect sheet", isOn: $settings.networkBonjourDiscovery)
+                    Toggle("Bonjour discovery (Connect sheet and sidebar)", isOn: $settings.networkBonjourDiscovery)
                     Toggle("Auto-reconnect pinned servers on launch", isOn: $settings.networkAutoReconnect)
                 }
             }

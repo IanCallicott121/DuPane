@@ -452,7 +452,7 @@ struct SidebarView: View {
         } label: {
             HStack(spacing: 6) {
                 Circle()
-                    .fill(finderTagColor(tag.name))
+                    .fill(Color.finderTag(tag.name))
                     .frame(width: 9, height: 9)
                 Text(tag.name)
                     .fontWeight(isSelected ? .semibold : .regular)
@@ -485,18 +485,6 @@ struct SidebarView: View {
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
     }
 
-    private func finderTagColor(_ name: String) -> Color {
-        switch name.lowercased() {
-        case "red":           return .red
-        case "orange":        return .orange
-        case "yellow":        return .yellow
-        case "green":         return .green
-        case "blue":          return .blue
-        case "purple":        return .purple
-        case "gray", "grey":  return .gray
-        default:              return .accentColor
-        }
-    }
 
     // MARK: - Network section rows
 
@@ -657,7 +645,6 @@ struct SidebarView: View {
             return
         }
         connectError = nil
-        networkMonitor.clearSuppressedPaths()
         showConnectToServer = false
         NSWorkspace.shared.open(url)
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {

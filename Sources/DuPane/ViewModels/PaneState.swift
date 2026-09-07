@@ -230,9 +230,13 @@ final class PaneState: ObservableObject {
     }
 
     func duplicate() {
-        guard let dir = currentURL, !selectedItems.isEmpty else { return }
+        guard let dir = currentURL else {
+            errorMessage = "Duplicate is not available at the Computer level."
+            return
+        }
+        guard !selectedItems.isEmpty else { return }
         let targets = selectedItems
-        Task.detached(priority: .userInitiated) {
+        Task.detached(priority: .userInitiated) { [weak self] in
             var errors: [String] = []
             for item in targets {
                 let url = item.url
@@ -252,7 +256,8 @@ final class PaneState: ObservableObject {
                 }
             }
             let capturedErrors = errors
-            await MainActor.run {
+            await MainActor.run { [weak self] in
+                guard let self else { return }
                 if !capturedErrors.isEmpty {
                     self.errorMessage = capturedErrors.joined(separator: "\n")
                 }
@@ -317,10 +322,11 @@ final class PaneState: ObservableObject {
         }
         let newURL = item.url.deletingLastPathComponent().appendingPathComponent(trimmed)
         let folderURL = currentURL
-        return Task.detached {
+        return Task.detached { [weak self] in
             do {
                 try FileManager.default.moveItem(at: item.url, to: newURL)
-                await MainActor.run {
+                await MainActor.run { [weak self] in
+                    guard let self else { return }
                     if self.isInSearchMode { self.endDeepSearch() }
                     self.load()
                     self.selection = [newURL]
@@ -332,8 +338,8 @@ final class PaneState: ObservableObject {
                     }
                 }
             } catch {
-                await MainActor.run {
-                    self.errorMessage = "Couldn't rename \(item.name): \(error.localizedDescription)"
+                await MainActor.run { [weak self] in
+                    self?.errorMessage = "Couldn't rename \(item.name): \(error.localizedDescription)"
                 }
             }
         }
@@ -481,17 +487,26 @@ final class PaneState: ObservableObject {
 
 // MARK: - Sort Persistence
 
-private enum SortPreference {
-    static func save(url: URL, key: SortKey, ascending: Bool) {
-        UserDefaults.standard.set(
-            [key.rawValue, ascending ? "1" : "0"],
-            forKey: "sortPref_\(url.path)"
-        )
+enum SortPreference {
+    static let orderKey = "sortPrefKeysList"
+    static let maxCount = 200
+
+    static func save(url: URL, key: SortKey, ascending: Bool, userDefaults: UserDefaults = .standard) {
+        let prefKey = "sortPref_\(url.path)"
+        userDefaults.set([key.rawValue, ascending ? "1" : "0"], forKey: prefKey)
+        var order = userDefaults.stringArray(forKey: orderKey) ?? []
+        order.removeAll { $0 == prefKey }
+        order.append(prefKey)
+        if order.count > maxCount {
+            let evicted = order.removeFirst()
+            userDefaults.removeObject(forKey: evicted)
+        }
+        userDefaults.set(order, forKey: orderKey)
     }
 
-    static func load(url: URL) -> (key: SortKey, ascending: Bool)? {
+    static func load(url: URL, userDefaults: UserDefaults = .standard) -> (key: SortKey, ascending: Bool)? {
         guard
-            let arr = UserDefaults.standard.stringArray(forKey: "sortPref_\(url.path)"),
+            let arr = userDefaults.stringArray(forKey: "sortPref_\(url.path)"),
             arr.count == 2,
             let key = SortKey(rawValue: arr[0])
         else { return nil }

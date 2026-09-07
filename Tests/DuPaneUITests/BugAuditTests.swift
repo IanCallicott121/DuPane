@@ -297,14 +297,19 @@ final class NetworkVolumeMonitorEjectTests: XCTestCase {
 
 final class AppLaunchConfigurationURLTests: XCTestCase {
 
-    func testNonExistentLeftPaneURLIsAccepted() {
+    func testNonExistentLeftPaneURLFallsBackToDefault() {
         let ghost = "/tmp/this-path-does-not-exist-\(UUID().uuidString)"
         let config = AppLaunchConfiguration.current(arguments: [
             "DuPane", "--left-pane-url", ghost
         ])
-        XCTAssertNotNil(config.leftPaneURL,
-                        "non-existent path is accepted without existence check")
-        XCTAssertEqual(config.leftPaneURL?.path, ghost)
+        // Non-existent path is now rejected; config falls back to ~/Downloads default.
+        let downloads = FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent("Downloads")
+        XCTAssertNotEqual(config.leftPaneURL?.path, ghost,
+                          "non-existent path should not be used as left pane URL")
+        XCTAssertEqual(config.leftPaneURL?.standardizedFileURL,
+                       downloads.standardizedFileURL,
+                       "non-existent path should fall back to ~/Downloads")
     }
 
     func testMissingValueAfterFlagFallsBackToDefault() {

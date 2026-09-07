@@ -194,9 +194,6 @@ struct ContentView: View {
             UserDefaults.standard.set(newValue, forKey: "showSidebar")
         })
         .onChange(of: leftTabs.activePaneState.currentURL, perform: { url in
-            if settings.leftStartupMode == .rememberLast {
-                UserDefaults.standard.set(url?.path, forKey: "lastLeftURL")
-            }
             if let url { sidebarModel.recordVisit(url) }
             disableCompareIfNeeded()
             if isFollowMode, activePane == .left, let url,
@@ -205,9 +202,6 @@ struct ContentView: View {
             }
         })
         .onChange(of: rightTabs.activePaneState.currentURL, perform: { url in
-            if settings.rightStartupMode == .rememberLast {
-                UserDefaults.standard.set(url?.path, forKey: "lastRightURL")
-            }
             if let url { sidebarModel.recordVisit(url) }
             disableCompareIfNeeded()
             if isFollowMode, activePane == .right, let url,
@@ -626,7 +620,9 @@ struct ContentView: View {
     private func showToast(_ message: String) {
         withAnimation { toastMessage = message }
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            withAnimation { toastMessage = nil }
+            if toastMessage == message {
+                withAnimation { toastMessage = nil }
+            }
         }
     }
 
