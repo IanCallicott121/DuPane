@@ -215,8 +215,11 @@ enum FolderCompareService {
         guard let left else { return right == nil ? .same : .onlyRight }
         guard let right else { return .onlyLeft }
 
+        // For directories, skip kind comparison: iCloud Drive reports "iCloud Folder"
+        // instead of "Folder" for the same directory, causing false .different results.
+        let kindMatches = left.isDirectory || left.kind == right.kind
         guard left.isDirectory == right.isDirectory,
-              left.kind == right.kind,
+              kindMatches,
               left.size == right.size else {
             return .different
         }

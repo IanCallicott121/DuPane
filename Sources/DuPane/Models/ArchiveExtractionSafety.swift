@@ -39,9 +39,24 @@ enum ArchiveExtractionSafety {
 
     static func conflicts(for fileEntries: [String], in destinationDirectory: URL) -> [String] {
         fileEntries.filter { entry in
-            FileManager.default.fileExists(
-                atPath: destinationDirectory.appendingPathComponent(entry).path
-            )
+            let fullPath = destinationDirectory.appendingPathComponent(entry)
+            if FileManager.default.fileExists(atPath: fullPath.path) {
+                return true
+            }
+            // Detect conflicts where an intermediate directory component already exists
+            // as a non-directory file. fileExists on the leaf returns false in this case,
+            // but extraction would fail trying to create the directory.
+            let components = entry.components(separatedBy: "/").dropLast()
+            var partial = destinationDirectory
+            for component in components where !component.isEmpty {
+                partial = partial.appendingPathComponent(component)
+                var isDir: ObjCBool = false
+                let exists = FileManager.default.fileExists(atPath: partial.path, isDirectory: &isDir)
+                if exists && !isDir.boolValue {
+                    return true
+                }
+            }
+            return false
         }
     }
 

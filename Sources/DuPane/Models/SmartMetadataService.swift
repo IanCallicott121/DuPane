@@ -68,15 +68,19 @@ final class SmartMetadataService: ObservableObject {
         defer { try? fh.close() }
         var count = 0
         var hasContent = false
+        var lastByte: UInt8 = 0
         let newline = UInt8(ascii: "\n")
         while true {
             let chunk = fh.readData(ofLength: 65_536)
             guard !chunk.isEmpty else { break }
             hasContent = true
             count += chunk.filter { $0 == newline }.count
+            lastByte = chunk[chunk.count - 1]
         }
         guard hasContent else { return nil }
-        let total = count + 1
+        // Don't add 1 when the file already ends with a newline; that final newline
+        // terminates the last line rather than beginning a new empty one.
+        let total = lastByte == newline ? count : count + 1
         return "\(total) line\(total == 1 ? "" : "s")"
     }
 }

@@ -53,24 +53,20 @@ enum FileOperationService {
         conflictResolution: ConflictResolution = .automatic,
         onProgress: ((Int, Int) -> Void)? = nil
     ) -> FileOperationResult {
-        // Guard: refuse to copy/move a folder into its own subtree
         let dstPath = destinationFolder.standardizedFileURL.resolvingSymlinksInPath().path
-        for file in files where file.isDirectory {
-            let srcPath = file.url.standardizedFileURL.resolvingSymlinksInPath().path
-            if dstPath == srcPath || dstPath.hasPrefix(srcPath + "/") {
-                return FileOperationResult(
-                    succeeded: 0,
-                    errors: ["Cannot \(isMove ? "move" : "copy") '\(file.name)' into itself or one of its subfolders."],
-                    resultingURLs: []
-                )
-            }
-        }
-
         var succeeded = 0
         var errors: [String] = []
         var resultingURLs: [URL] = []
 
         for (index, file) in files.enumerated() {
+            // Guard: refuse to copy/move a folder into its own subtree; skip this item only.
+            if file.isDirectory {
+                let srcPath = file.url.standardizedFileURL.resolvingSymlinksInPath().path
+                if dstPath == srcPath || dstPath.hasPrefix(srcPath + "/") {
+                    errors.append("Cannot \(isMove ? "move" : "copy") '\(file.name)' into itself or one of its subfolders.")
+                    continue
+                }
+            }
             defer { onProgress?(index + 1, files.count) }
             let proposed = destinationFolder.appendingPathComponent(file.name)
             let exists = FileManager.default.fileExists(atPath: proposed.path)

@@ -437,7 +437,7 @@ final class TabbedPaneState: ObservableObject {
         savedPins: [Bool],
         usedMetadataIndexes: inout Set<Int>
     ) -> Int? {
-        guard savedPaths.count == tabs.count || savedLabels.count == tabs.count || savedPins.count == tabs.count else {
+        guard savedPaths.count == tabs.count else {
             return nil
         }
         guard !usedMetadataIndexes.contains(tabIndex) else { return nil }

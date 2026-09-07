@@ -161,6 +161,112 @@ final class SortPreferenceGrowthTests: XCTestCase {
     }
 }
 
+// MARK: - FileOperationService.moveOrCopy subtree guard skips only the offending item — 2 tests [must]
+
+final class FileOperationSubtreeGuardTests: XCTestCase {
+    private var fixture: FilePaneFixture!
+
+    override func setUpWithError() throws {
+        try super.setUpWithError()
+        fixture = try FilePaneFixture()
+    }
+
+    override func tearDownWithError() throws {
+        try fixture?.tearDown()
+        fixture = nil
+        try super.tearDownWithError()
+    }
+
+    func testSubtreeSelfCopySkipsOffendingFolderButCopiesOtherItems() throws {
+        // Batch: one folder copying into itself (invalid) + one regular file (valid).
+        // Bug: the guard returned early, abandoning the entire batch.
+        // Fix: only the self-referential folder should be skipped.
+        let validFile = try fixture.writeFile(named: "valid.txt", contents: "hello", in: .left)
+        let selfFolder = try fixture.createFolder(named: "self", in: .left)
+        // Destination is the selfFolder itself — a subtree violation.
+        let selfItem = FileItem(
+            id: selfFolder, name: "self", url: selfFolder,
+            isDirectory: true, isVolume: false, isRemovable: false,
+            size: nil, kind: "Folder", modified: nil, tags: []
+        )
+        let fileItem = FileItem(
+            id: validFile, name: "valid.txt", url: validFile,
+            isDirectory: false, isVolume: false, isRemovable: false,
+            size: 5, kind: "Text", modified: nil, tags: []
+        )
+
+        let result = FileOperationService.moveOrCopy(
+            files: [selfItem, fileItem],
+            to: selfFolder,
+            isMove: false
+        )
+
+        XCTAssertEqual(result.succeeded, 1, "valid.txt must be copied even though the folder item is invalid")
+        XCTAssertEqual(result.errors.count, 1, "exactly one error for the self-referential folder")
+        XCTAssertTrue(FileManager.default.fileExists(atPath: selfFolder.appendingPathComponent("valid.txt").path),
+                      "valid.txt must appear inside the destination folder")
+    }
+
+    func testSubtreeSelfCopyOnlyItemReturnsOneError() throws {
+        let selfFolder = try fixture.createFolder(named: "loop", in: .left)
+        let selfItem = FileItem(
+            id: selfFolder, name: "loop", url: selfFolder,
+            isDirectory: true, isVolume: false, isRemovable: false,
+            size: nil, kind: "Folder", modified: nil, tags: []
+        )
+
+        let result = FileOperationService.moveOrCopy(
+            files: [selfItem],
+            to: selfFolder,
+            isMove: false
+        )
+
+        XCTAssertEqual(result.succeeded, 0)
+        XCTAssertEqual(result.errors.count, 1)
+    }
+}
+
+// MARK: - ArchiveExtractionSafety.conflicts detects intermediate-component conflicts — 3 tests [must]
+
+final class ArchiveExtractionSafetyConflictTests: XCTestCase {
+    private var destDir: URL!
+
+    override func setUpWithError() throws {
+        try super.setUpWithError()
+        destDir = FileManager.default.temporaryDirectory
+            .appendingPathComponent("archive-conflict-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: destDir, withIntermediateDirectories: true)
+    }
+
+    override func tearDownWithError() throws {
+        try? FileManager.default.removeItem(at: destDir)
+        destDir = nil
+        try super.tearDownWithError()
+    }
+
+    func testTopLevelFileConflictDetected() throws {
+        // Archive entry "readme.txt" conflicts with existing file at destination root.
+        try "existing".write(to: destDir.appendingPathComponent("readme.txt"), atomically: true, encoding: .utf8)
+        let conflicts = ArchiveExtractionSafety.conflicts(for: ["readme.txt"], in: destDir)
+        XCTAssertEqual(conflicts, ["readme.txt"])
+    }
+
+    func testNoConflictWhenPathIsFree() {
+        let conflicts = ArchiveExtractionSafety.conflicts(for: ["newfile.txt"], in: destDir)
+        XCTAssertTrue(conflicts.isEmpty, "no conflict for a path that does not exist")
+    }
+
+    func testSubdirectoryFileConflictWhenIntermediateIsAFile() throws {
+        // "subdir" exists as a FILE — extracting "subdir/data.txt" would fail because
+        // the intermediate component is not a directory. The bug: fileExists on the
+        // leaf path returned false, missing the conflict entirely.
+        try "I am a file".write(to: destDir.appendingPathComponent("subdir"), atomically: true, encoding: .utf8)
+        let conflicts = ArchiveExtractionSafety.conflicts(for: ["subdir/data.txt"], in: destDir)
+        XCTAssertEqual(conflicts, ["subdir/data.txt"],
+                       "intermediate component 'subdir' is a file, not a directory — must be flagged as a conflict")
+    }
+}
+
 // MARK: - Bug 19: SmartMetadataService.lineCount overcounts lines for files ending with a newline — 2 tests [optional]
 
 @MainActor

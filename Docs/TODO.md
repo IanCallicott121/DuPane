@@ -18,14 +18,11 @@
 - **`NetworkVolumeMonitor.ejectAndRemove` ignores unmount failure** — `try? NSWorkspace.unmountAndEjectDevice` failure is silently discarded; volume is removed from `mountedVolumes` even if the unmount didn't succeed, so the sidebar shows it gone while it's still mounted. (`Models/NetworkVolumeMonitor.swift`)
 - **Sync plan not atomic** — `executeSyncPlan()` with `.overwrite` has no transaction log; a crash mid-operation leaves the destination partially overwritten with no way to resume or roll back. (`Views/ContentView.swift`)
 - **Partial trash failure unrecoverable** — `FileOperationService.trash()` collects errors but can't identify which items were successfully trashed before the failure; user has no way to undo the partial deletion. (`Models/FileOperationService.swift`)
-- **`FileOperationService.moveOrCopy` subtree guard aborts entire batch** — guard exits early when any one item would copy into itself; other unrelated items in the batch are never processed. Skip only the offending item. (`Models/FileOperationService.swift`)
 - **`ContentView.showToast` race** — a second toast before the first's `asyncAfter` fires clears the second toast prematurely. Capture and compare the message in the closure. (`Views/ContentView.swift`)
 - **Dead `lastLeftURL`/`lastRightURL` UserDefaults writes** — `ContentView` writes these keys but they are never read (tab-state JSON takes over first). Remove the dead writes. (`Views/ContentView.swift`, `Models/AppLaunchConfiguration.swift`)
 - **`SidebarModel.recordVisit` and `init` block main thread** — `FileManager.fileExists` called synchronously on the main actor per bookmark and per recent URL. Move to a background task. (`Models/SidebarModel.swift`)
-- **`FolderCompareService` directory kind mismatch** — two dirs with the same name compare as `.different` if `localizedTypeDescription` differs (e.g. iCloud alias vs Folder). Exclude `kind` from directory equality. (`Models/FolderCompareService.swift`)
 - **`TabbedPaneView` calls `pane.load()` on every tab switch** — fires a directory read even when tab contents are current, causing unnecessary I/O and flicker. Only load if the tab has never loaded or its URL changed. (`Views/TabbedPaneView.swift`)
 - **`SidebarView` remove-from-recents calls `fileExists` O(n) times** — clear-then-re-record rebuilds the list by calling `recordVisit` for every remaining URL. Add a targeted `removeRecent(_ url:)` method to `SidebarModel`. (`Views/SidebarView.swift`, `Models/SidebarModel.swift`)
-- **`ArchiveExtractionSafety` conflict check misses subdirectory conflicts** — `fileExists` on a path whose intermediate dirs don't exist returns false; only top-level conflicts are detected. (`Models/ArchiveExtractionSafety.swift`)
 - **`NetworkVolumeMonitor` Bonjour delegate mutates `@Published` on background thread** — `BonjourBrowserDelegate` callbacks fire on the `NetServiceBrowser` queue without a `DispatchQueue.main` hop. (`Models/NetworkVolumeMonitor.swift`)
 - **`DuplicateFinderView` resolved groups linger** — after trashing all-but-one duplicate, the kept file stays in the list indefinitely with no dismiss affordance. Add a "Dismiss resolved" or "Rescan" action. (`Views/DuplicateFinderView.swift`)
 - **`ContentView.performDelete` peer-pane nav uses first deleted URL** — if multiple items are deleted and the peer pane is inside a later one, the nav target points to the wrong parent. (`Views/ContentView.swift`)
@@ -34,10 +31,8 @@
 
 - **`FileRowView.formatDate` creates `DateFormatter` per call** — expensive to construct per row per render. Cache as `static` properties. (`Views/FileRowView.swift`)
 - **`finderTagColor` duplicated in three files** — identical `switch name.lowercased()` in `FileRowView`, `SidebarView`, and `PropertiesView`. Extract to a shared function. (`Views/FileRowView.swift`, `Views/SidebarView.swift`, `Views/PropertiesView.swift`)
-- **`SmartMetadataService.lineCount` off-by-one** — `total = count + 1` overcounts by 1 for files ending with a newline (the common case). (`Models/SmartMetadataService.swift`)
 - **`QuickLookCoordinator.toggle` requires double-Space to change selection** — calls `orderOut` when panel is visible with new URLs instead of refreshing in place. (`Views/QuickLookCoordinator.swift`)
 - **`ColumnResizeHandle.anyIsDragging` stuck on missed mouseUp** — static flag never reset if `mouseUp` is missed (focus lost mid-drag), permanently suppressing cursor reset for all handles until restart. (`Views/ColumnResizeHandle.swift`)
-- **`TabbedPaneState.fallbackMetadataIndex` guard too permissive** — accepts count match on `savedLabels` or `savedPins` even when `savedPaths` count doesn't match; can restore metadata to wrong tabs after a tab count change. (`ViewModels/TabbedPaneState.swift`)
 - **`SidebarView.connectToServer` clears suppressed paths on every connect** — `clearSuppressedPaths()` called unconditionally, restoring volumes the user deliberately hid. (`Views/SidebarView.swift`)
 - **`PaneState.rename` / `duplicate` capture `self` strongly in `Task.detached`** — if the tab is closed mid-operation the pane stays alive and `load()` fires on a dead pane. Use `[weak self]`. (`ViewModels/PaneState.swift`)
 - **`AppLaunchConfiguration` command-line URL always `isDirectory: true`** — spurious trailing slash affects path comparisons for file arguments. (`Models/AppLaunchConfiguration.swift`)
@@ -58,6 +53,16 @@ none
 ---
 
 ## Done
+### Build 389 — 5 bug fixes: directory compare, line count, tab metadata, subtree copy guard, archive conflicts (2026-09-07)
+
+- **`FolderCompareService` directory kind mismatch fixed** — `status()` no longer checks `kind` when both items are directories. iCloud Drive reports "iCloud Folder" vs "Folder" for the same directory; this caused false `.different` results. (`Models/FolderCompareService.swift`)
+- **`SmartMetadataService.lineCount` off-by-one fixed** — tracks `lastByte`; does not add +1 when the file already ends with a newline. Files like "line1\nline2\nline3\n" now correctly report "3 lines" instead of "4 lines". (`Models/SmartMetadataService.swift`)
+- **`TabbedPaneState.fallbackMetadataIndex` guard fixed** — OR condition changed to only check `savedPaths.count == tabs.count`. Previously, matching `savedLabels` or `savedPins` count alone (without `savedPaths`) could stamp metadata onto the wrong tabs after a tab-count change. (`ViewModels/TabbedPaneState.swift`)
+- **`FileOperationService.moveOrCopy` subtree guard fixed** — guard moved inside the main loop with `continue` instead of early `return`. Other items in the batch now proceed when one folder is self-referential. (`Models/FileOperationService.swift`)
+- **`ArchiveExtractionSafety` subdirectory conflict detection fixed** — `conflicts()` now also checks intermediate path components; detects the case where an intermediate component exists as a file (not a directory), which `fileExists` on the leaf path missed. (`Models/ArchiveExtractionSafety.swift`)
+- **New tests added** — `FileOperationSubtreeGuardTests` (2 tests) and `ArchiveExtractionSafetyConflictTests` (3 tests) in `Build381BugTests.swift`. Updated `Build42BugFixTests` expected lineCount value.
+- **277 tests, 0 failures.**
+
 ### Build 380 — E2E rename test fix, CI hardening, .xcodeproj cleanup (2026-09-07)
 
 - **`testCriticalRenameFileThroughToolbarSheet` fixed** — replaced unreliable `typeKey("a", modifierFlags: .command)` (⌘A) with `typeKey(.rightArrow, modifierFlags: .command)` + `typeKey(.leftArrow, modifierFlags: [.command, .shift])` to navigate to end then select back to beginning, guaranteeing the pre-filled filename is replaced before typing the new name.

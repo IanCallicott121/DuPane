@@ -230,7 +230,7 @@ final class Build42BugFixTests: XCTestCase {
     @MainActor
     // [optional] — slow async metadata test; tests background service, not hot path
     func testSmartMetadataLineCountIsAccurateForSwiftFile() async throws {
-        // 3 newlines → lineCount returns count + 1 = 4 lines
+        // 3 lines with a trailing newline → lineCount must return 3, not 4.
         let content = "let a = 1\nlet b = 2\nlet c = 3\n"
         let tmpURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("linecount_\(UUID().uuidString).swift")
@@ -251,7 +251,7 @@ final class Build42BugFixTests: XCTestCase {
             try await Task.sleep(nanoseconds: 50_000_000)
         }
 
-        XCTAssertEqual(service.cache[tmpURL], "4 lines")
+        XCTAssertEqual(service.cache[tmpURL], "3 lines")
     }
 
     @MainActor
