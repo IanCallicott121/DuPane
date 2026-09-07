@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0745BBFB2CE6367E82E8EED2 /* CustomActionsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0F9D06550473864F1C8E6E /* CustomActionsSettingsView.swift */; };
 		094541A0B1B9AC9B18C41D53 /* FileRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 360E6EB5F8EAEE4205C6E7C2 /* FileRowView.swift */; };
 		1A7C6C85FD621712DE58772E /* FileOperationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CABF7D3C5CD1BA9F8C4992C /* FileOperationService.swift */; };
 		1F8F5D5F0CFE9119AA97748F /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45BCD3F60603830DD11FE1B /* SettingsView.swift */; };
@@ -24,7 +23,6 @@
 		6FF1393932F591E1A41891B6 /* PaneStatusFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2AB1720EBFDD942932DA08 /* PaneStatusFormatter.swift */; };
 		7AF00C431BF2D2F4DE9EB78C /* FileItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111CD0B2A6FF020EEE44C249 /* FileItem.swift */; };
 		84A17B6D94A1C3E64BF185C9 /* DuPaneApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D64A3C378B4FF4EF43433C4 /* DuPaneApp.swift */; };
-		8BE72E1CF0EB83EBCE25BCD3 /* CustomActionsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9D9DCDFD03AFC65219B4AB3 /* CustomActionsModel.swift */; };
 		9C8D125999C057C45C615F31 /* DuplicateFinderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E9AC9BE723532F7A720C8C9 /* DuplicateFinderView.swift */; };
 		A2E4FD90D8664662C3185749 /* PaneState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E61DCC34ECE77D90CF6F125F /* PaneState.swift */; };
 		A507F6C200F53A5E914E37BD /* AppLaunchConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23CB56998520ADE5AACB1D31 /* AppLaunchConfiguration.swift */; };
@@ -92,7 +90,6 @@
 		B28EEE1BD89BF68C22BFBE35 /* FAQs.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = FAQs.html; sourceTree = "<group>"; };
 		BBD4C822071AB0B8AC372B9B /* DuPane.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DuPane.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C61418D97A5F9621A9AE1341 /* GlobalToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalToolbar.swift; sourceTree = "<group>"; };
-		C9D9DCDFD03AFC65219B4AB3 /* CustomActionsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomActionsModel.swift; sourceTree = "<group>"; };
 		CC91B0171B9C5B4E5E2F4A8E /* FolderCompareService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderCompareService.swift; sourceTree = "<group>"; };
 		D5AA27DF55CCADB499D6FE85 /* DividerBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DividerBadge.swift; sourceTree = "<group>"; };
 		D6104505C3E09A7E8C238D71 /* TabbedPaneState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabbedPaneState.swift; sourceTree = "<group>"; };
@@ -105,7 +102,6 @@
 		F85322D958A3D7F86BC39780 /* FolderSizeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderSizeViewModel.swift; sourceTree = "<group>"; };
 		F9B6670DC7F86CE59A77BDCB /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		FDB59E6732FAF14C48E23627 /* PropertiesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PropertiesView.swift; sourceTree = "<group>"; };
-		FF0F9D06550473864F1C8E6E /* CustomActionsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomActionsSettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -116,7 +112,6 @@
 				4D23189709AA33FA3A8D8BFE /* AppNotifications.swift */,
 				F9B6670DC7F86CE59A77BDCB /* AppSettings.swift */,
 				359D76E90A07D857C14708EF /* ArchiveExtractionSafety.swift */,
-				C9D9DCDFD03AFC65219B4AB3 /* CustomActionsModel.swift */,
 				EB61086CBBC46886E669CD83 /* DragSession.swift */,
 				111CD0B2A6FF020EEE44C249 /* FileItem.swift */,
 				0CABF7D3C5CD1BA9F8C4992C /* FileOperationService.swift */,
@@ -202,7 +197,6 @@
 				5BD4687C8D9A67385CE7D668 /* ColumnResizeHandle.swift */,
 				89C00AB8AD080B4BD0FF4EA8 /* CommandRunnerView.swift */,
 				2D06BE3328E728A2679B9CFF /* ContentView.swift */,
-				FF0F9D06550473864F1C8E6E /* CustomActionsSettingsView.swift */,
 				D5AA27DF55CCADB499D6FE85 /* DividerBadge.swift */,
 				3E9AC9BE723532F7A720C8C9 /* DuplicateFinderView.swift */,
 				360E6EB5F8EAEE4205C6E7C2 /* FileRowView.swift */,
@@ -341,8 +335,6 @@
 				B694F1F8731D44F98C3CFF61 /* ColumnResizeHandle.swift in Sources */,
 				DD9BAB730BA5574BA2F3F2D3 /* CommandRunnerView.swift in Sources */,
 				34DC8D25232881D9D58E18D8 /* ContentView.swift in Sources */,
-				8BE72E1CF0EB83EBCE25BCD3 /* CustomActionsModel.swift in Sources */,
-				0745BBFB2CE6367E82E8EED2 /* CustomActionsSettingsView.swift in Sources */,
 				AF3CF01B6C4C42E29AD7FADA /* DividerBadge.swift in Sources */,
 				5A6ACFFD0D249142FAC20D73 /* DragSession.swift in Sources */,
 				84A17B6D94A1C3E64BF185C9 /* DuPaneApp.swift in Sources */,
@@ -415,7 +407,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = local.DuPane;
 				SDKROOT = macosx;
 				SWIFT_VERSION = 5.9;
-				SYMROOT = "$(HOME)/Library/Developer/DuPane-build";
 			};
 			name = Release;
 		};
@@ -442,7 +433,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = local.DuPane;
 				SDKROOT = macosx;
 				SWIFT_VERSION = 5.9;
-				SYMROOT = "$(HOME)/Library/Developer/DuPane-build";
 			};
 			name = Debug;
 		};
@@ -542,6 +532,7 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
+				SYMROOT = "$(HOME)/Library/Developer/DuPane-build";
 			};
 			name = Debug;
 		};
@@ -598,6 +589,7 @@
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
+				SYMROOT = "$(HOME)/Library/Developer/DuPane-build";
 			};
 			name = Release;
 		};
