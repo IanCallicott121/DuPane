@@ -63,7 +63,7 @@ final class DuplicateFinderViewModel: ObservableObject {
         }
         groups = groups.compactMap { group in
             let remaining = group.filter { $0 != url }
-            return remaining.isEmpty ? nil : remaining
+            return remaining.count > 1 ? remaining : nil
         }
     }
 
