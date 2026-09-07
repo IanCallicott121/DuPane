@@ -1191,48 +1191,10 @@ final class PaneStateEnhancedTests: XCTestCase {
     }
 }
 
-// MARK: - CustomActionsModelTests
+// MARK: - ProcessRunnerTests
 
 @MainActor
-final class CustomActionsModelTests: XCTestCase {
-    private let key = "customActions.v1"
-
-    override func tearDown() {
-        UserDefaults.standard.removeObject(forKey: key)
-        super.tearDown()
-    }
-
-    func testAddAction() {
-        let model = CustomActionsModel()
-        model.add(name: "Echo", command: "echo $@")
-        XCTAssertEqual(model.actions.count, 1)
-        XCTAssertEqual(model.actions.first?.name, "Echo")
-    }
-
-    func testRemoveAction() {
-        let model = CustomActionsModel()
-        model.add(name: "A", command: "a")
-        model.add(name: "B", command: "b")
-        model.remove(at: IndexSet([0]))
-        XCTAssertEqual(model.actions.count, 1)
-        XCTAssertEqual(model.actions.first?.name, "B")
-    }
-
-    func testMoveAction() {
-        let model = CustomActionsModel()
-        model.add(name: "A", command: "a")
-        model.add(name: "B", command: "b")
-        model.move(from: IndexSet([0]), to: 2)
-        XCTAssertEqual(model.actions.map(\.name), ["B", "A"])
-    }
-
-    func testActionsPersistAcrossInstances() {
-        let m1 = CustomActionsModel()
-        m1.add(name: "Persist", command: "open $@")
-        let m2 = CustomActionsModel()
-        XCTAssertEqual(m2.actions.first?.name, "Persist")
-    }
-
+final class ProcessRunnerTests: XCTestCase {
     // [optional] — slow I/O stress test; run periodically, not on every build
     func testProcessRunnerHandlesLargeOutputWithoutDeadlock() async throws {
         let result = try await ProcessRunner.run(

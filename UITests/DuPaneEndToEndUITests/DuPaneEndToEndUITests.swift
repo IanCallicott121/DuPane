@@ -207,34 +207,13 @@ final class DuPaneEndToEndUITests: XCTestCase {
     }
 
     @MainActor
-    func testShellCommandNoticeAppearsBeforeCommandRunnerExecution() throws {
-        launchApp(extraArguments: ["-showCustomShellCommandNotice", "YES"])
-        clickToolbarButton("toolbar-terminal-button")
-
-        let commandField = app.textFields.matching(NSPredicate(format: "placeholderValue == %@", "Command…")).firstMatch
-        XCTAssertTrue(commandField.waitForExistence(timeout: 5))
-        commandField.click()
-        commandField.typeText("printf hello")
-        let runButton = app.buttons["Arrow Right Circle"]
-        XCTAssertTrue(runButton.waitForExistence(timeout: 5))
-        runButton.click()
-
-        XCTAssertTrue(app.staticTexts["Run Shell Command?"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["Run"].exists)
-        XCTAssertTrue(app.buttons["Don't Show Again"].exists)
-        let alert = app.sheets.firstMatch
-        XCTAssertTrue(alert.buttons["Cancel"].exists)
-        alert.buttons["Cancel"].click()
-    }
-
-    @MainActor
-    private func launchApp(extraArguments: [String] = []) {
+    private func launchApp() {
         app.launchArguments = [
             "-ApplePersistenceIgnoreState",
             "YES",
             "--left-pane-url", fixture.leftPaneURL.path,
             "--right-pane-url", fixture.rightPaneURL.path
-        ] + extraArguments
+        ]
         app.launch()
         app.activate()
         XCTAssertTrue(

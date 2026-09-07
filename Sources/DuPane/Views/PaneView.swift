@@ -1095,39 +1095,6 @@ struct PaneView: View {
 
     // MARK: - File operations
 
-    private func duplicateItems(_ urls: [URL]) {
-        guard let dir = pane.currentURL else { return }
-        Task.detached {
-            var errors: [String] = []
-            for url in urls {
-                let base = url.deletingPathExtension().lastPathComponent
-                let ext = url.pathExtension
-                var dest = dir.appendingPathComponent(ext.isEmpty ? "\(base) copy" : "\(base) copy.\(ext)")
-                var n = 2
-                while FileManager.default.fileExists(atPath: dest.path) {
-                    let name = ext.isEmpty ? "\(base) copy \(n)" : "\(base) copy \(n).\(ext)"
-                    dest = dir.appendingPathComponent(name)
-                    n += 1
-                }
-                do {
-                    try FileManager.default.copyItem(at: url, to: dest)
-                } catch {
-                    errors.append("Couldn't duplicate \(url.lastPathComponent): \(error.localizedDescription)")
-                }
-            }
-            let errorMessage = Self.aggregatedErrorMessage(errors, label: "duplicate errors")
-            await MainActor.run {
-                pane.load()
-                NotificationCenter.default.post(name: .paneContentsChanged,
-                                                object: nil,
-                                                userInfo: ["url": dir])
-                if let errorMessage {
-                    pane.errorMessage = errorMessage
-                }
-            }
-        }
-    }
-
     private func compressItems(_ urls: [URL]) {
         guard let dir = pane.currentURL else { return }
         let archiveName = urls.count == 1
@@ -1271,16 +1238,6 @@ struct PaneView: View {
             return "Couldn't \(action): process exited with status \(result.terminationStatus)."
         }
         return "Couldn't \(action): \(output)"
-    }
-
-    nonisolated private static func aggregatedErrorMessage(_ errors: [String], label: String) -> String? {
-        if errors.count == 1 {
-            return errors[0]
-        }
-        if errors.count > 1 {
-            return "\(errors.count) \(label) - \(errors[0])"
-        }
-        return nil
     }
 
     // MARK: - Drag and drop
