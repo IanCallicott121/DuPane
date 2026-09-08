@@ -4,6 +4,8 @@ import QuickLookUI
 /// Manages the Quick Look panel as its data source.
 /// All public methods must be called from the main thread.
 final class QuickLookCoordinator: NSObject, QLPreviewPanelDataSource {
+    enum ToggleAction: Equatable { case hide, show }
+
     static let shared = QuickLookCoordinator()
     private override init() { super.init() }
 
@@ -25,11 +27,23 @@ final class QuickLookCoordinator: NSObject, QLPreviewPanelDataSource {
     @MainActor
     func toggle(urls: [URL]) {
         guard let panel = QLPreviewPanel.shared() else { return }
-        if panel.isVisible {
+        if Self.toggleAction(
+            isVisible: panel.isVisible,
+            currentURLs: previewURLs,
+            requestedURLs: urls
+        ) == .hide {
             panel.orderOut(nil)
         } else {
             show(urls: urls)
         }
+    }
+
+    static func toggleAction(
+        isVisible: Bool,
+        currentURLs: [URL],
+        requestedURLs: [URL]
+    ) -> ToggleAction {
+        isVisible && currentURLs == requestedURLs ? .hide : .show
     }
 
     // MARK: - QLPreviewPanelDataSource

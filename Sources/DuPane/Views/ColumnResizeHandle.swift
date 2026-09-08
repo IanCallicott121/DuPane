@@ -14,6 +14,8 @@ final class ColumnResizeNSView: NSView {
     private var thresholdMet = false
     private var dragCursor: NSCursor?
     private var dragCursorMonitor: Any?
+    private var globalMouseUpMonitor: Any?
+    private var dragEndObservers: [NSObjectProtocol] = []
     private var didPushDragCursor = false
     private weak var cursorRectsDisabledWindow: NSWindow?
 
@@ -88,10 +90,23 @@ final class ColumnResizeNSView: NSView {
         didPushDragCursor = true
         cursor.set()
 
-        dragCursorMonitor = NSEvent.addLocalMonitorForEvents(matching: [.leftMouseDragged, .cursorUpdate]) { [weak self] e in
+        dragCursorMonitor = NSEvent.addLocalMonitorForEvents(matching: [.leftMouseDragged, .leftMouseUp, .cursorUpdate]) { [weak self] e in
+            if e.type == .leftMouseUp { self?.finishDragging() }
             self?.dragCursor?.set()
             return e
         }
+        globalMouseUpMonitor = NSEvent.addGlobalMonitorForEvents(matching: .leftMouseUp) { [weak self] _ in
+            self?.finishDragging()
+        }
+        let center = NotificationCenter.default
+        if let window {
+            dragEndObservers.append(center.addObserver(
+                forName: NSWindow.didResignKeyNotification, object: window, queue: .main
+            ) { [weak self] _ in self?.finishDragging() })
+        }
+        dragEndObservers.append(center.addObserver(
+            forName: NSApplication.didResignActiveNotification, object: NSApp, queue: .main
+        ) { [weak self] _ in self?.finishDragging() })
     }
 
     override func mouseDragged(with event: NSEvent) {
@@ -127,6 +142,12 @@ final class ColumnResizeNSView: NSView {
             NSEvent.removeMonitor(monitor)
             dragCursorMonitor = nil
         }
+        if let monitor = globalMouseUpMonitor {
+            NSEvent.removeMonitor(monitor)
+            globalMouseUpMonitor = nil
+        }
+        dragEndObservers.forEach { NotificationCenter.default.removeObserver($0) }
+        dragEndObservers = []
         if didPushDragCursor {
             NSCursor.pop()
             didPushDragCursor = false
