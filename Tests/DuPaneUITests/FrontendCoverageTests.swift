@@ -5,7 +5,7 @@ import XCTest
 // MARK: - DuplicateFinderViewModelTests (8 tests)
 
 @MainActor
-final class DuplicateFinderViewModelTests: XCTestCase {
+final class DuplicateFinderViewModelTests: DuPaneTestCase {
     private var dir: URL!
 
     override func setUpWithError() throws {
@@ -160,7 +160,7 @@ final class DuplicateFinderViewModelTests: XCTestCase {
 // MARK: - PaneState filter + navigation (3 tests)
 
 @MainActor
-final class PaneStateFilterNavigationTests: XCTestCase {
+final class PaneStateFilterNavigationTests: DuPaneTestCase {
     private var fixture: FilePaneFixture!
 
     override func setUpWithError() throws {
@@ -220,7 +220,7 @@ final class PaneStateFilterNavigationTests: XCTestCase {
 // MARK: - Tab tint / colour (3 tests)
 
 @MainActor
-final class TabTintTests: XCTestCase {
+final class TabTintTests: DuPaneTestCase {
     func testTabTintDefaultsToNil() {
         let state = TabbedPaneState(initialURL: nil)
         XCTAssertNil(state.tabs[0].tint)
@@ -253,7 +253,7 @@ final class TabTintTests: XCTestCase {
 // MARK: - FolderSizeViewModel edge cases (2 tests)
 
 @MainActor
-final class FolderSizeViewModelEdgeCaseTests: XCTestCase {
+final class FolderSizeViewModelEdgeCaseTests: DuPaneTestCase {
     func testFolderSizeViewModelHandlesEmptyDirectory() async throws {
         let dir = FileManager.default.temporaryDirectory
             .appendingPathComponent("fsvm-empty-\(UUID().uuidString)", isDirectory: true)
@@ -296,7 +296,7 @@ final class FolderSizeViewModelEdgeCaseTests: XCTestCase {
 
 // MARK: - AppSettings & PaneState defaults (2 tests)
 
-final class AppSettingsAndPaneDefaultTests: XCTestCase {
+final class AppSettingsAndPaneDefaultTests: DuPaneTestCase {
     // [optional] — trivial default; covered by the broader new-defaults test in Build268Tests
     func testAppSettingsListFontSizeDefaultIs14() {
         UserDefaults.standard.removeObject(forKey: "listFontSize")

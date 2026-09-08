@@ -3,7 +3,7 @@ import XCTest
 @testable import DuPane
 
 /// Tests covering the Critical and Major bug fixes from Build 42.
-final class Build42BugFixTests: XCTestCase {
+final class Build42BugFixTests: DuPaneTestCase {
     private var fixture: FilePaneFixture!
 
     override func setUpWithError() throws {

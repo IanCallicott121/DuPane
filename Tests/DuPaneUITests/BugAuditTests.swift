@@ -10,7 +10,7 @@ import XCTest
 // initialised with at least one URL and only grow, so the access is safe, but
 // the behaviour must remain correct if the algorithm changes.
 
-final class DuplicateFinderVerifiedGroupsTests: XCTestCase {
+final class DuplicateFinderVerifiedGroupsTests: DuPaneTestCase {
     private var dir: URL!
 
     override func setUpWithError() throws {
@@ -86,7 +86,7 @@ final class DuplicateFinderVerifiedGroupsTests: XCTestCase {
 // not left with a single-element group (which would be a non-duplicate).
 
 @MainActor
-final class DuplicateFinderMoveToTrashTests: XCTestCase {
+final class DuplicateFinderMoveToTrashTests: DuPaneTestCase {
     private var dir: URL!
 
     override func setUpWithError() throws {
@@ -169,7 +169,7 @@ final class DuplicateFinderMoveToTrashTests: XCTestCase {
 // so test that they gate correctly under navigation sequences.
 
 @MainActor
-final class PaneStateHistoryBoundaryTests: XCTestCase {
+final class PaneStateHistoryBoundaryTests: DuPaneTestCase {
 
     func testCanGoBackFalseAtStart() {
         let pane = PaneState(initialURL: URL(fileURLWithPath: "/tmp"))
@@ -249,7 +249,7 @@ final class PaneStateHistoryBoundaryTests: XCTestCase {
 // if NSWorkspace.unmountAndEjectDevice fails. This documents the current behaviour;
 // a fix would only remove if unmount succeeds.
 
-final class NetworkVolumeMonitorEjectTests: XCTestCase {
+final class NetworkVolumeMonitorEjectTests: DuPaneTestCase {
 
     func testEjectAndRemoveUpdatesSuppressedPaths() {
         let monitor = NetworkVolumeMonitor()
@@ -295,7 +295,7 @@ final class NetworkVolumeMonitorEjectTests: XCTestCase {
 // exists. A non-existent path still produces a non-nil URL — this documents
 // the behaviour so a future fix can be verified against these tests.
 
-final class AppLaunchConfigurationURLTests: XCTestCase {
+final class AppLaunchConfigurationURLTests: DuPaneTestCase {
 
     func testNonExistentLeftPaneURLFallsBackToDefault() {
         let ghost = "/tmp/this-path-does-not-exist-\(UUID().uuidString)"
@@ -348,7 +348,7 @@ final class AppLaunchConfigurationURLTests: XCTestCase {
 // Same-URL comparison must short-circuit. Zero-byte files must not be confused
 // with each other (size guard handles this via the scan pre-filter, but document it).
 
-final class DuplicateFinderSameContentsTests: XCTestCase {
+final class DuplicateFinderSameContentsTests: DuPaneTestCase {
     private var dir: URL!
 
     override func setUpWithError() throws {

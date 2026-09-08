@@ -8,7 +8,7 @@ import XCTest
 
 // MARK: - Bug 10: FolderCompareService treats directories with different kind strings as .different — 3 tests [must]
 
-final class FolderCompareDirectoryKindTests: XCTestCase {
+final class FolderCompareDirectoryKindTests: DuPaneTestCase {
     private var fixture: FilePaneFixture!
 
     override func setUpWithError() throws {
@@ -64,7 +64,7 @@ final class FolderCompareDirectoryKindTests: XCTestCase {
 // MARK: - Bug 22: TabbedPaneState.fallbackMetadataIndex OR guard applies metadata when only label count matches tabs count — 1 test [must]
 
 @MainActor
-final class TabbedPaneStateFallbackMetadataTests: XCTestCase {
+final class TabbedPaneStateFallbackMetadataTests: DuPaneTestCase {
     private var testKey: String!
 
     override func setUp() {
@@ -104,7 +104,7 @@ final class TabbedPaneStateFallbackMetadataTests: XCTestCase {
 // MARK: - Bug 26: PaneState.duplicate() with nil currentURL is a silent no-op — 1 test [must]
 
 @MainActor
-final class PaneStateDuplicateSilentNoOpTests: XCTestCase {
+final class PaneStateDuplicateSilentNoOpTests: DuPaneTestCase {
     func testDuplicateAtComputerRootSetsErrorMessage() {
         let pane = PaneState(initialURL: nil) // nil = virtual Computer root
         XCTAssertNil(pane.currentURL)
@@ -117,7 +117,7 @@ final class PaneStateDuplicateSilentNoOpTests: XCTestCase {
 // MARK: - Bug 2: SortPreference writes a distinct UserDefaults key per folder URL — unbounded growth — 1 test [must]
 
 @MainActor
-final class SortPreferenceGrowthTests: XCTestCase {
+final class SortPreferenceGrowthTests: DuPaneTestCase {
     private var writtenPaths: [String] = []
 
     override func tearDown() {
@@ -161,7 +161,7 @@ final class SortPreferenceGrowthTests: XCTestCase {
 
 // MARK: - FileOperationService.moveOrCopy subtree guard skips only the offending item — 2 tests [must]
 
-final class FileOperationSubtreeGuardTests: XCTestCase {
+final class FileOperationSubtreeGuardTests: DuPaneTestCase {
     private var fixture: FilePaneFixture!
 
     override func setUpWithError() throws {
@@ -226,7 +226,7 @@ final class FileOperationSubtreeGuardTests: XCTestCase {
 
 // MARK: - ArchiveExtractionSafety.conflicts detects intermediate-component conflicts — 3 tests [must]
 
-final class ArchiveExtractionSafetyConflictTests: XCTestCase {
+final class ArchiveExtractionSafetyConflictTests: DuPaneTestCase {
     private var destDir: URL!
 
     override func setUpWithError() throws {
@@ -268,7 +268,7 @@ final class ArchiveExtractionSafetyConflictTests: XCTestCase {
 // MARK: - Bug 19: SmartMetadataService.lineCount overcounts lines for files ending with a newline — 2 tests [optional]
 
 @MainActor
-final class SmartMetadataLineCountTests: XCTestCase {
+final class SmartMetadataLineCountTests: DuPaneTestCase {
     private var tmpFiles: [URL] = []
 
     override func tearDown() async throws {

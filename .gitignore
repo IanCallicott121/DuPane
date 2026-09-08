@@ -10,3 +10,6 @@ xcuserdata/
 
 # macOS
 .DS_Store
+
+# Test result log (written by TestResultLog)
+.test-results/

@@ -2,7 +2,7 @@ import Foundation
 import XCTest
 @testable import DuPane
 
-final class DeepSearchTests: XCTestCase {
+final class DeepSearchTests: DuPaneTestCase {
     private var fixture: FilePaneFixture!
 
     override func setUpWithError() throws {

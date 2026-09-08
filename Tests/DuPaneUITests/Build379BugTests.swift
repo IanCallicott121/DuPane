@@ -12,7 +12,7 @@ import XCTest
 // the guarded completion path must not overwrite it.
 
 @MainActor
-final class DuplicateFinderCancellationTests: XCTestCase {
+final class DuplicateFinderCancellationTests: DuPaneTestCase {
     private var dir: URL!
 
     override func setUpWithError() throws {

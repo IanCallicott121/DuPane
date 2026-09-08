@@ -1,6 +1,6 @@
 import XCTest
 
-final class DuPaneEndToEndUITests: XCTestCase {
+final class DuPaneEndToEndUITests: DuPaneTestCase {
     private var fixture: EndToEndFixture!
     private var app: XCUIApplication!
 

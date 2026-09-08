@@ -4,7 +4,7 @@ import XCTest
 
 // MARK: - NetworkVolume (5 tests)
 
-final class NetworkVolumeTests: XCTestCase {
+final class NetworkVolumeTests: DuPaneTestCase {
     func testNetworkVolumeNameDerivedFromLastPathComponent() {
         let url = URL(fileURLWithPath: "/Volumes/WorkShare")
         let vol = NetworkVolume(url: url)
@@ -37,7 +37,7 @@ final class NetworkVolumeTests: XCTestCase {
 
 // MARK: - BonjourServer (5 tests)
 
-final class BonjourServerTests: XCTestCase {
+final class BonjourServerTests: DuPaneTestCase {
     func testBonjourServerIdCombinesSchemeAndHost() {
         let s = BonjourServer(name: "MyServer", hostName: "myserver.local", scheme: "smb")
         XCTAssertEqual(s.id, "smb://myserver.local")
@@ -69,7 +69,7 @@ final class BonjourServerTests: XCTestCase {
 
 // MARK: - AppSettings network defaults (7 tests)
 
-final class AppSettingsNetworkDefaultTests: XCTestCase {
+final class AppSettingsNetworkDefaultTests: DuPaneTestCase {
     private static let networkKeys = [
         "networkShowMountedVolumes", "networkBonjourDiscovery", "networkPinnedLocations",
         "networkAutoReconnect", "networkStatusIndicator", "pinnedNetworkURLs"
@@ -120,7 +120,7 @@ final class AppSettingsNetworkDefaultTests: XCTestCase {
 // MARK: - NetworkVolumeMonitor unit (3 tests)
 
 @MainActor
-final class NetworkVolumeMonitorTests: XCTestCase {
+final class NetworkVolumeMonitorTests: DuPaneTestCase {
     func testRefreshProducesNoVolumesOnRootFileSystem() {
         // The root filesystem ("/") is always local — refresh should not include it
         let monitor = NetworkVolumeMonitor()

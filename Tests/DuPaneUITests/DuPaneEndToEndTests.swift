@@ -1,6 +1,6 @@
 import XCTest
 
-final class DuPaneEndToEndTests: XCTestCase {
+final class DuPaneEndToEndTests: DuPaneTestCase {
     // Requires an Xcode-built executable in DerivedData.
     // Passes silently via `swift test` (no binary); runs fully via ⌘U in Xcode.
     func testAppBundleCanBeCreatedFromBuiltExecutable() {

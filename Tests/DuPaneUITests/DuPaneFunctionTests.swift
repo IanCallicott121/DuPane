@@ -3,7 +3,7 @@ import XCTest
 @testable import DuPane
 // All tests [must] unless marked [optional]. See Build268Tests.swift for tagging convention.
 
-final class DuPaneFunctionTests: XCTestCase {
+final class DuPaneFunctionTests: DuPaneTestCase {
     private var fixture: FilePaneFixture!
 
     override func setUpWithError() throws {
@@ -766,7 +766,7 @@ final class DuPaneFunctionTests: XCTestCase {
 // MARK: - TabbedPaneState Tests
 
 @MainActor
-final class TabbedPaneStateTests: XCTestCase {
+final class TabbedPaneStateTests: DuPaneTestCase {
 
     func testInitialStateHasOneTab() {
         let state = TabbedPaneState(initialURL: nil)
@@ -1057,7 +1057,7 @@ final class TabbedPaneStateTests: XCTestCase {
 // MARK: - SidebarModel Tests
 
 @MainActor
-final class SidebarModelTests: XCTestCase {
+final class SidebarModelTests: DuPaneTestCase {
 
     // [optional] — environment check; fails only if system folders are missing
     func testSystemLocationsAreNonEmpty() {
@@ -1123,7 +1123,7 @@ final class SidebarModelTests: XCTestCase {
 // MARK: - PaneState Enhanced Tests
 
 @MainActor
-final class PaneStateEnhancedTests: XCTestCase {
+final class PaneStateEnhancedTests: DuPaneTestCase {
     var fixture: FilePaneFixture!
 
     override func setUp() async throws {
@@ -1194,7 +1194,7 @@ final class PaneStateEnhancedTests: XCTestCase {
 // MARK: - ProcessRunnerTests
 
 @MainActor
-final class ProcessRunnerTests: XCTestCase {
+final class ProcessRunnerTests: DuPaneTestCase {
     // [optional] — slow I/O stress test; run periodically, not on every build
     func testProcessRunnerHandlesLargeOutputWithoutDeadlock() async throws {
         let result = try await ProcessRunner.run(
@@ -1221,7 +1221,7 @@ final class ProcessRunnerTests: XCTestCase {
 // MARK: - SmartMetadataServiceTests
 
 @MainActor
-final class SmartMetadataServiceTests: XCTestCase {
+final class SmartMetadataServiceTests: DuPaneTestCase {
     // [optional] — slow (500ms sleep); metadata correctness covered by Build42BugFixTests
     func testLineCountForSwiftFile() async throws {
         let tmp = FileManager.default.temporaryDirectory
@@ -1276,7 +1276,7 @@ final class SmartMetadataServiceTests: XCTestCase {
 // MARK: - FolderSizeViewModelTests
 
 @MainActor
-final class FolderSizeViewModelTests: XCTestCase {
+final class FolderSizeViewModelTests: DuPaneTestCase {
     // [optional] — slow folder scan; FolderSizeViewModel edge cases in FrontendCoverageTests
     func testScanCountsSubitems() async throws {
         let dir = FileManager.default.temporaryDirectory

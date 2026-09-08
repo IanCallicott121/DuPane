@@ -2,7 +2,7 @@ import XCTest
 @testable import DuPane
 // All tests in this file are [optional] — performance budgets, run periodically.
 
-final class DuPaneLatencyTests: XCTestCase {
+final class DuPaneLatencyTests: DuPaneTestCase {
 
     // 1 000 clicks must complete in under 10 ms (10 µs / click).
     // Pure in-memory set/array work lands well under 1 ms; this budget exists

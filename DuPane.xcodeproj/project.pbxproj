@@ -27,6 +27,7 @@
 		A2E4FD90D8664662C3185749 /* PaneState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E61DCC34ECE77D90CF6F125F /* PaneState.swift */; };
 		A507F6C200F53A5E914E37BD /* AppLaunchConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23CB56998520ADE5AACB1D31 /* AppLaunchConfiguration.swift */; };
 		AA620C5E945BCFEEB2A18ADF /* FolderSizeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85322D958A3D7F86BC39780 /* FolderSizeViewModel.swift */; };
+		6277C33D8E559AC66D9CA629 /* FileOperationProgressModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376B44222EDB9FCEED6AFC4E /* FileOperationProgressModel.swift */; };
 		AC82F80C592B566515734DE5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A7BAAC9837A4127AF9B04ADB /* Assets.xcassets */; };
 		AEA014C849A8F46B4518B2EA /* PaneSide.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6CBFA6671B709D2A2A656F2 /* PaneSide.swift */; };
 		AEBD3B39F31C441B65960B16 /* QuickLookCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF5F050DAF4B82B586B4C349 /* QuickLookCoordinator.swift */; };
@@ -41,6 +42,7 @@
 		EDF9DD91C7EFFE1F451F8CFF /* PaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A82E5C9F38FB38C70591C46 /* PaneView.swift */; };
 		EE2A94D4F59EF1B7486B39A5 /* NetworkVolumeMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A39EB85CF1684C4F50439457 /* NetworkVolumeMonitor.swift */; };
 		F30626DBB59CFE1EF8A35D5E /* DuPaneEndToEndUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F3DE126E6ED9AE8C058440 /* DuPaneEndToEndUITests.swift */; };
+		60DE908C4966FD54E0AEA30E /* TestResultLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585EC80A1E453872E2ACB61B /* TestResultLog.swift */; };
 		F542C58721FA4AFFC1DD0410 /* TabbedPaneState.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6104505C3E09A7E8C238D71 /* TabbedPaneState.swift */; };
 		FBB5C017FFFEF616F003E72E /* DuplicateFinderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B85D3FC392CEC6039DBC45F /* DuplicateFinderViewModel.swift */; };
 		FE5EBA5ECC39452288C5EF3D /* PropertiesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDB59E6732FAF14C48E23627 /* PropertiesView.swift */; };
@@ -70,6 +72,7 @@
 		39E987ED4C8E3B99EF9428BC /* TabbedPaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabbedPaneView.swift; sourceTree = "<group>"; };
 		3E9AC9BE723532F7A720C8C9 /* DuplicateFinderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuplicateFinderView.swift; sourceTree = "<group>"; };
 		42F3DE126E6ED9AE8C058440 /* DuPaneEndToEndUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuPaneEndToEndUITests.swift; sourceTree = "<group>"; };
+		585EC80A1E453872E2ACB61B /* TestResultLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestResultLog.swift; sourceTree = "<group>"; };
 		4A82E5C9F38FB38C70591C46 /* PaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaneView.swift; sourceTree = "<group>"; };
 		4C95D005626882E2D2F3EAEF /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
 		4D23189709AA33FA3A8D8BFE /* AppNotifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNotifications.swift; sourceTree = "<group>"; };
@@ -100,6 +103,7 @@
 		EC30511A9FD0582A9C4E614C /* TextPromptSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextPromptSheet.swift; sourceTree = "<group>"; };
 		EF5F050DAF4B82B586B4C349 /* QuickLookCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickLookCoordinator.swift; sourceTree = "<group>"; };
 		F85322D958A3D7F86BC39780 /* FolderSizeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderSizeViewModel.swift; sourceTree = "<group>"; };
+		376B44222EDB9FCEED6AFC4E /* FileOperationProgressModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileOperationProgressModel.swift; sourceTree = "<group>"; };
 		F9B6670DC7F86CE59A77BDCB /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		FDB59E6732FAF14C48E23627 /* PropertiesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PropertiesView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -130,6 +134,7 @@
 			isa = PBXGroup;
 			children = (
 				42F3DE126E6ED9AE8C058440 /* DuPaneEndToEndUITests.swift */,
+				585EC80A1E453872E2ACB61B /* TestResultLog.swift */,
 			);
 			name = DuPaneEndToEndUITests;
 			path = UITests/DuPaneEndToEndUITests;
@@ -162,6 +167,7 @@
 			isa = PBXGroup;
 			children = (
 				0B85D3FC392CEC6039DBC45F /* DuplicateFinderViewModel.swift */,
+				376B44222EDB9FCEED6AFC4E /* FileOperationProgressModel.swift */,
 				F85322D958A3D7F86BC39780 /* FolderSizeViewModel.swift */,
 				E61DCC34ECE77D90CF6F125F /* PaneState.swift */,
 				D6104505C3E09A7E8C238D71 /* TabbedPaneState.swift */,
@@ -346,6 +352,7 @@
 				5BC659FEF0C3C3C3BAFB53F1 /* FolderCompareService.swift in Sources */,
 				5CB104C680E47D19D10B63B1 /* FolderSizeView.swift in Sources */,
 				AA620C5E945BCFEEB2A18ADF /* FolderSizeViewModel.swift in Sources */,
+				6277C33D8E559AC66D9CA629 /* FileOperationProgressModel.swift in Sources */,
 				DCD935681E23DE29901295DA /* GlobalToolbar.swift in Sources */,
 				EE2A94D4F59EF1B7486B39A5 /* NetworkVolumeMonitor.swift in Sources */,
 				AEA014C849A8F46B4518B2EA /* PaneSide.swift in Sources */,
@@ -371,6 +378,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F30626DBB59CFE1EF8A35D5E /* DuPaneEndToEndUITests.swift in Sources */,
+				60DE908C4966FD54E0AEA30E /* TestResultLog.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

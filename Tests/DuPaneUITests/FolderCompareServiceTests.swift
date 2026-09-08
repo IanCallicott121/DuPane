@@ -2,7 +2,7 @@ import Foundation
 import XCTest
 @testable import DuPane
 
-final class FolderCompareServiceTests: XCTestCase {
+final class FolderCompareServiceTests: DuPaneTestCase {
     private var fixture: FilePaneFixture!
 
     override func setUpWithError() throws {

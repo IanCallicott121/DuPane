@@ -10,7 +10,7 @@ import XCTest
 // MARK: - PaneState.duplicate() — 4 tests [must]
 
 @MainActor
-final class PaneStateDuplicateTests: XCTestCase {
+final class PaneStateDuplicateTests: DuPaneTestCase {
     private var dir: URL!
 
     override func setUpWithError() throws {
@@ -85,7 +85,7 @@ final class PaneStateDuplicateTests: XCTestCase {
 // MARK: - SidebarModel recents — 4 tests [must]
 
 @MainActor
-final class SidebarModelRecentsTests: XCTestCase {
+final class SidebarModelRecentsTests: DuPaneTestCase {
     private let recentsKey = "sidebar.recentURLs"
 
     override func setUp() {
@@ -137,7 +137,7 @@ final class SidebarModelRecentsTests: XCTestCase {
 
 // MARK: - FileRowView.formatDate(showTime:) — 6 tests [must]
 
-final class FileRowViewFormatDateTests: XCTestCase {
+final class FileRowViewFormatDateTests: DuPaneTestCase {
     private let fixedDate: Date = {
         var c = DateComponents()
         c.year = 2025; c.month = 12; c.day = 31; c.hour = 14; c.minute = 30; c.second = 0
@@ -180,7 +180,7 @@ final class FileRowViewFormatDateTests: XCTestCase {
 // MARK: - PaneState.foldersFirst = false — 2 tests [must]
 
 @MainActor
-final class PaneStateFoldersFirstTests: XCTestCase {
+final class PaneStateFoldersFirstTests: DuPaneTestCase {
     func testFoldersFirstFalseInterleavesFoldersAndFilesByName() {
         let pane = PaneState()
         pane.foldersFirst = false
@@ -216,7 +216,7 @@ final class PaneStateFoldersFirstTests: XCTestCase {
 // MARK: - TabbedPaneState.foldersFirst propagation — 2 tests [must]
 
 @MainActor
-final class TabbedPaneStateFoldersFirstTests: XCTestCase {
+final class TabbedPaneStateFoldersFirstTests: DuPaneTestCase {
     func testFoldersFirstPropagatesToAllExistingTabs() {
         let tabs = TabbedPaneState()
         tabs.openTab()
@@ -241,7 +241,7 @@ final class TabbedPaneStateFoldersFirstTests: XCTestCase {
 
 // MARK: - AppSettings new defaults — 1 test [must]
 
-final class AppSettingsNewDefaultsTests: XCTestCase {
+final class AppSettingsNewDefaultsTests: DuPaneTestCase {
     func testNewBoolSettingsDefaultToTrue() {
         let keys = [
             "showSidebarPlaces",
@@ -265,7 +265,7 @@ final class AppSettingsNewDefaultsTests: XCTestCase {
 // MARK: - PaneState new flag defaults — 2 tests [must]
 
 @MainActor
-final class PaneStateNewFlagDefaultsTests: XCTestCase {
+final class PaneStateNewFlagDefaultsTests: DuPaneTestCase {
     func testRequestGetInfoDefaultsFalse() {
         XCTAssertFalse(PaneState().requestGetInfo)
     }

@@ -7,7 +7,7 @@ import XCTest
 
 // MARK: - SortPreference pruning (Critical: PaneState sortPref UserDefaults leak)
 
-final class SortPreferenceKeyPruningTests: XCTestCase {
+final class SortPreferenceKeyPruningTests: DuPaneTestCase {
     private let ud = UserDefaults(suiteName: "SortPrefPruningTests-\(UUID().uuidString)")!
 
     override func tearDownWithError() throws {
@@ -46,7 +46,7 @@ final class SortPreferenceKeyPruningTests: XCTestCase {
 
 // MARK: - AppLaunchConfiguration non-existent path (Low: url() no existence check)
 
-final class AppLaunchConfigurationURLExistenceTests: XCTestCase {
+final class AppLaunchConfigurationURLExistenceTests: DuPaneTestCase {
     func testNonExistentPathIsIgnoredAndFallsBackToDefault() {
         let nonExistentPath = "/tmp/dupane-nonexistent-\(UUID().uuidString)/some/folder"
         let config = AppLaunchConfiguration.current(arguments: ["DuPane", "--left-pane-url", nonExistentPath])
@@ -81,7 +81,7 @@ final class AppLaunchConfigurationURLExistenceTests: XCTestCase {
 
 // MARK: - PaneState duplicate at Computer root (Low: duplicate() silent fail)
 
-final class PaneStateDuplicateAtRootTests: XCTestCase {
+final class PaneStateDuplicateAtRootTests: DuPaneTestCase {
     @MainActor
     func testDuplicateAtComputerRootSetsErrorMessage() async {
         let pane = PaneState(initialURL: nil)
@@ -102,7 +102,7 @@ final class PaneStateDuplicateAtRootTests: XCTestCase {
 
 // MARK: - TabbedPaneState pinned-path migration guard (Low: diverged savedPinnedPaths)
 
-final class TabbedPinMigrationTests: XCTestCase {
+final class TabbedPinMigrationTests: DuPaneTestCase {
     private let key = "TabbedPinMigrationTests-\(UUID().uuidString)"
     private let ud = UserDefaults.standard
 

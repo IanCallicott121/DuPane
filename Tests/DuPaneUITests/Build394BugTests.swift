@@ -11,7 +11,7 @@ import XCTest
 // source over it, then deleted the backup with removeItem. Any file present only in
 // the destination was permanently gone — no Trash, no undo. Finder merges instead.
 
-final class FolderOverwriteMergeTests: XCTestCase {
+final class FolderOverwriteMergeTests: DuPaneTestCase {
     private var fixture: FilePaneFixture!
 
     override func setUpWithError() throws {
@@ -131,7 +131,7 @@ final class FolderOverwriteMergeTests: XCTestCase {
 
 // MARK: - Low: onProgress skipped for items rejected by the subtree guard — 1 test [must]
 
-final class MoveOrCopyProgressReportingTests: XCTestCase {
+final class MoveOrCopyProgressReportingTests: DuPaneTestCase {
     private var fixture: FilePaneFixture!
 
     override func setUpWithError() throws {
@@ -169,7 +169,7 @@ final class MoveOrCopyProgressReportingTests: XCTestCase {
 // cooperative-pool thread busy until the read finished. Enough of those (several tabs
 // on a hung SMB share) exhausts the pool and every Task.detached in the app stalls.
 
-final class LoadFolderCancellationTests: XCTestCase {
+final class LoadFolderCancellationTests: DuPaneTestCase {
     private var fixture: FilePaneFixture!
 
     override func setUpWithError() throws {
@@ -215,7 +215,7 @@ final class LoadFolderCancellationTests: XCTestCase {
 // for a nil, so loadIfNeeded restarted the whole set on every pane reload — thousands of
 // no-op detached tasks after every file operation in a large folder.
 
-final class SmartMetadataNegativeCacheTests: XCTestCase {
+final class SmartMetadataNegativeCacheTests: DuPaneTestCase {
     private var fixture: FilePaneFixture!
 
     override func setUpWithError() throws {
@@ -269,7 +269,7 @@ final class SmartMetadataNegativeCacheTests: XCTestCase {
 // issued at begin() and a finished operation can only retire itself.
 
 @MainActor
-final class FileOperationProgressModelTests: XCTestCase {
+final class FileOperationProgressModelTests: DuPaneTestCase {
 
     func testFinishingOneOperationDoesNotHideAnotherStillRunning() {
         let model = FileOperationProgressModel()
@@ -341,7 +341,7 @@ final class FileOperationProgressModelTests: XCTestCase {
 // PaneState of the tab that was gone. Views now key on activeTabID.
 
 @MainActor
-final class ActiveTabIdentityTests: XCTestCase {
+final class ActiveTabIdentityTests: DuPaneTestCase {
 
     func testClosingTheActiveMiddleTabChangesTheActiveTabIdentity() {
         let tabs = TabbedPaneState(initialURL: URL(fileURLWithPath: "/tmp"))
