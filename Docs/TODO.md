@@ -1,8 +1,58 @@
 # DuPane — TODO
 
 
+## Handover — next agent starts here
+
+**State:** Build 395. Working tree clean. **4 commits committed locally but NOT pushed**
+(a cloud session has no SSH keys). Push is the first thing to do.
+
+**Verified:** unit suite **307 passed, 0 failed** (plus 12 e2e correctly skipped in the
+package scheme). App target and e2e target both build.
+
+**Not verified:** the 12 e2e tests. See the blocker below.
+
+### Do first
+1. `git push` — 4 commits are waiting.
+2. Resolve the e2e blocker below, then run the e2e suite and confirm the two new tests
+   (`testCriticalTypeAheadStillWorksAfterClosingTheActiveTab`,
+   `testCriticalProgressOverlayIsNotLeftOnScreenAfterACopy`) actually pass. They were
+   written against Build 395's fixes but have never executed.
+
+### Blocker — e2e suite cannot run: UI testing not authorised
+Every e2e run fails with `Failed to load AX for local.DuPane (pid:NNNN): Not authorized
+for performing UI testing actions.` — 10 of 12 tests, including long-standing ones like
+`testLaunchShowsFixtureRows`, so it is environmental rather than a code fault. The suite
+did run earlier the same day, so something changed mid-session. Most likely cause: a
+concurrent computer-use/automation session was injecting input through the same
+accessibility subsystem XCUI needs; a screen lock/unlock may also have reset it. Check
+System Settings > Privacy & Security > Accessibility (and Developer Tools) for Xcode, and
+run the suite with no other automation holding the machine.
+
+### How to run the tests
+- **Unit (307):** open the **DuPane folder** (not the `.xcodeproj`) for the
+  `DuPane-Package` scheme, then ⌘U. Or `swift test --filter DuPaneUITests`.
+- **E2E (12):** open **`DuPane.xcodeproj`**, ⌘U.
+- **Results are now readable from a shell** — `TestResultLog` writes one line per test to
+  `.test-results/<bundle>.log` (gitignored): `PASS`/`SKIP`/`FAIL <name> :: <issue>`. Use
+  that instead of reading the Xcode UI.
+- `./Scripts/handoff-check.sh` before and after. `Docs/AGENT-WORKFLOW.md` has the process.
+
+### Remaining work
+21 open bugs: 0 Critical, 0 High, 15 Medium, 6 Low. Of those, about 4 are design
+decisions rather than fixes (sync transaction log, trash undo, UserDefaults transactions,
+`Sendable` hardening) and want a call from Ian before anyone implements them.
+
+Roughly 7 of the remainder are view-layer and not unit-testable as written; they need the
+same treatment the two High bugs got in Build 395 — extract the logic to a model, or add
+accessibility identifiers, then test.
+
+
 ## Next items
-none yet
+
+### Infrastructure / test quality
+
+- **`SmartMetadataServiceTests.testImageDimensionsForPNG` is flaky** — writes a 1x1 PNG, calls `loadIfNeeded`, sleeps 500 ms, then asserts. The work runs in a `.background`-priority detached task, so under a full-suite run it sometimes has not finished and the assertion sees `nil`. Observed failing once and passing on immediate re-run. Replace the fixed sleep with polling on `hasResolved(_:)` or an expectation. (`Tests/DuPaneUITests/DuPaneFunctionTests.swift`)
+- **E2E suite has never been executed against Builds 394/395** — blocked by the UI-testing authorisation issue described in the Handover section above. Until it runs, the 12 e2e tests are unproven, including the 2 added in Build 395.
 
 ### Bug fixes — Medium
 
