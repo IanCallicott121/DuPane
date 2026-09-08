@@ -100,6 +100,7 @@ final class SidebarModel: ObservableObject {
     @Published private(set) var bookmarkNames: [String: String] = [:]
     @Published private(set) var tags: [FinderTag] = []
     @Published private(set) var recentURLs: [URL] = []
+    @Published private(set) var systemLocations: [(name: String, url: URL, icon: String)] = []
 
     private static let defaultsKey  = "sidebar.bookmarks"
     private static let namesKey     = "sidebar.bookmarkNames"
@@ -109,51 +110,46 @@ final class SidebarModel: ObservableObject {
     private var tagQueryObservers: [NSObjectProtocol] = []
     private var spotlightTags: [FinderTag] = []
     private var paneTags: [FinderTag] = []
+    private let pathExists: @Sendable (String) -> Bool
+    private var validationGeneration = 0
+    private var optionalSystemLocations: [(name: String, url: URL, icon: String)] = []
+    private(set) var validationTask: Task<Void, Never>?
 
-    let systemLocations: [(name: String, url: URL, icon: String)]
-
-    init() {
+    init(pathExists: @escaping @Sendable (String) -> Bool = { FileManager.default.fileExists(atPath: $0) }) {
+        self.pathExists = pathExists
         let fm = FileManager.default
         var locs: [(String, URL, String)] = []
         locs.append(("Home", fm.homeDirectoryForCurrentUser, "house.fill"))
         let appDir = URL(fileURLWithPath: "/Applications")
-        if fm.fileExists(atPath: appDir.path) {
-            locs.append(("Applications", appDir, "app.badge"))
-        }
+        locs.append(("Applications", appDir, "app.badge"))
         if let u = fm.urls(for: .desktopDirectory,   in: .userDomainMask).first { locs.append(("Desktop",   u, "menubar.rectangle")) }
         if let u = fm.urls(for: .documentDirectory,  in: .userDomainMask).first { locs.append(("Documents", u, "doc.fill")) }
         if let u = fm.urls(for: .downloadsDirectory, in: .userDomainMask).first { locs.append(("Downloads", u, "arrow.down.circle.fill")) }
         let iCloudPath = fm.homeDirectoryForCurrentUser
             .appendingPathComponent("Library/Mobile Documents/com~apple~CloudDocs")
-        if fm.fileExists(atPath: iCloudPath.path) {
-            let resolved = (try? URL(resolvingAliasFileAt: iCloudPath)) ?? iCloudPath
-            locs.append(("iCloud Drive", resolved, "icloud.fill"))
-        }
         let oneDrivePath = fm.homeDirectoryForCurrentUser.appendingPathComponent("OneDrive")
-        if fm.fileExists(atPath: oneDrivePath.path) {
-            let resolved = (try? URL(resolvingAliasFileAt: oneDrivePath)) ?? oneDrivePath
-            locs.append(("OneDrive", resolved, "cloud.fill"))
-        }
         systemLocations = locs
+        optionalSystemLocations = [
+            ("iCloud Drive", iCloudPath, "icloud.fill"),
+            ("OneDrive", oneDrivePath, "cloud.fill")
+        ]
 
         if let data = UserDefaults.standard.data(forKey: SidebarModel.defaultsKey),
            let paths = try? JSONDecoder().decode([String].self, from: data) {
-            bookmarks = paths
-                .map { URL(fileURLWithPath: $0) }
-                .filter { fm.fileExists(atPath: $0.path) }
+            bookmarks = paths.map { URL(fileURLWithPath: $0) }
         }
         if let dict = UserDefaults.standard.dictionary(forKey: SidebarModel.namesKey) as? [String: String] {
             bookmarkNames = dict
         }
         if let data = UserDefaults.standard.data(forKey: SidebarModel.recentsKey),
            let paths = try? JSONDecoder().decode([String].self, from: data) {
-            recentURLs = paths
-                .map { URL(fileURLWithPath: $0) }
-                .filter { fm.fileExists(atPath: $0.path) }
+            recentURLs = paths.map { URL(fileURLWithPath: $0) }
         }
+        scheduleExistenceValidation()
     }
 
     deinit {
+        validationTask?.cancel()
         tagQueryObservers.forEach { NotificationCenter.default.removeObserver($0) }
         tagQuery?.stop()
     }
@@ -218,14 +214,41 @@ final class SidebarModel: ObservableObject {
     // MARK: - Recents
 
     func recordVisit(_ url: URL) {
-        let fm = FileManager.default
         var recent = recentURLs.filter { $0 != url }
         recent.insert(url, at: 0)
-        recent = recent.filter { fm.fileExists(atPath: $0.path) }
         if recent.count > maxRecents { recent = Array(recent.prefix(maxRecents)) }
         recentURLs = recent
         if let data = try? JSONEncoder().encode(recent.map { $0.path }) {
             UserDefaults.standard.set(data, forKey: SidebarModel.recentsKey)
+        }
+        scheduleExistenceValidation()
+    }
+
+    private func scheduleExistenceValidation() {
+        validationGeneration += 1
+        let generation = validationGeneration
+        let bookmarkCandidates = bookmarks
+        let recentCandidates = recentURLs
+        let locationCandidates = optionalSystemLocations
+        let pathExists = pathExists
+
+        validationTask?.cancel()
+        validationTask = Task { [weak self] in
+            let result = await Task.detached(priority: .utility) {
+                let bookmarks = bookmarkCandidates.filter { pathExists($0.path) }
+                let recents = recentCandidates.filter { pathExists($0.path) }
+                let locations: [(name: String, url: URL, icon: String)] = locationCandidates.compactMap { location in
+                    guard pathExists(location.url.path) else { return nil }
+                    let resolved = (try? URL(resolvingAliasFileAt: location.url)) ?? location.url
+                    return (name: location.name, url: resolved, icon: location.icon)
+                }
+                return (bookmarks, recents, locations)
+            }.value
+            guard let self, self.validationGeneration == generation else { return }
+            self.bookmarks = result.0
+            self.recentURLs = result.1
+            self.systemLocations.removeAll { $0.name == "iCloud Drive" || $0.name == "OneDrive" }
+            self.systemLocations.append(contentsOf: result.2)
         }
     }
 
@@ -236,11 +259,13 @@ final class SidebarModel: ObservableObject {
         } else {
             UserDefaults.standard.removeObject(forKey: SidebarModel.recentsKey)
         }
+        scheduleExistenceValidation()
     }
 
     func clearRecents() {
         recentURLs = []
         UserDefaults.standard.removeObject(forKey: SidebarModel.recentsKey)
+        scheduleExistenceValidation()
     }
 
     // MARK: - Bookmarks
@@ -249,6 +274,7 @@ final class SidebarModel: ObservableObject {
         guard !bookmarks.contains(url) else { return }
         bookmarks.append(url)
         persist()
+        scheduleExistenceValidation()
     }
 
     @discardableResult
@@ -270,6 +296,7 @@ final class SidebarModel: ObservableObject {
         bookmarkNames.removeValue(forKey: url.path)
         persist()
         persistNames()
+        scheduleExistenceValidation()
     }
 
     func toggleBookmark(_ url: URL) {
@@ -283,6 +310,7 @@ final class SidebarModel: ObservableObject {
     func moveBookmark(from: IndexSet, to: Int) {
         bookmarks.move(fromOffsets: from, toOffset: to)
         persist()
+        scheduleExistenceValidation()
     }
 
     func renameBookmark(_ url: URL, to newName: String) {
