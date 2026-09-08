@@ -267,20 +267,16 @@ final class DuPaneEndToEndUITests: DuPaneTestCase {
         waitForSelection(alpha)
 
         clickToolbarButton("toolbar-delete-button")
-        // The confirmation is optional — it depends on the "delete without confirmation"
-        // setting, which varies by machine. Dismiss it if it appears.
-        let sheet = app.sheets.firstMatch
-        if sheet.waitForExistence(timeout: 3) {
-            sheet.buttons["Move to Trash"].click()
-        }
-
         waitForMissingRow(named: "alpha.txt", in: "left")
 
         let undo = app.buttons["toast-undo-button"]
         XCTAssertTrue(undo.waitForExistence(timeout: 5), "an Undo button must appear after a delete")
+        let undoReady = NSPredicate(format: "enabled == true AND hittable == true")
+        let undoReadyExpectation = expectation(for: undoReady, evaluatedWith: undo)
+        wait(for: [undoReadyExpectation], timeout: 5)
         undo.click()
 
-        XCTAssertTrue(row(named: "alpha.txt", in: "left").waitForExistence(timeout: 5),
+        XCTAssertTrue(row(named: "alpha.txt", in: "left").waitForExistence(timeout: 10),
                       "the deleted row must return after Undo")
         XCTAssertTrue(fixture.exists(fixture.fileURL(named: "alpha.txt", in: fixture.leftPaneURL)),
                       "the file must be restored to its original location on disk")
@@ -334,6 +330,10 @@ final class DuPaneEndToEndUITests: DuPaneTestCase {
         app.launchArguments = [
             "-ApplePersistenceIgnoreState",
             "YES",
+            "-fileDeleteNoConfirm",
+            "YES",
+            "-directoryDeleteNoConfirm",
+            "YES",
             "--left-pane-url", fixture.leftPaneURL.path,
             "--right-pane-url", fixture.rightPaneURL.path
         ]
@@ -370,6 +370,9 @@ final class DuPaneEndToEndUITests: DuPaneTestCase {
     private func clickToolbarButton(_ identifier: String) {
         let button = app.buttons[identifier]
         XCTAssertTrue(button.waitForExistence(timeout: 5))
+        let ready = NSPredicate(format: "enabled == true AND hittable == true")
+        let readyExpectation = expectation(for: ready, evaluatedWith: button)
+        wait(for: [readyExpectation], timeout: 5)
         button.click()
     }
 

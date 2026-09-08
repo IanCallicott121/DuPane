@@ -60,6 +60,10 @@ only the e2e UI tests.
 
 From a terminal: `swift test --filter DuPaneUITests`.
 
+Run e2e tests from a terminal with `./Scripts/run-e2e.sh`. The wrapper preserves
+`xcodebuild`'s exit status and extracts sandbox-safe result markers into
+`.test-results/DuPaneEndToEndUITests.log`.
+
 Fix every failure before moving on. UI/e2e tests only on big changes.
 
 ## 6. Report status

@@ -3,61 +3,27 @@
 
 ## Handover — next agent starts here
 
-**State:** Build 404. Unit suite **323 passed, 0 failed**. E2E suite **14 passed, 0
-failed** — run 2026-09-08 via `xcodebuild test -project DuPane.xcodeproj -scheme DuPane
--destination 'platform=macOS' -derivedDataPath /tmp/DuPane-e2e-dd` (a scratch path outside
-iCloud avoids codesign issues). That command is the reliable headless way to run e2e from
-a shell — it does what `DuPane.xcodeproj` ⌘U does. Note the UI-testing authorisation must
-be granted (it is, on this machine).
-
-Note: that e2e run did not rewrite `.test-results/DuPaneEndToEndUITests.log` (still shows
-the old all-SKIP state); the authoritative result was read from the xcresult bundle. If
-the shell-readable log matters for future automation, investigate why `TestResultLog`
-didn't fire under the xcodeproj scheme.
+**State:** Build 418. Unit suite **336 passed, 0 failed**. E2E suite **14 passed, 0
+failed** — run 2026-09-08 through `./Scripts/run-e2e.sh`, including a current
+machine-readable PASS log.
 
 ### How to run the tests
-- **Unit (323):** open the **DuPane folder** (not the `.xcodeproj`) for the
+- **Unit (336):** open the **DuPane folder** (not the `.xcodeproj`) for the
   `DuPane-Package` scheme, then ⌘U. Or `swift test --filter DuPaneUITests`.
-- **E2E (14):** open **`DuPane.xcodeproj`**, ⌘U.
-- **Results are now readable from a shell** — `TestResultLog` writes one line per test to
-  `.test-results/<bundle>.log` (gitignored): `PASS`/`SKIP`/`FAIL <name> :: <issue>`. Use
-  that instead of reading the Xcode UI.
+- **E2E (14):** `./Scripts/run-e2e.sh`, or open **`DuPane.xcodeproj`** and press ⌘U.
+- **Shell-readable e2e results** — the wrapper extracts `TestResultLog` marker lines into
+  `.test-results/DuPaneEndToEndUITests.log` (gitignored): `PASS`/`SKIP`/`FAIL <name> ::
+  <issue>`. The wrapper is required because the UI-test sandbox cannot write directly to
+  the checkout.
 - `./Scripts/handoff-check.sh` before and after. `Docs/AGENT-WORKFLOW.md` has the process.
 
 ### Remaining work
-15 open bugs: 0 Critical, 0 High, 11 Medium, 4 Low. Of those, about 4 are design
-decisions rather than fixes (sync transaction log, trash undo, UserDefaults transactions,
-`Sendable` hardening) and want a call from Ian before anyone implements them.
-
-Roughly 7 of the remainder are view-layer and not unit-testable as written; they need the
-same treatment the two High bugs got in Build 395 — extract the logic to a model, or add
-accessibility identifiers, then test.
+No confirmed outstanding bugs remain in this list. Continue auditing before assuming the
+repository is defect-free.
 
 
 ## Next items
-
-### Infrastructure / test quality
-
-- **`SmartMetadataServiceTests.testImageDimensionsForPNG` is flaky** — writes a 1x1 PNG, calls `loadIfNeeded`, sleeps 500 ms, then asserts. The work runs in a `.background`-priority detached task, so under a full-suite run it sometimes has not finished and the assertion sees `nil`. Observed failing once and passing on immediate re-run. Replace the fixed sleep with polling on `hasResolved(_:)` or an expectation. (`Tests/DuPaneUITests/DuPaneFunctionTests.swift`)
-- **`TestResultLog` does not write under the xcodeproj e2e scheme** — the 2026-09-08 e2e run passed all 12 tests but left `.test-results/DuPaneEndToEndUITests.log` untouched, so the shell-readable log went stale. Results had to be read from the xcresult bundle instead. Investigate why `invokeTest`/`TestResultLog.append` didn't fire (or write to the expected path) when driven from `DuPane.xcodeproj`. (`UITests/DuPaneEndToEndUITests/TestResultLog.swift`)
-
-### Bug fixes — Medium
-
-- **`PaneState.goBack()`/`goForward()` history race** — `canGoBack`/`canGoForward` are checked, then `history[historyIndex]` is accessed; if history is mutated between the guard and the access (async callback), index goes out of bounds. (`ViewModels/PaneState.swift`)
-- **`PaneState.endDeepSearch` cancellation window** — Spotlight results can arrive after `endDeepSearch()` is called but before `spotlightQuery = nil` is set; rapid navigation leaves search state inconsistent. (`ViewModels/PaneState.swift`)
-- **`SidebarModel.recordVisit` and `init` block main thread** — `FileManager.fileExists` called synchronously on the main actor per bookmark and per recent URL. Move to a background task. (`Models/SidebarModel.swift`)
-- **`TabbedPaneView` calls `pane.load()` on every tab switch** — fires a directory read even when tab contents are current, causing unnecessary I/O and flicker. Only load if the tab has never loaded or its URL changed. (`Views/TabbedPaneView.swift`)
-- **`ContentView.performDelete` peer-pane nav uses first deleted URL** — if multiple items are deleted and the peer pane is inside a later one, the nav target points to the wrong parent. (`Views/ContentView.swift`)
-
-- **Spotlight observers and `NSMetadataQuery` leak when a searching tab is closed** — the three `addObserver` tokens and the running query are torn down only in `endDeepSearch()`, called from navigate/goBack/goForward/filter-cleared. `PaneState` has no `deinit`, so closing a tab mid-search leaves the observers registered for the process lifetime and the query never `stop()`ped. Distinct from the `endDeepSearch` cancellation-window item above. (`ViewModels/PaneState.swift`)
-- **`PaneState.displayedItems` re-filters and re-sorts on every access** — it is a computed property consumed at seven sites in `PaneView` (list body, empty-state overlay, status bar count, selection, type-ahead), so a single body evaluation performs four or more full sorts, plus one per click and one per type-ahead keystroke. Cache the sorted result and invalidate on items/sortKey/sortAscending/filterText/tag-filter changes. (`ViewModels/PaneState.swift`, `Views/PaneView.swift`)
-- **`ProcessRunner.run` has no timeout or cancellation and inherits stdin** — nothing resumes the continuation if the child never exits, and `standardInput` is never redirected. `unzip` on a password-protected archive is the realistic trigger. Closing the Command Runner sheet does not terminate the process. Add a timeout, wire `Task` cancellation to `process.terminate()`, and set `standardInput` to `/dev/null`. (`Models/FileOperationService.swift`, `Views/CommandRunnerView.swift`)
-- **`uncompressItem` writes `@State` through a stale captured struct** — two `ProcessRunner` awaits precede writes to `uncompressConflicts` / `pendingUncompressURL` / `showUncompressAlert`. Switching tabs during the awaits tears down that `PaneView` (identity is `.id(activeTabIndex)`), so the conflict alert is written into an orphaned state box: no alert appears and the archive is silently never extracted. (`Views/PaneView.swift`)
-
-### Bug fixes — Low / Inconsistencies
-
-- **`QuickLookCoordinator.toggle` requires double-Space to change selection** — calls `orderOut` when panel is visible with new URLs instead of refreshing in place. (`Views/QuickLookCoordinator.swift`)
-- **`ColumnResizeHandle.anyIsDragging` stuck on missed mouseUp** — static flag never reset if `mouseUp` is missed (focus lost mid-drag), permanently suppressing cursor reset for all handles until restart. (`Views/ColumnResizeHandle.swift`)
+No confirmed items.
 
 
 ## Clarifications
@@ -69,6 +35,19 @@ none
 ---
 
 ## Done
+### Build 418 — outstanding bug closure and lifecycle hardening (2026-09-08)
+
+- **Pane and tab performance/lifecycle** — `displayedItems` is cached and invalidated only when one of its inputs changes; switching tabs no longer forces an unnecessary directory load; closing a tab now cancels its load and explicitly tears down Spotlight observers/query state. (`ViewModels/PaneState.swift`, `ViewModels/TabbedPaneState.swift`, `Views/TabbedPaneView.swift`)
+- **Sidebar filesystem checks moved off the main actor** — bookmark, recent, iCloud, and OneDrive existence validation now runs in a cancellable utility task with generation checks, so stale validation snapshots cannot overwrite newer UI mutations. (`Models/SidebarModel.swift`)
+- **Process lifecycle hardened** — `ProcessRunner` redirects stdin to `/dev/null`, enforces a five-minute default timeout, terminates on task cancellation, and still drains stdout/stderr concurrently. Collapsing the Command Runner cancels its active task. (`Models/FileOperationService.swift`, `Views/CommandRunnerView.swift`)
+- **Archive conflict state survives tab switches** — pending uncompress URL/conflicts now live on the stable `PaneState`, not an orphanable `PaneView` state box. (`ViewModels/PaneState.swift`, `Views/PaneView.swift`)
+- **Delete navigation handles nested and partial-success cases** — peer recovery walks outside every successfully trashed ancestor and ignores failed deletions. (`Models/FileOperationService.swift`, `Views/ContentView.swift`)
+- **Quick Look updates an already-visible panel when selection changes** — Space still closes the panel for the same selection, while a new selection reloads it immediately. (`Views/QuickLookCoordinator.swift`)
+- **Column drag cleanup covers missed mouse-up events** — local/global mouse-up monitors plus window/app deactivation observers terminate the drag and restore cursor state. (`Views/ColumnResizeHandle.swift`)
+- **Test infrastructure repaired** — the flaky PNG metadata test polls for resolution; `Scripts/run-e2e.sh` captures structured UI-test stdout markers into the gitignored repo-local log, avoiding the UI runner's source-tree sandbox. E2E actions now wait for enabled, hittable controls, and delete confirmation is pinned by launch arguments so machine preferences cannot consume the Undo toast lifetime. (`Tests/DuPaneUITests/DuPaneFunctionTests.swift`, `UITests/DuPaneEndToEndUITests/TestResultLog.swift`, `UITests/DuPaneEndToEndUITests/DuPaneEndToEndUITests.swift`, `Scripts/run-e2e.sh`)
+- **Audit: two reported races were unreachable** — history navigation and `endDeepSearch()` are synchronous `@MainActor` operations with no suspension point; queued Spotlight callbacks re-check the cleared query. No defensive code was added for impossible interleavings.
+- **Tests: 336 passed, 0 failed; e2e: 14 passed, 0 failed** — 13 new unit regressions in `Build418BugTests.swift`; the full wrapper run proved `.test-results/DuPaneEndToEndUITests.log` contains 14 current PASS results.
+
 ### Build 404 — Duplicate Finder scan identity and Codex workflow (2026-09-08)
 
 - **Low: superseded Duplicate Finder scans can no longer publish stale progress or results** — every scan now carries a monotonically increasing generation. Progress and completion callbacks update the view model only when their generation is still current and the scan is active, so reopening the finder on another folder cannot briefly show counters or groups from the previous scan. The detached task also captures the view model weakly. (`ViewModels/DuplicateFinderViewModel.swift`, `Tests/DuPaneUITests/Build404BugTests.swift`)

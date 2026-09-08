@@ -1236,7 +1236,7 @@ final class SmartMetadataServiceTests: DuPaneTestCase {
         XCTAssertTrue(info?.contains("line") == true, "Expected line count, got: \(info ?? "nil")")
     }
 
-    // [optional] — slow (500ms sleep); tests SmartMetadataService background path
+    // [optional] — tests SmartMetadataService background path
     func testImageDimensionsForPNG() async throws {
         // Create a minimal 1x1 PNG (89 bytes)
         let pngData = Data([
@@ -1258,7 +1258,10 @@ final class SmartMetadataServiceTests: DuPaneTestCase {
         let service = SmartMetadataService.shared
         let item = makeItem(url: tmp, ext: "png")
         service.loadIfNeeded(for: [item])
-        try await Task.sleep(nanoseconds: 500_000_000)
+        let deadline = ContinuousClock.now + .seconds(5)
+        while !service.hasResolved(tmp), ContinuousClock.now < deadline {
+            try await Task.sleep(for: .milliseconds(20))
+        }
         let info = service.info(for: item)
         XCTAssertTrue(info?.contains("px") == true, "Expected pixel dimensions, got: \(info ?? "nil")")
     }

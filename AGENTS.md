@@ -16,7 +16,7 @@ swift test --filter DuPaneUITests
 
 Use `project.yml` as the Xcode project source of truth. If it changes, run
 `xcodegen generate` and rebuild. Run the Xcode UI-test scheme for user-visible or
-cross-process changes.
+cross-process changes with `./Scripts/run-e2e.sh`.
 
 Before handoff, update `BuildNumber.txt`, `Docs/TODO.md`, and `Docs/UserGuide.html` as
 required by the repository workflow, commit and push completed work, and run
