@@ -14,7 +14,14 @@ final class SmartMetadataService: ObservableObject {
     private static let cacheMaxSize = 500
     private var pending: Set<URL> = []
 
-    func info(for item: FileItem) -> String? { cache[item.url] }
+    /// An empty cache entry means "computed, nothing worth showing" — see loadIfNeeded.
+    func info(for item: FileItem) -> String? {
+        guard let value = cache[item.url], !value.isEmpty else { return nil }
+        return value
+    }
+
+    /// True once metadata has been computed for `url`, whether or not it produced anything.
+    func hasResolved(_ url: URL) -> Bool { cache[url] != nil }
 
     func loadIfNeeded(for items: [FileItem]) {
         for item in items where !item.isDirectory {
@@ -26,13 +33,14 @@ final class SmartMetadataService: ObservableObject {
                 let result = await Self.compute(url: url, ext: ext)
                 await MainActor.run {
                     self.pending.remove(url)
-                    if let result {
-                        self.cache[url] = result
-                        self.cacheOrder.append(url)
-                        if self.cacheOrder.count > Self.cacheMaxSize {
-                            let oldest = self.cacheOrder.removeFirst()
-                            self.cache.removeValue(forKey: oldest)
-                        }
+                    // Record the negative result too. compute() returns nil for every
+                    // extension outside its three lists, and not recording that made
+                    // loadIfNeeded restart the whole set on every pane reload.
+                    self.cache[url] = result ?? ""
+                    self.cacheOrder.append(url)
+                    if self.cacheOrder.count > Self.cacheMaxSize {
+                        let oldest = self.cacheOrder.removeFirst()
+                        self.cache.removeValue(forKey: oldest)
                     }
                 }
             }

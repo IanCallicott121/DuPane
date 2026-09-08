@@ -459,12 +459,17 @@ final class PaneState: ObservableObject {
         let raw = try fileManager.contentsOfDirectory(
             at: url, includingPropertiesForKeys: keys, options: options
         )
-        let mapped = raw.map { itemURL in
+        var mapped: [FileItem] = []
+        mapped.reserveCapacity(raw.count)
+        for itemURL in raw {
+            // Without this the enumeration runs to completion even after the caller has
+            // cancelled, holding a cooperative-pool thread against a slow or hung volume.
+            try Task.checkCancellation()
             let values = try? itemURL.resourceValues(forKeys: Set(keys))
             var isDirectory: ObjCBool = false
             let exists = fileManager.fileExists(atPath: itemURL.path, isDirectory: &isDirectory)
             let isDir = values?.isDirectory ?? (exists && isDirectory.boolValue)
-            return FileItem(
+            mapped.append(FileItem(
                 id: itemURL,
                 name: itemURL.lastPathComponent,
                 url: itemURL,
@@ -476,7 +481,7 @@ final class PaneState: ObservableObject {
                 modified: values?.contentModificationDate,
                 tags: values?.tagNames ?? [],
                 isRestricted: isDir && !fileManager.isReadableFile(atPath: itemURL.path)
-            )
+            ))
         }
         if showHiddenFolders && !showHidden {
             return mapped.filter { !$0.name.hasPrefix(".") || $0.isDirectory }

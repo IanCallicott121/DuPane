@@ -59,6 +59,7 @@ enum FileOperationService {
         var resultingURLs: [URL] = []
 
         for (index, file) in files.enumerated() {
+            defer { onProgress?(index + 1, files.count) }
             // Guard: refuse to copy/move a folder into its own subtree; skip this item only.
             if file.isDirectory {
                 let srcPath = file.url.standardizedFileURL.resolvingSymlinksInPath().path
@@ -67,7 +68,6 @@ enum FileOperationService {
                     continue
                 }
             }
-            defer { onProgress?(index + 1, files.count) }
             let proposed = destinationFolder.appendingPathComponent(file.name)
             let exists = FileManager.default.fileExists(atPath: proposed.path)
 
@@ -94,6 +94,23 @@ enum FileOperationService {
 
             guard !sameFileLocation(file.url, destination) else {
                 errors.append("Cannot \(isMove ? "move" : "copy") '\(file.name)': source and destination are the same.")
+                continue
+            }
+
+            // Overwriting a folder with a folder merges rather than replaces. Replacing
+            // deletes every file that exists only in the destination, permanently and
+            // without Trash recovery. Packages (.app, .rtfd) are directories on disk but
+            // opaque to the user, so those still replace wholesale.
+            if conflictResolution == .overwrite,
+               isMergeableDirectory(file.url),
+               isMergeableDirectory(destination) {
+                do {
+                    try mergeDirectory(from: file.url, to: destination, isMove: isMove)
+                    succeeded += 1
+                    resultingURLs.append(destination)
+                } catch {
+                    errors.append("Couldn't merge \(file.name): \(error.localizedDescription)")
+                }
                 continue
             }
 
@@ -179,6 +196,53 @@ enum FileOperationService {
         }
 
         return FileOperationResult(succeeded: succeeded, errors: errors, resultingURLs: resultingURLs)
+    }
+
+    private static func isMergeableDirectory(_ url: URL) -> Bool {
+        guard let values = try? url.resourceValues(forKeys: [.isDirectoryKey, .isPackageKey]) else {
+            return false
+        }
+        return values.isDirectory == true && values.isPackage != true
+    }
+
+    /// Copies or moves every entry of `source` into `destination`, recursing into
+    /// subdirectories and overwriting colliding files. Never removes a destination entry
+    /// that has no counterpart in the source — that is the whole point of merging.
+    private static func mergeDirectory(from source: URL, to destination: URL, isMove: Bool) throws {
+        let fileManager = FileManager.default
+        if !fileManager.fileExists(atPath: destination.path) {
+            try fileManager.createDirectory(at: destination, withIntermediateDirectories: true)
+        }
+
+        let entries = try fileManager.contentsOfDirectory(
+            at: source,
+            includingPropertiesForKeys: [.isDirectoryKey, .isPackageKey],
+            options: []
+        )
+
+        for entry in entries {
+            let target = destination.appendingPathComponent(entry.lastPathComponent)
+            if isMergeableDirectory(entry), isMergeableDirectory(target) {
+                try mergeDirectory(from: entry, to: target, isMove: isMove)
+            } else {
+                if fileManager.fileExists(atPath: target.path) {
+                    try fileManager.removeItem(at: target)
+                }
+                try transferItem(entry, to: target, isMove: isMove)
+            }
+        }
+
+        if isMove, (try? fileManager.contentsOfDirectory(atPath: source.path))?.isEmpty == true {
+            try? fileManager.removeItem(at: source)
+        }
+    }
+
+    private static func transferItem(_ source: URL, to destination: URL, isMove: Bool) throws {
+        if isMove {
+            try FileManager.default.moveItem(at: source, to: destination)
+        } else {
+            try FileManager.default.copyItem(at: source, to: destination)
+        }
     }
 
     // Returns a destination URL that doesn't exist by appending a numeric suffix.
