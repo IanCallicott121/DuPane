@@ -58,7 +58,7 @@ final class DuplicateFinderViewModel: ObservableObject {
             )
             guard !Task.isCancelled else { return }
             await MainActor.run { [weak vm] in
-                guard let vm else { return }
+                guard let vm, vm.phase == .scanning else { return }
                 vm.groups = result.groups
                 vm.totalWastedBytes = result.wastedBytes
                 vm.phase = .done

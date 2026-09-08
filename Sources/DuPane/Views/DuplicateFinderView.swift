@@ -58,6 +58,7 @@ struct DuplicateFinderView: View {
                 }
                 Button("Cancel") { viewModel.cancel(); onDismiss() }
                     .controlSize(.small)
+                    .keyboardShortcut(.cancelAction)
             }
         }
         .padding(.horizontal, 16)
