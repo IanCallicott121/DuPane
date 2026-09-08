@@ -13,6 +13,8 @@ final class DuplicateFinderViewModel: ObservableObject {
     @Published var errorMessage: String?
 
     private var scanTask: Task<Void, Never>?
+    // Phase alone cannot distinguish callbacks queued by a superseded scan.
+    private(set) var scanGeneration = 0
     private let trash: ([URL]) -> FileOperationResult
 
     var totalDuplicateCount: Int { groups.reduce(0) { $0 + $1.count - 1 } }
@@ -24,6 +26,8 @@ final class DuplicateFinderViewModel: ObservableObject {
 
     func startScan(at rootURL: URL) {
         scanTask?.cancel()
+        scanGeneration += 1
+        let generation = scanGeneration
         phase = .scanning
         groups = []
         scannedFiles = 0
@@ -33,37 +37,57 @@ final class DuplicateFinderViewModel: ObservableObject {
         errorMessage = nil
 
         let vm = self
-        scanTask = Task.detached(priority: .userInitiated) {
+        scanTask = Task.detached(priority: .userInitiated) { [weak vm] in
             let result = await DuplicateFinderViewModel.scan(
                 rootURL: rootURL,
                 onScanProgress: { count in
                     Task { @MainActor [weak vm] in
-                        guard vm?.phase == .scanning else { return }
-                        vm?.scannedFiles = count
+                        vm?.recordScannedFiles(count, generation: generation)
                     }
                 },
                 onHashStart: { total in
                     Task { @MainActor [weak vm] in
-                        guard vm?.phase == .scanning else { return }
-                        vm?.filesToHash = total
-                        vm?.hashedFiles = 0
+                        vm?.recordHashStart(total: total, generation: generation)
                     }
                 },
                 onHashProgress: { count in
                     Task { @MainActor [weak vm] in
-                        guard vm?.phase == .scanning else { return }
-                        vm?.hashedFiles = count
+                        vm?.recordHashProgress(count, generation: generation)
                     }
                 }
             )
             guard !Task.isCancelled else { return }
             await MainActor.run { [weak vm] in
-                guard let vm, vm.phase == .scanning else { return }
-                vm.groups = result.groups
-                vm.totalWastedBytes = result.wastedBytes
-                vm.phase = .done
+                vm?.completeScan(groups: result.groups, wastedBytes: result.wastedBytes, generation: generation)
             }
         }
+    }
+
+    private func isCurrentScan(_ generation: Int) -> Bool {
+        generation == scanGeneration && phase == .scanning
+    }
+
+    func recordScannedFiles(_ count: Int, generation: Int) {
+        guard isCurrentScan(generation) else { return }
+        scannedFiles = count
+    }
+
+    func recordHashStart(total: Int, generation: Int) {
+        guard isCurrentScan(generation) else { return }
+        filesToHash = total
+        hashedFiles = 0
+    }
+
+    func recordHashProgress(_ count: Int, generation: Int) {
+        guard isCurrentScan(generation) else { return }
+        hashedFiles = count
+    }
+
+    func completeScan(groups: [[URL]], wastedBytes: Int64, generation: Int) {
+        guard isCurrentScan(generation) else { return }
+        self.groups = groups
+        self.totalWastedBytes = wastedBytes
+        self.phase = .done
     }
 
     func moveToTrash(_ url: URL) {

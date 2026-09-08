@@ -3,7 +3,7 @@
 
 ## Handover — next agent starts here
 
-**State:** Build 403. Unit suite **322 passed, 0 failed**. E2E suite **14 passed, 0
+**State:** Build 404. Unit suite **323 passed, 0 failed**. E2E suite **14 passed, 0
 failed** — run 2026-09-08 via `xcodebuild test -project DuPane.xcodeproj -scheme DuPane
 -destination 'platform=macOS' -derivedDataPath /tmp/DuPane-e2e-dd` (a scratch path outside
 iCloud avoids codesign issues). That command is the reliable headless way to run e2e from
@@ -16,7 +16,7 @@ the shell-readable log matters for future automation, investigate why `TestResul
 didn't fire under the xcodeproj scheme.
 
 ### How to run the tests
-- **Unit (322):** open the **DuPane folder** (not the `.xcodeproj`) for the
+- **Unit (323):** open the **DuPane folder** (not the `.xcodeproj`) for the
   `DuPane-Package` scheme, then ⌘U. Or `swift test --filter DuPaneUITests`.
 - **E2E (14):** open **`DuPane.xcodeproj`**, ⌘U.
 - **Results are now readable from a shell** — `TestResultLog` writes one line per test to
@@ -25,7 +25,7 @@ didn't fire under the xcodeproj scheme.
 - `./Scripts/handoff-check.sh` before and after. `Docs/AGENT-WORKFLOW.md` has the process.
 
 ### Remaining work
-17 open bugs: 0 Critical, 0 High, 12 Medium, 5 Low. Of those, about 4 are design
+15 open bugs: 0 Critical, 0 High, 11 Medium, 4 Low. Of those, about 4 are design
 decisions rather than fixes (sync transaction log, trash undo, UserDefaults transactions,
 `Sendable` hardening) and want a call from Ian before anyone implements them.
 
@@ -47,7 +47,6 @@ accessibility identifiers, then test.
 - **`PaneState.endDeepSearch` cancellation window** — Spotlight results can arrive after `endDeepSearch()` is called but before `spotlightQuery = nil` is set; rapid navigation leaves search state inconsistent. (`ViewModels/PaneState.swift`)
 - **`SidebarModel.recordVisit` and `init` block main thread** — `FileManager.fileExists` called synchronously on the main actor per bookmark and per recent URL. Move to a background task. (`Models/SidebarModel.swift`)
 - **`TabbedPaneView` calls `pane.load()` on every tab switch** — fires a directory read even when tab contents are current, causing unnecessary I/O and flicker. Only load if the tab has never loaded or its URL changed. (`Views/TabbedPaneView.swift`)
-- **`DuplicateFinderView` resolved groups linger** — after trashing all-but-one duplicate, the kept file stays in the list indefinitely with no dismiss affordance. Add a "Dismiss resolved" or "Rescan" action. (`Views/DuplicateFinderView.swift`)
 - **`ContentView.performDelete` peer-pane nav uses first deleted URL** — if multiple items are deleted and the peer pane is inside a later one, the nav target points to the wrong parent. (`Views/ContentView.swift`)
 
 - **Spotlight observers and `NSMetadataQuery` leak when a searching tab is closed** — the three `addObserver` tokens and the running query are torn down only in `endDeepSearch()`, called from navigate/goBack/goForward/filter-cleared. `PaneState` has no `deinit`, so closing a tab mid-search leaves the observers registered for the process lifetime and the query never `stop()`ped. Distinct from the `endDeepSearch` cancellation-window item above. (`ViewModels/PaneState.swift`)
@@ -60,7 +59,6 @@ accessibility identifiers, then test.
 - **`QuickLookCoordinator.toggle` requires double-Space to change selection** — calls `orderOut` when panel is visible with new URLs instead of refreshing in place. (`Views/QuickLookCoordinator.swift`)
 - **`ColumnResizeHandle.anyIsDragging` stuck on missed mouseUp** — static flag never reset if `mouseUp` is missed (focus lost mid-drag), permanently suppressing cursor reset for all handles until restart. (`Views/ColumnResizeHandle.swift`)
 
-- **`DuplicateFinderViewModel` progress guard tests a value, not an identity** — callbacks check `vm?.phase == .scanning`, so callbacks queued by a superseded scan pass the *new* scan's guard and write stale `scannedFiles`/`hashedFiles`. Close the duplicate finder mid-scan and reopen on another folder: the counter briefly shows the previous scan's numbers. Tag each scan with a token and compare that. (`ViewModels/DuplicateFinderViewModel.swift`)
 
 ## Clarifications
 none
@@ -71,6 +69,13 @@ none
 ---
 
 ## Done
+### Build 404 — Duplicate Finder scan identity and Codex workflow (2026-09-08)
+
+- **Low: superseded Duplicate Finder scans can no longer publish stale progress or results** — every scan now carries a monotonically increasing generation. Progress and completion callbacks update the view model only when their generation is still current and the scan is active, so reopening the finder on another folder cannot briefly show counters or groups from the previous scan. The detached task also captures the view model weakly. (`ViewModels/DuplicateFinderViewModel.swift`, `Tests/DuPaneUITests/Build404BugTests.swift`)
+- **Audit: the reported resolved-group UI bug was already fixed** — `moveToTrash` removes groups with fewer than two remaining files, so the view never retains a one-file “resolved” group. Re-verified with the existing four-test `DuplicateFinderMoveToTrashTests` suite and removed the stale TODO entry. (`ViewModels/DuplicateFinderViewModel.swift`, `Tests/DuPaneUITests/BugAuditTests.swift`)
+- **Repository workflow: added Codex-native instructions** — root `AGENTS.md` directs Codex to the complete project conventions and agent workflow, including handoff checks, regression tests, documentation/build updates, XcodeGen handling, and clean sync requirements. (`AGENTS.md`)
+- **Tests: 323 passed, 0 failed** — full SPM unit suite, including the new deterministic superseded-scan regression. Existing Duplicate Finder group-cleanup tests passed 4/4. No e2e run was needed because this build changes internal scan-state isolation and repository guidance only; the previous Build 403 e2e result remains 14 passed, 0 failed.
+
 ### Build 403 — network ejection consistency and descending sort tiebreaks (2026-09-08)
 
 - **Medium: a failed network-volume eject now leaves the sidebar unchanged** — `NetworkVolumeMonitor.ejectAndRemove` now attempts the unmount before suppressing or removing the volume. If macOS rejects the eject, the still-mounted share remains visible and can be retried. The unmount operation is injected for deterministic regression coverage. (`Models/NetworkVolumeMonitor.swift`, `Tests/DuPaneUITests/BugAuditTests.swift`)
