@@ -3,7 +3,7 @@
 
 ## Handover — next agent starts here
 
-**State:** Build 397. Unit suite **319 passed, 0 failed**. E2E suite **14 passed, 0
+**State:** Build 403. Unit suite **322 passed, 0 failed**. E2E suite **14 passed, 0
 failed** — run 2026-09-08 via `xcodebuild test -project DuPane.xcodeproj -scheme DuPane
 -destination 'platform=macOS' -derivedDataPath /tmp/DuPane-e2e-dd` (a scratch path outside
 iCloud avoids codesign issues). That command is the reliable headless way to run e2e from
@@ -16,16 +16,16 @@ the shell-readable log matters for future automation, investigate why `TestResul
 didn't fire under the xcodeproj scheme.
 
 ### How to run the tests
-- **Unit (307):** open the **DuPane folder** (not the `.xcodeproj`) for the
+- **Unit (322):** open the **DuPane folder** (not the `.xcodeproj`) for the
   `DuPane-Package` scheme, then ⌘U. Or `swift test --filter DuPaneUITests`.
-- **E2E (12):** open **`DuPane.xcodeproj`**, ⌘U.
+- **E2E (14):** open **`DuPane.xcodeproj`**, ⌘U.
 - **Results are now readable from a shell** — `TestResultLog` writes one line per test to
   `.test-results/<bundle>.log` (gitignored): `PASS`/`SKIP`/`FAIL <name> :: <issue>`. Use
   that instead of reading the Xcode UI.
 - `./Scripts/handoff-check.sh` before and after. `Docs/AGENT-WORKFLOW.md` has the process.
 
 ### Remaining work
-21 open bugs: 0 Critical, 0 High, 15 Medium, 6 Low. Of those, about 4 are design
+17 open bugs: 0 Critical, 0 High, 12 Medium, 5 Low. Of those, about 4 are design
 decisions rather than fixes (sync transaction log, trash undo, UserDefaults transactions,
 `Sendable` hardening) and want a call from Ian before anyone implements them.
 
@@ -45,16 +45,13 @@ accessibility identifiers, then test.
 
 - **`PaneState.goBack()`/`goForward()` history race** — `canGoBack`/`canGoForward` are checked, then `history[historyIndex]` is accessed; if history is mutated between the guard and the access (async callback), index goes out of bounds. (`ViewModels/PaneState.swift`)
 - **`PaneState.endDeepSearch` cancellation window** — Spotlight results can arrive after `endDeepSearch()` is called but before `spotlightQuery = nil` is set; rapid navigation leaves search state inconsistent. (`ViewModels/PaneState.swift`)
-- **`NetworkVolumeMonitor.ejectAndRemove` ignores unmount failure** — `try? NSWorkspace.unmountAndEjectDevice` failure is silently discarded; volume is removed from `mountedVolumes` even if the unmount didn't succeed, so the sidebar shows it gone while it's still mounted. (`Models/NetworkVolumeMonitor.swift`)
 - **`SidebarModel.recordVisit` and `init` block main thread** — `FileManager.fileExists` called synchronously on the main actor per bookmark and per recent URL. Move to a background task. (`Models/SidebarModel.swift`)
 - **`TabbedPaneView` calls `pane.load()` on every tab switch** — fires a directory read even when tab contents are current, causing unnecessary I/O and flicker. Only load if the tab has never loaded or its URL changed. (`Views/TabbedPaneView.swift`)
-- **`NetworkVolumeMonitor` Bonjour delegate mutates `@Published` on background thread** — `BonjourBrowserDelegate` callbacks fire on the `NetServiceBrowser` queue without a `DispatchQueue.main` hop. (`Models/NetworkVolumeMonitor.swift`)
 - **`DuplicateFinderView` resolved groups linger** — after trashing all-but-one duplicate, the kept file stays in the list indefinitely with no dismiss affordance. Add a "Dismiss resolved" or "Rescan" action. (`Views/DuplicateFinderView.swift`)
 - **`ContentView.performDelete` peer-pane nav uses first deleted URL** — if multiple items are deleted and the peer pane is inside a later one, the nav target points to the wrong parent. (`Views/ContentView.swift`)
 
 - **Spotlight observers and `NSMetadataQuery` leak when a searching tab is closed** — the three `addObserver` tokens and the running query are torn down only in `endDeepSearch()`, called from navigate/goBack/goForward/filter-cleared. `PaneState` has no `deinit`, so closing a tab mid-search leaves the observers registered for the process lifetime and the query never `stop()`ped. Distinct from the `endDeepSearch` cancellation-window item above. (`ViewModels/PaneState.swift`)
 - **`PaneState.displayedItems` re-filters and re-sorts on every access** — it is a computed property consumed at seven sites in `PaneView` (list body, empty-state overlay, status bar count, selection, type-ahead), so a single body evaluation performs four or more full sorts, plus one per click and one per type-ahead keystroke. Cache the sorted result and invalidate on items/sortKey/sortAscending/filterText/tag-filter changes. (`ViewModels/PaneState.swift`, `Views/PaneView.swift`)
-- **`NetworkVolumeMonitor.refresh()` runs `statfs` per volume on the main thread** — invoked from `.onAppear` and from the `didMount`/`didUnmount` observers, both `queue: .main`. `statfs` on a stale SMB/NFS mount blocks for the mount timeout, so plugging in a USB drive while a share is unreachable beachballs the UI. Same class as the `SidebarModel.recordVisit` item, different site. (`Models/NetworkVolumeMonitor.swift`)
 - **`ProcessRunner.run` has no timeout or cancellation and inherits stdin** — nothing resumes the continuation if the child never exits, and `standardInput` is never redirected. `unzip` on a password-protected archive is the realistic trigger. Closing the Command Runner sheet does not terminate the process. Add a timeout, wire `Task` cancellation to `process.terminate()`, and set `standardInput` to `/dev/null`. (`Models/FileOperationService.swift`, `Views/CommandRunnerView.swift`)
 - **`uncompressItem` writes `@State` through a stale captured struct** — two `ProcessRunner` awaits precede writes to `uncompressConflicts` / `pendingUncompressURL` / `showUncompressAlert`. Switching tabs during the awaits tears down that `PaneView` (identity is `.id(activeTabIndex)`), so the conflict alert is written into an orphaned state box: no alert appears and the archive is silently never extracted. (`Views/PaneView.swift`)
 
@@ -63,7 +60,6 @@ accessibility identifiers, then test.
 - **`QuickLookCoordinator.toggle` requires double-Space to change selection** — calls `orderOut` when panel is visible with new URLs instead of refreshing in place. (`Views/QuickLookCoordinator.swift`)
 - **`ColumnResizeHandle.anyIsDragging` stuck on missed mouseUp** — static flag never reset if `mouseUp` is missed (focus lost mid-drag), permanently suppressing cursor reset for all handles until restart. (`Views/ColumnResizeHandle.swift`)
 
-- **Sort tiebreak ignores `sortAscending`** — for `.size`, `.kind` and `.modified`, equal values fall through to `a.name.localizedStandardCompare(b.name) == .orderedAscending`, which is hardcoded ascending. Sorting descending by size shows equal-size files in ascending name order. The comparator stays consistent so there is no crash risk, only visible inconsistency. (`ViewModels/PaneState.swift`)
 - **`DuplicateFinderViewModel` progress guard tests a value, not an identity** — callbacks check `vm?.phase == .scanning`, so callbacks queued by a superseded scan pass the *new* scan's guard and write stale `scannedFiles`/`hashedFiles`. Close the duplicate finder mid-scan and reopen on another folder: the counter briefly shows the previous scan's numbers. Tag each scan with a token and compare that. (`ViewModels/DuplicateFinderViewModel.swift`)
 
 ## Clarifications
@@ -75,6 +71,18 @@ none
 ---
 
 ## Done
+### Build 403 — network ejection consistency and descending sort tiebreaks (2026-09-08)
+
+- **Medium: a failed network-volume eject now leaves the sidebar unchanged** — `NetworkVolumeMonitor.ejectAndRemove` now attempts the unmount before suppressing or removing the volume. If macOS rejects the eject, the still-mounted share remains visible and can be retried. The unmount operation is injected for deterministic regression coverage. (`Models/NetworkVolumeMonitor.swift`, `Tests/DuPaneUITests/BugAuditTests.swift`)
+- **Medium: mounted-volume probing no longer blocks the UI** — `refresh()` snapshots its inputs and performs `mountedVolumeURLs`/`statfs` work on a serial utility queue, publishing only the newest completed generation back on the main queue. A stale network share can no longer beachball the app during sidebar refresh. (`Models/NetworkVolumeMonitor.swift`)
+- **Medium: Bonjour discovery publishes on the main thread** — delegate callbacks now pass through `receiveBonjourServers`, which marshals background callbacks to the main queue before changing `bonjourServers`. (`Models/NetworkVolumeMonitor.swift`)
+- **Low: descending sort now applies descending name tiebreaks** — equal values in Size, Kind, and Modified sorts now order names consistently with the selected descending direction. Updated `testDescendingSortEqualValuesTieBreakByName` to assert the intended behaviour. (`ViewModels/PaneState.swift`, `Tests/DuPaneUITests/DuPaneFunctionTests.swift`)
+- **Tests: 322 passed, 0 failed** — full SPM unit suite, including four network-eject tests and two network-threading regression tests in `Build403BugTests.swift`.
+
+### Repository tooling — local clone migration helper (2026-09-08)
+
+- **iCloud-to-local migration script** — `Scripts/migrate-off-icloud.sh` creates a clean, metadata-free Git clone at `~/Developer/DuPane` by default, preserving tracked work through a binary patch and untracked files without Finder/resource-fork metadata. It leaves the iCloud checkout untouched, retains a local safety backup, restores the original `origin` URL, and optionally runs the SPM unit suite. Use it instead of copying the repository in Finder when iCloud metadata makes codesigning fail.
+
 ### Build 397 — 4 design-decision fixes: sync atomicity, trash undo, atomic settings import, metadata isolation (2026-09-08)
 
 - **Medium: folder sync is now all-or-nothing** — `executeSyncPlan()` copied via `moveOrCopy` with per-item backups that were deleted the instant each item succeeded, so a failure partway through left earlier files overwritten with no rollback. New `FileOperationService.transactionalCopy(files:to:onProgress:)` backs up every existing destination, keeps all backups until the whole plan succeeds, and rolls the entire batch back (restoring overwritten files, removing newly-created ones) on any single failure. Sync-plan overwrite entries are files only (directories are excluded upstream in `FolderCompareService.overwritingEntry`), so no directory-merge rollback is needed. (`Models/FileOperationService.swift`, `Views/ContentView.swift`)
