@@ -207,6 +207,77 @@ final class DuPaneEndToEndUITests: XCTestCase {
         XCTAssertTrue(app.menuItems["Reveal in Finder"].exists)
     }
 
+    // Critical UI tag: post-build subset for functional, broad, or full test runs.
+    // Bug 394-B: view identity was keyed on activeTabIndex, an Int. Closing a tab can
+    // leave the index unchanged while it refers to a different tab, so SwiftUI reused
+    // the view, onAppear did not re-run, and the type-ahead closure kept writing into
+    // the PaneState of the tab that was gone — type-ahead silently dead in that pane.
+    @MainActor
+    func testCriticalTypeAheadStillWorksAfterClosingTheActiveTab() throws {
+        launchApp()
+        _ = waitForRow(named: "alpha.txt", in: "left")
+
+        // A second tab on the same folder, so both tabs list the same rows.
+        clickToolbarButton("left-new-tab-button")
+        goToPath(fixture.leftPaneURL.path, in: "left")
+        _ = waitForRow(named: "alpha.txt", in: "left")
+
+        // Close the first tab. activeTabIndex stays 0 while now referring to the second.
+        app.buttons["left-tab-0"].click()
+        app.buttons["left-close-tab-0"].click()
+        let survivor = waitForRow(named: "gamma.txt", in: "left")
+
+        // Type-ahead must act on the pane now on screen.
+        clickRow(waitForRow(named: "alpha.txt", in: "left"))
+        app.typeText("g")
+
+        XCTAssertTrue(
+            survivor.waitForExistence(timeout: 5),
+            "the surviving tab's rows must still be listed"
+        )
+        expectSelected("gamma.txt", in: "left")
+    }
+
+    // Bug 394-A: file-operation progress lived in one shared set of @State slots, so a
+    // finishing operation tore down the overlay. Extracted to FileOperationProgressModel;
+    // this guards the wiring — the overlay must be retired when the operation completes.
+    @MainActor
+    func testCriticalProgressOverlayIsNotLeftOnScreenAfterACopy() throws {
+        launchApp()
+        let source = waitForRow(named: "alpha.txt", in: "left")
+        clickRow(source)
+        waitForSelection(source)
+
+        clickToolbarButton("toolbar-copy-button")
+
+        _ = waitForRow(named: "alpha.txt", in: "right")
+        let overlay = app.descendants(matching: .any)["file-op-progress"]
+        let predicate = NSPredicate(format: "exists == false")
+        expectation(for: predicate, evaluatedWith: overlay)
+        waitForExpectations(timeout: 5)
+    }
+
+    @MainActor
+    private func goToPath(_ path: String, in pane: String) {
+        app.typeKey("g", modifierFlags: [.command, .shift])
+        let field = app.textFields["go-to-path-field"]
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        field.click()
+        field.typeKey(.rightArrow, modifierFlags: .command)
+        field.typeKey(.leftArrow, modifierFlags: [.command, .shift])
+        field.typeText(path)
+        app.buttons["go-to-path-confirm-button"].click()
+    }
+
+    @MainActor
+    private func expectSelected(_ name: String, in pane: String) {
+        let target = row(named: name, in: pane)
+        XCTAssertTrue(target.waitForExistence(timeout: 5))
+        let predicate = NSPredicate(format: "value CONTAINS[c] %@", "Selected")
+        expectation(for: predicate, evaluatedWith: target)
+        waitForExpectations(timeout: 5)
+    }
+
     @MainActor
     private func launchApp() {
         app.launchArguments = [

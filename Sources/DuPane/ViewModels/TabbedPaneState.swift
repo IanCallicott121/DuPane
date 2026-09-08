@@ -228,6 +228,14 @@ final class TabbedPaneState: ObservableObject {
         subscribeAllTabURLs()
     }
 
+    /// Stable identity of the active tab. Views must key on this rather than on
+    /// `activeTabIndex`: closing a tab can leave the index unchanged while it now
+    /// refers to a different tab, so an index-keyed view is never rebuilt and keeps
+    /// state captured from the tab that is gone.
+    var activeTabID: UUID {
+        tabs.indices.contains(activeTabIndex) ? tabs[activeTabIndex].id : UUID()
+    }
+
     var activePaneState: PaneState {
         tabs[activeTabIndex].pane
     }

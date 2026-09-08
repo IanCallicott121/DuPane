@@ -88,11 +88,14 @@ struct PaneView: View {
                     .textFieldStyle(.roundedBorder)
                     .font(.system(size: 12, design: .monospaced))
                     .onSubmit { commitGoToPath() }
+                    .accessibilityIdentifier("go-to-path-field")
                 HStack {
                     Spacer()
                     Button("Cancel") { showGoToPath = false }
+                        .accessibilityIdentifier("go-to-path-cancel-button")
                     Button("Go") { commitGoToPath() }
                         .keyboardShortcut(.defaultAction)
+                        .accessibilityIdentifier("go-to-path-confirm-button")
                         .disabled(goToPathText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }

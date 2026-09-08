@@ -33,7 +33,7 @@ struct TabbedPaneView: View {
                 onCopyRequested: onCopyRequested,
                 onDeleteRequested: onDeleteRequested
             )
-            .id(tabs.activeTabIndex)
+            .id(tabs.activeTabID)
         }
         .frame(minWidth: 0, maxWidth: .infinity)
         .clipShape(paneShape)
@@ -91,6 +91,7 @@ struct TabbedPaneView: View {
             }
             .buttonStyle(.borderless)
             .help("New Tab (⌘T)")
+            .accessibilityIdentifier("\(side.accessibilityIDPrefix)-new-tab-button")
         }
         .frame(height: 26)
         .padding(.trailing, 6)
@@ -144,6 +145,7 @@ struct TabbedPaneView: View {
             .foregroundStyle(isSelected ? .primary : .secondary)
             .accessibilityLabel("Tab: \(label)")
             .accessibilityValue(tab.isPinned ? "Pinned" : "")
+            .accessibilityIdentifier("\(side.accessibilityIDPrefix)-tab-\(index)")
 
             if tabs.canCloseTab(at: index) {
                 Button {
@@ -156,6 +158,7 @@ struct TabbedPaneView: View {
                 .buttonStyle(.borderless)
                 .foregroundStyle(.tertiary)
                 .accessibilityLabel("Close tab \(label)")
+                .accessibilityIdentifier("\(side.accessibilityIDPrefix)-close-tab-\(index)")
             }
         }
         .background(tabBg)

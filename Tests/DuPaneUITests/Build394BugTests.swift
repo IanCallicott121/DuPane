@@ -259,3 +259,128 @@ final class SmartMetadataNegativeCacheTests: XCTestCase {
                       "a resolved file must stay resolved across reloads")
     }
 }
+
+// MARK: - High: concurrent file operations clobbered each other's progress UI — 5 tests [must]
+//
+// fileOpInfo / fileOpVisible / fileOpRevealTask were one shared set of @State slots in
+// ContentView with nothing serialising operations, so whichever finished first tore down
+// the overlay and the one still running had no progress display for the rest of its life.
+// Extracted to FileOperationProgressModel, where every mutation is addressed by the token
+// issued at begin() and a finished operation can only retire itself.
+
+@MainActor
+final class FileOperationProgressModelTests: XCTestCase {
+
+    func testFinishingOneOperationDoesNotHideAnotherStillRunning() {
+        let model = FileOperationProgressModel()
+        let slow = model.begin(label: "Copying 5000 items…", total: 5000)
+        let fast = model.begin(label: "Copying 1 item…", total: 1)
+        model.reveal(slow)
+
+        model.finish(fast)
+
+        XCTAssertTrue(model.isVisible, "the overlay must stay up while the slow operation runs")
+        XCTAssertEqual(model.activeOperationCount, 1)
+        XCTAssertEqual(model.info?.label, "Copying 5000 items…",
+                       "display must fall back to the operation still in flight")
+    }
+
+    func testOverlayHidesOnlyWhenTheLastOperationFinishes() {
+        let model = FileOperationProgressModel()
+        let first = model.begin(label: "A", total: 10)
+        let second = model.begin(label: "B", total: 10)
+        model.reveal(second)
+
+        model.finish(second)
+        XCTAssertTrue(model.isVisible, "still one operation in flight")
+
+        model.finish(first)
+        XCTAssertFalse(model.isVisible)
+        XCTAssertNil(model.info)
+        XCTAssertEqual(model.activeOperationCount, 0)
+    }
+
+    func testProgressFromAFinishedOperationIsIgnored() {
+        let model = FileOperationProgressModel()
+        let stale = model.begin(label: "stale", total: 100)
+        let live = model.begin(label: "live", total: 100)
+        model.finish(stale)
+
+        model.update(stale, completed: 99)
+
+        XCTAssertEqual(model.info?.label, "live", "a retired operation must not write into the display")
+        XCTAssertEqual(model.info?.completed, 0)
+        _ = live
+    }
+
+    func testRevealFromAFinishedOperationDoesNotShowTheOverlay() {
+        let model = FileOperationProgressModel()
+        let token = model.begin(label: "quick", total: 1)
+        model.finish(token)
+
+        model.reveal(token)
+
+        XCTAssertFalse(model.isVisible, "an operation that finished before its reveal delay must not flash the overlay")
+    }
+
+    func testUpdateTracksTheDisplayedOperation() {
+        let model = FileOperationProgressModel()
+        let token = model.begin(label: "Copying 10 items…", total: 10)
+        model.update(token, completed: 7)
+
+        XCTAssertEqual(model.info?.completed, 7)
+        XCTAssertEqual(model.info?.total, 10)
+    }
+}
+
+// MARK: - High: type-ahead wrote into a closed tab's PaneState — 3 tests [must]
+//
+// TabbedPaneView keyed view identity on activeTabIndex, an Int. Closing the middle of
+// three tabs leaves the index unchanged while it now refers to a different tab, so
+// SwiftUI reused the view, onAppear did not re-run, and the type-ahead closure kept the
+// PaneState of the tab that was gone. Views now key on activeTabID.
+
+@MainActor
+final class ActiveTabIdentityTests: XCTestCase {
+
+    func testClosingTheActiveMiddleTabChangesTheActiveTabIdentity() {
+        let tabs = TabbedPaneState(initialURL: URL(fileURLWithPath: "/tmp"))
+        tabs.openTab(url: URL(fileURLWithPath: "/tmp"))
+        tabs.openTab(url: URL(fileURLWithPath: "/tmp"))
+        XCTAssertEqual(tabs.tabs.count, 3)
+
+        tabs.switchTab(to: 1)
+        let indexBefore = tabs.activeTabIndex
+        let idBefore = tabs.activeTabID
+
+        tabs.closeTab(at: 1)
+
+        XCTAssertEqual(tabs.activeTabIndex, indexBefore,
+                       "precondition: the index is unchanged — this is why keying on it was wrong")
+        XCTAssertNotEqual(tabs.activeTabID, idBefore,
+                          "identity must change so the view is rebuilt and rebinds to the new PaneState")
+    }
+
+    func testActiveTabIDTracksTheActivePaneState() {
+        let tabs = TabbedPaneState(initialURL: URL(fileURLWithPath: "/tmp"))
+        tabs.openTab(url: URL(fileURLWithPath: "/tmp"))
+
+        tabs.switchTab(to: 0)
+        let firstID = tabs.activeTabID
+        let firstPane = tabs.activePaneState
+
+        tabs.switchTab(to: 1)
+        XCTAssertNotEqual(tabs.activeTabID, firstID)
+        XCTAssertFalse(tabs.activePaneState === firstPane)
+
+        tabs.switchTab(to: 0)
+        XCTAssertEqual(tabs.activeTabID, firstID, "returning to a tab restores its identity")
+        XCTAssertTrue(tabs.activePaneState === firstPane)
+    }
+
+    func testActiveTabIDIsStableAcrossReadsWhenNothingChanges() {
+        let tabs = TabbedPaneState(initialURL: URL(fileURLWithPath: "/tmp"))
+        XCTAssertEqual(tabs.activeTabID, tabs.activeTabID,
+                       "a view keyed on this must not be rebuilt on every render")
+    }
+}

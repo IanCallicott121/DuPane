@@ -37,9 +37,7 @@ struct ContentView: View {
     @State private var showDuplicateFinder: Bool = false
     @State private var duplicateScanURL: URL? = nil
     @StateObject private var duplicateFinderViewModel = DuplicateFinderViewModel()
-    @State private var fileOpInfo: (label: String, completed: Int, total: Int)? = nil
-    @State private var fileOpVisible: Bool = false
-    @State private var fileOpRevealTask: Task<Void, Never>? = nil
+    @StateObject private var fileOpProgress = FileOperationProgressModel()
     private var active: PaneState { activePane == .left ? leftTabs.activePaneState : rightTabs.activePaneState }
     private var inactive: PaneState { activePane == .left ? rightTabs.activePaneState : leftTabs.activePaneState }
     private var activeTabs: TabbedPaneState { activePane == .left ? leftTabs : rightTabs }
@@ -211,7 +209,7 @@ struct ContentView: View {
         })
         .background { keyboardButtons }
         .overlay(alignment: .bottom) {
-            if fileOpVisible, let info = fileOpInfo {
+            if fileOpProgress.isVisible, let info = fileOpProgress.info {
                 VStack(spacing: 4) {
                     Text(info.label)
                         .font(.system(size: 12))
@@ -228,6 +226,7 @@ struct ContentView: View {
                 .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8))
                 .padding(.bottom, 70)
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
+                .accessibilityIdentifier("file-op-progress")
             }
         }
         .overlay(alignment: .bottom) {
@@ -566,14 +565,13 @@ struct ContentView: View {
     }
 
     private func executeSyncPlan(_ plan: FolderSyncPlan) {
-        fileOpRevealTask?.cancel()
         let total = plan.entries.count
         let label = "Syncing \(total) item\(total == 1 ? "" : "s") \(plan.direction.label)…"
-        fileOpInfo = (label: label, completed: 0, total: total)
-        fileOpRevealTask = Task { @MainActor in
+        let token = fileOpProgress.begin(label: label, total: total)
+        Task { @MainActor in
             try? await Task.sleep(nanoseconds: 400_000_000)
             guard !Task.isCancelled else { return }
-            withAnimation { self.fileOpVisible = true }
+            withAnimation { self.fileOpProgress.reveal(token) }
         }
         let sourcePane = plan.direction == .leftToRight ? leftTabs.activePaneState : rightTabs.activePaneState
         let destinationPane = plan.direction == .leftToRight ? rightTabs.activePaneState : leftTabs.activePaneState
@@ -587,15 +585,12 @@ struct ContentView: View {
                 conflictResolution: .overwrite,
                 onProgress: { completed, _ in
                     Task { @MainActor in
-                        self.fileOpInfo = (label: label, completed: completed, total: total)
+                        self.fileOpProgress.update(token, completed: completed)
                     }
                 }
             )
             await MainActor.run {
-                self.fileOpRevealTask?.cancel()
-                self.fileOpRevealTask = nil
-                withAnimation { self.fileOpVisible = false }
-                self.fileOpInfo = nil
+                withAnimation { self.fileOpProgress.finish(token) }
                 sourcePane.load()
                 destinationPane.load()
                 if result.errors.count == 1 {
@@ -715,14 +710,13 @@ struct ContentView: View {
     }
 
     private func executeMoveOrCopy(files: [FileItem], destination: URL, isMove: Bool, resolution: ConflictResolution) {
-        fileOpRevealTask?.cancel()
         let label = "\(isMove ? "Moving" : "Copying") \(files.count) item\(files.count == 1 ? "" : "s") to \(destination.lastPathComponent)…"
         let total = files.count
-        fileOpInfo = (label: label, completed: 0, total: total)
-        fileOpRevealTask = Task { @MainActor in
+        let token = fileOpProgress.begin(label: label, total: total)
+        Task { @MainActor in
             try? await Task.sleep(nanoseconds: 400_000_000)
             guard !Task.isCancelled else { return }
-            withAnimation { self.fileOpVisible = true }
+            withAnimation { self.fileOpProgress.reveal(token) }
         }
         let sourcePane = active
         let destPane = inactive
@@ -731,15 +725,12 @@ struct ContentView: View {
                 files: files, to: destination, isMove: isMove, conflictResolution: resolution,
                 onProgress: { completed, _ in
                     Task { @MainActor in
-                        self.fileOpInfo = (label: label, completed: completed, total: total)
+                        self.fileOpProgress.update(token, completed: completed)
                     }
                 }
             )
             await MainActor.run {
-                self.fileOpRevealTask?.cancel()
-                self.fileOpRevealTask = nil
-                withAnimation { self.fileOpVisible = false }
-                self.fileOpInfo = nil
+                withAnimation { self.fileOpProgress.finish(token) }
                 if result.errors.count == 1 {
                     sourcePane.errorMessage = result.errors[0]
                 } else if result.errors.count > 1 {

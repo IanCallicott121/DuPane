@@ -4,11 +4,6 @@
 ## Next items
 none yet
 
-### Bug fixes — High
-
-- **Concurrent file operations clobber each other's progress UI** — `fileOpInfo` / `fileOpVisible` / `fileOpRevealTask` are a single shared `@State` slot and nothing serialises operations. Start a large copy, then a small one: the small one finishes first and runs the teardown, cancelling the large op's reveal task and setting `fileOpVisible = false`. The large copy then runs to completion with no progress overlay, followed by a toast from nowhere. Serialise operations or key the progress state per operation. (`Views/ContentView.swift`)
-- **Type-ahead writes into a closed tab's `PaneState`** — the type-ahead closure is installed once in `onAppear`, capturing the `PaneView` struct and its `pane` reference. View identity is `.id(tabs.activeTabIndex)`, an `Int`. Closing the middle of three tabs leaves `activeTabIndex` unchanged while it now points at a different `PaneState`, so `onAppear` does not re-run. Typing then sets selection on the closed tab's state; type-ahead is silently dead in that pane and the old `PaneState` is retained. Key view identity on tab identity rather than index, or reinstall the closure on change. (`Views/PaneView.swift`, `Views/TabbedPaneView.swift`, `ViewModels/TabbedPaneState.swift`)
-
 ### Bug fixes — Medium
 
 - **`PaneState.goBack()`/`goForward()` history race** — `canGoBack`/`canGoForward` are checked, then `history[historyIndex]` is accessed; if history is mutated between the guard and the access (async callback), index goes out of bounds. (`ViewModels/PaneState.swift`)
@@ -47,6 +42,14 @@ none
 ---
 
 ## Done
+### Build 395 — 2 High bug fixes with refactors for testability (2026-09-08)
+
+- **High: concurrent file operations no longer clobber each other's progress UI** — `fileOpInfo` / `fileOpVisible` / `fileOpRevealTask` were one shared set of `@State` slots in `ContentView` with nothing serialising operations, so whichever finished first tore down the overlay and the one still running had no progress display for the rest of its life. Extracted to `FileOperationProgressModel` (`ViewModels/`), where every mutation is addressed by the token issued at `begin()`: a finished operation can only retire itself, the overlay hides only when the last operation completes, and a stale `update`/`reveal` is ignored. Both call sites (`executeMoveOrCopy`, `executeSyncPlan`) now go through it. (`ViewModels/FileOperationProgressModel.swift`, `Views/ContentView.swift`)
+- **High: type-ahead no longer writes into a closed tab's `PaneState`** — `TabbedPaneView` keyed view identity on `activeTabIndex`, an `Int`. Closing the middle of three tabs leaves the index unchanged while it now refers to a different tab, so SwiftUI reused the view, `onAppear` did not re-run, and the type-ahead closure kept the `PaneState` of the tab that was gone — type-ahead silently dead in that pane, old `PaneState` retained. `Tab` already carried a stable `UUID`; added `TabbedPaneState.activeTabID` and keyed the view on it. (`ViewModels/TabbedPaneState.swift`, `Views/TabbedPaneView.swift`)
+- **Testability** — accessibility identifiers added to the tab strip (`<side>-tab-<n>`, `<side>-close-tab-<n>`, `<side>-new-tab-button`), the Go-to-Folder sheet (`go-to-path-field`, `-confirm-button`, `-cancel-button`) and the progress overlay (`file-op-progress`). None of these were reachable from a UI test before.
+- **8 new unit tests** in `Build394BugTests.swift`: `FileOperationProgressModelTests` (5), `ActiveTabIdentityTests` (3). **319 tests, 0 failures.**
+- **2 new e2e tests** in `DuPaneEndToEndUITests.swift`: `testCriticalTypeAheadStillWorksAfterClosingTheActiveTab`, `testCriticalProgressOverlayIsNotLeftOnScreenAfterACopy`. **Not yet executed** — they need `xcodegen generate` first, because `FileOperationProgressModel.swift` is new and the `.xcodeproj` does not reference it yet.
+
 ### Build 394 — 4 bug fixes: folder-merge data loss, load cancellation, metadata re-spawn, progress reporting (2026-09-08)
 
 - **Critical: "Overwrite" on a folder no longer destroys data** — `FileOperationService.moveOrCopy` now merges directory-into-directory rather than replacing. Previously it moved the existing destination aside, copied the source over it, then deleted the backup with `removeItem`, so every file present only in the destination was permanently gone — no Trash, no undo. Reachable from both the copy/move and drag-drop conflict alerts. New `mergeDirectory(from:to:isMove:)` recurses and overwrites colliding files while never removing a destination entry that has no counterpart in the source. Packages (`.app`, `.rtfd`) are detected via `isPackageKey` and still replace wholesale, since merging two bundle versions would produce a broken one. (`Models/FileOperationService.swift`)
