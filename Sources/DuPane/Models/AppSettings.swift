@@ -180,117 +180,141 @@ enum FileColumnLayout {
 }
 
 final class AppSettings: ObservableObject {
+    // While a batch update is in flight, per-property writes are collected here and
+    // flushed to UserDefaults in a single pass at the end, so a bulk change (e.g. Import
+    // Settings) can never leave the persisted store in an inconsistent intermediate state.
+    private var batchedWrites: [String: Any]? = nil
+
+    private func store(_ value: Any, forKey key: String) {
+        if batchedWrites != nil {
+            batchedWrites![key] = value
+        } else {
+            UserDefaults.standard.set(value, forKey: key)
+        }
+    }
+
+    /// Applies a group of setting changes as one transaction: nested calls coalesce, and
+    /// the accumulated writes are committed to UserDefaults only after `body` returns.
+    func performBatchUpdate(_ body: () -> Void) {
+        let alreadyBatching = batchedWrites != nil
+        if !alreadyBatching { batchedWrites = [:] }
+        body()
+        guard !alreadyBatching, let writes = batchedWrites else { return }
+        batchedWrites = nil
+        for (key, value) in writes {
+            UserDefaults.standard.set(value, forKey: key)
+        }
+    }
+
     // Delete behaviour
     @Published var fileDeleteNoConfirm: Bool {
-        didSet { UserDefaults.standard.set(fileDeleteNoConfirm, forKey: "fileDeleteNoConfirm") }
+        didSet { store(fileDeleteNoConfirm, forKey: "fileDeleteNoConfirm") }
     }
     @Published var directoryDeleteNoConfirm: Bool {
-        didSet { UserDefaults.standard.set(directoryDeleteNoConfirm, forKey: "directoryDeleteNoConfirm") }
+        didSet { store(directoryDeleteNoConfirm, forKey: "directoryDeleteNoConfirm") }
     }
     @Published var showCustomShellCommandNotice: Bool {
-        didSet { UserDefaults.standard.set(showCustomShellCommandNotice, forKey: "showCustomShellCommandNotice") }
+        didSet { store(showCustomShellCommandNotice, forKey: "showCustomShellCommandNotice") }
     }
     // Display
     @Published var showHiddenFiles: Bool {
-        didSet { UserDefaults.standard.set(showHiddenFiles, forKey: "showHiddenFiles") }
+        didSet { store(showHiddenFiles, forKey: "showHiddenFiles") }
     }
     @Published var showHiddenFolders: Bool {
-        didSet { UserDefaults.standard.set(showHiddenFolders, forKey: "showHiddenFolders") }
+        didSet { store(showHiddenFolders, forKey: "showHiddenFolders") }
     }
     @Published var showFileExtensions: Bool {
-        didSet { UserDefaults.standard.set(showFileExtensions, forKey: "showFileExtensions") }
+        didSet { store(showFileExtensions, forKey: "showFileExtensions") }
     }
     // Toolbar
     @Published var showToolbarLabels: Bool {
-        didSet { UserDefaults.standard.set(showToolbarLabels, forKey: "showToolbarLabels") }
+        didSet { store(showToolbarLabels, forKey: "showToolbarLabels") }
     }
     // Appearance
     @Published var appColorScheme: AppColorScheme {
-        didSet { UserDefaults.standard.set(appColorScheme.rawValue, forKey: "appColorScheme") }
+        didSet { store(appColorScheme.rawValue, forKey: "appColorScheme") }
     }
     @Published var appColorMode: AppColorMode {
-        didSet { UserDefaults.standard.set(appColorMode.rawValue, forKey: "appColorMode") }
+        didSet { store(appColorMode.rawValue, forKey: "appColorMode") }
     }
     @Published var listFontSize: Int {
-        didSet { UserDefaults.standard.set(listFontSize, forKey: "listFontSize") }
+        didSet { store(listFontSize, forKey: "listFontSize") }
     }
     @Published var dateFormatStyle: DateFormatStyle {
-        didSet { UserDefaults.standard.set(dateFormatStyle.rawValue, forKey: "dateFormatStyle") }
+        didSet { store(dateFormatStyle.rawValue, forKey: "dateFormatStyle") }
     }
     // Column visibility — comma-separated list of hidden column names
     @Published var hiddenColumnsRaw: String {
-        didSet { UserDefaults.standard.set(hiddenColumnsRaw, forKey: "hiddenColumns") }
+        didSet { store(hiddenColumnsRaw, forKey: "hiddenColumns") }
     }
     // Column order — display order of the reorderable columns
     @Published var columnOrder: [String] {
-        didSet { UserDefaults.standard.set(columnOrder, forKey: "columnOrder") }
+        didSet { store(columnOrder, forKey: "columnOrder") }
     }
     // Column widths are kept per pane so resizing one side doesn't move the other.
     @Published var leftColumnWidths: [String: CGFloat] {
-        didSet { Self.saveColumnWidths(leftColumnWidths, forKey: "leftColumnWidths") }
+        didSet { store(leftColumnWidths.mapValues { Double($0) }, forKey: "leftColumnWidths") }
     }
     @Published var rightColumnWidths: [String: CGFloat] {
-        didSet { Self.saveColumnWidths(rightColumnWidths, forKey: "rightColumnWidths") }
+        didSet { store(rightColumnWidths.mapValues { Double($0) }, forKey: "rightColumnWidths") }
     }
     // Startup folders
     @Published var leftStartupMode: StartupFolderMode {
-        didSet { UserDefaults.standard.set(leftStartupMode.rawValue, forKey: "leftStartupMode") }
+        didSet { store(leftStartupMode.rawValue, forKey: "leftStartupMode") }
     }
     @Published var leftFixedPath: String {
-        didSet { UserDefaults.standard.set(leftFixedPath, forKey: "leftFixedPath") }
+        didSet { store(leftFixedPath, forKey: "leftFixedPath") }
     }
     @Published var rightStartupMode: StartupFolderMode {
-        didSet { UserDefaults.standard.set(rightStartupMode.rawValue, forKey: "rightStartupMode") }
+        didSet { store(rightStartupMode.rawValue, forKey: "rightStartupMode") }
     }
     @Published var rightFixedPath: String {
-        didSet { UserDefaults.standard.set(rightFixedPath, forKey: "rightFixedPath") }
+        didSet { store(rightFixedPath, forKey: "rightFixedPath") }
     }
     // Sidebar Places — set of location names to show in the Places section
     @Published var enabledPlaces: Set<String> {
-        didSet {
-            UserDefaults.standard.set(Array(enabledPlaces), forKey: "enabledPlaces")
-        }
+        didSet { store(Array(enabledPlaces), forKey: "enabledPlaces") }
     }
     // Sidebar section visibility
     @Published var showSidebarPlaces: Bool {
-        didSet { UserDefaults.standard.set(showSidebarPlaces, forKey: "showSidebarPlaces") }
+        didSet { store(showSidebarPlaces, forKey: "showSidebarPlaces") }
     }
     @Published var showSidebarRecents: Bool {
-        didSet { UserDefaults.standard.set(showSidebarRecents, forKey: "showSidebarRecents") }
+        didSet { store(showSidebarRecents, forKey: "showSidebarRecents") }
     }
     // Sort behaviour
     @Published var foldersFirst: Bool {
-        didSet { UserDefaults.standard.set(foldersFirst, forKey: "foldersFirst") }
+        didSet { store(foldersFirst, forKey: "foldersFirst") }
     }
     // Date display
     @Published var timeFormatStyle: TimeFormatStyle {
-        didSet { UserDefaults.standard.set(timeFormatStyle.rawValue, forKey: "timeFormatStyle") }
+        didSet { store(timeFormatStyle.rawValue, forKey: "timeFormatStyle") }
     }
     // Network section in sidebar
     @Published var showNetworkSection: Bool {
-        didSet { UserDefaults.standard.set(showNetworkSection, forKey: "showNetworkSection") }
+        didSet { store(showNetworkSection, forKey: "showNetworkSection") }
     }
     // Network sub-features (each individually toggleable)
     @Published var networkShowMountedVolumes: Bool {
-        didSet { UserDefaults.standard.set(networkShowMountedVolumes, forKey: "networkShowMountedVolumes") }
+        didSet { store(networkShowMountedVolumes, forKey: "networkShowMountedVolumes") }
     }
     @Published var networkBonjourDiscovery: Bool {
-        didSet { UserDefaults.standard.set(networkBonjourDiscovery, forKey: "networkBonjourDiscovery") }
+        didSet { store(networkBonjourDiscovery, forKey: "networkBonjourDiscovery") }
     }
     @Published var networkPinnedLocations: Bool {
-        didSet { UserDefaults.standard.set(networkPinnedLocations, forKey: "networkPinnedLocations") }
+        didSet { store(networkPinnedLocations, forKey: "networkPinnedLocations") }
     }
     @Published var networkAutoReconnect: Bool {
-        didSet { UserDefaults.standard.set(networkAutoReconnect, forKey: "networkAutoReconnect") }
+        didSet { store(networkAutoReconnect, forKey: "networkAutoReconnect") }
     }
     @Published var networkStatusIndicator: Bool {
-        didSet { UserDefaults.standard.set(networkStatusIndicator, forKey: "networkStatusIndicator") }
+        didSet { store(networkStatusIndicator, forKey: "networkStatusIndicator") }
     }
     @Published var pinnedNetworkURLs: [String] {
-        didSet { UserDefaults.standard.set(pinnedNetworkURLs, forKey: "pinnedNetworkURLs") }
+        didSet { store(pinnedNetworkURLs, forKey: "pinnedNetworkURLs") }
     }
     @Published var pinnedNetworkNames: [String: String] {
-        didSet { UserDefaults.standard.set(pinnedNetworkNames, forKey: "pinnedNetworkNames") }
+        didSet { store(pinnedNetworkNames, forKey: "pinnedNetworkNames") }
     }
 
     init() {
@@ -418,10 +442,6 @@ final class AppSettings: ObservableObject {
         return FileColumnLayout.defaultWidths.merging(clamped) { _, saved in saved }
     }
 
-    private static func saveColumnWidths(_ widths: [String: CGFloat], forKey key: String) {
-        UserDefaults.standard.set(widths.mapValues { Double($0) }, forKey: key)
-    }
-
     func exportedData() -> Data? {
         let keys = [
             "fileDeleteNoConfirm", "directoryDeleteNoConfirm", "showCustomShellCommandNotice",
@@ -445,6 +465,12 @@ final class AppSettings: ObservableObject {
 
     func applyImport(from data: Data) {
         guard let dict = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return }
+        performBatchUpdate {
+            applyImportedValues(dict)
+        }
+    }
+
+    private func applyImportedValues(_ dict: [String: Any]) {
         if let v = dict["fileDeleteNoConfirm"] as? Bool { fileDeleteNoConfirm = v }
         if let v = dict["directoryDeleteNoConfirm"] as? Bool { directoryDeleteNoConfirm = v }
         if let v = dict["showCustomShellCommandNotice"] as? Bool { showCustomShellCommandNotice = v }

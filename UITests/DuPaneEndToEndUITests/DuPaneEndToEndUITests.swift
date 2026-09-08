@@ -257,6 +257,57 @@ final class DuPaneEndToEndUITests: DuPaneTestCase {
         waitForExpectations(timeout: 5)
     }
 
+    // Build 397: a partial/complete trash used to be unrecoverable in one step. Delete now
+    // offers an Undo affordance that restores the trashed items to their original location.
+    @MainActor
+    func testCriticalUndoAfterDeleteRestoresTheFile() throws {
+        launchApp()
+        let alpha = waitForRow(named: "alpha.txt", in: "left")
+        clickRow(alpha)
+        waitForSelection(alpha)
+
+        clickToolbarButton("toolbar-delete-button")
+        // The confirmation is optional — it depends on the "delete without confirmation"
+        // setting, which varies by machine. Dismiss it if it appears.
+        let sheet = app.sheets.firstMatch
+        if sheet.waitForExistence(timeout: 3) {
+            sheet.buttons["Move to Trash"].click()
+        }
+
+        waitForMissingRow(named: "alpha.txt", in: "left")
+
+        let undo = app.buttons["toast-undo-button"]
+        XCTAssertTrue(undo.waitForExistence(timeout: 5), "an Undo button must appear after a delete")
+        undo.click()
+
+        XCTAssertTrue(row(named: "alpha.txt", in: "left").waitForExistence(timeout: 5),
+                      "the deleted row must return after Undo")
+        XCTAssertTrue(fixture.exists(fixture.fileURL(named: "alpha.txt", in: fixture.leftPaneURL)),
+                      "the file must be restored to its original location on disk")
+    }
+
+    // Build 397: folder sync now goes through the all-or-nothing transactionalCopy. This
+    // exercises the happy path end-to-end — Compare, then Sync L→R — and confirms the
+    // left-only files are copied into the right pane and land on disk intact.
+    @MainActor
+    func testCriticalSyncCopiesLeftOnlyFilesToTheRightPane() throws {
+        launchApp()
+        _ = waitForRow(named: "alpha.txt", in: "left")
+        _ = waitForRow(named: "target.txt", in: "right")
+
+        clickToolbarButton("toolbar-compare-button")
+        clickToolbarButton("toolbar-sync-left-to-right-button")
+
+        let sheet = app.sheets.firstMatch
+        XCTAssertTrue(sheet.waitForExistence(timeout: 5), "the sync confirmation must appear")
+        sheet.buttons["Sync"].click()
+
+        XCTAssertTrue(row(named: "alpha.txt", in: "right").waitForExistence(timeout: 5),
+                      "a left-only file must appear in the right pane after Sync L→R")
+        XCTAssertEqual(try fixture.fileContents(named: "alpha.txt", in: fixture.rightPaneURL), "alpha",
+                       "the synced file must arrive with its contents intact")
+    }
+
     @MainActor
     private func goToPath(_ path: String, in pane: String) {
         app.typeKey("g", modifierFlags: [.command, .shift])

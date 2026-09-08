@@ -3,30 +3,17 @@
 
 ## Handover — next agent starts here
 
-**State:** Build 395. Working tree clean. **4 commits committed locally but NOT pushed**
-(a cloud session has no SSH keys). Push is the first thing to do.
+**State:** Build 397. Unit suite **319 passed, 0 failed**. E2E suite **14 passed, 0
+failed** — run 2026-09-08 via `xcodebuild test -project DuPane.xcodeproj -scheme DuPane
+-destination 'platform=macOS' -derivedDataPath /tmp/DuPane-e2e-dd` (a scratch path outside
+iCloud avoids codesign issues). That command is the reliable headless way to run e2e from
+a shell — it does what `DuPane.xcodeproj` ⌘U does. Note the UI-testing authorisation must
+be granted (it is, on this machine).
 
-**Verified:** unit suite **307 passed, 0 failed** (plus 12 e2e correctly skipped in the
-package scheme). App target and e2e target both build.
-
-**Not verified:** the 12 e2e tests. See the blocker below.
-
-### Do first
-1. `git push` — 4 commits are waiting.
-2. Resolve the e2e blocker below, then run the e2e suite and confirm the two new tests
-   (`testCriticalTypeAheadStillWorksAfterClosingTheActiveTab`,
-   `testCriticalProgressOverlayIsNotLeftOnScreenAfterACopy`) actually pass. They were
-   written against Build 395's fixes but have never executed.
-
-### Blocker — e2e suite cannot run: UI testing not authorised
-Every e2e run fails with `Failed to load AX for local.DuPane (pid:NNNN): Not authorized
-for performing UI testing actions.` — 10 of 12 tests, including long-standing ones like
-`testLaunchShowsFixtureRows`, so it is environmental rather than a code fault. The suite
-did run earlier the same day, so something changed mid-session. Most likely cause: a
-concurrent computer-use/automation session was injecting input through the same
-accessibility subsystem XCUI needs; a screen lock/unlock may also have reset it. Check
-System Settings > Privacy & Security > Accessibility (and Developer Tools) for Xcode, and
-run the suite with no other automation holding the machine.
+Note: that e2e run did not rewrite `.test-results/DuPaneEndToEndUITests.log` (still shows
+the old all-SKIP state); the authoritative result was read from the xcresult bundle. If
+the shell-readable log matters for future automation, investigate why `TestResultLog`
+didn't fire under the xcodeproj scheme.
 
 ### How to run the tests
 - **Unit (307):** open the **DuPane folder** (not the `.xcodeproj`) for the
@@ -52,15 +39,13 @@ accessibility identifiers, then test.
 ### Infrastructure / test quality
 
 - **`SmartMetadataServiceTests.testImageDimensionsForPNG` is flaky** — writes a 1x1 PNG, calls `loadIfNeeded`, sleeps 500 ms, then asserts. The work runs in a `.background`-priority detached task, so under a full-suite run it sometimes has not finished and the assertion sees `nil`. Observed failing once and passing on immediate re-run. Replace the fixed sleep with polling on `hasResolved(_:)` or an expectation. (`Tests/DuPaneUITests/DuPaneFunctionTests.swift`)
-- **E2E suite has never been executed against Builds 394/395** — blocked by the UI-testing authorisation issue described in the Handover section above. Until it runs, the 12 e2e tests are unproven, including the 2 added in Build 395.
+- **`TestResultLog` does not write under the xcodeproj e2e scheme** — the 2026-09-08 e2e run passed all 12 tests but left `.test-results/DuPaneEndToEndUITests.log` untouched, so the shell-readable log went stale. Results had to be read from the xcresult bundle instead. Investigate why `invokeTest`/`TestResultLog.append` didn't fire (or write to the expected path) when driven from `DuPane.xcodeproj`. (`UITests/DuPaneEndToEndUITests/TestResultLog.swift`)
 
 ### Bug fixes — Medium
 
 - **`PaneState.goBack()`/`goForward()` history race** — `canGoBack`/`canGoForward` are checked, then `history[historyIndex]` is accessed; if history is mutated between the guard and the access (async callback), index goes out of bounds. (`ViewModels/PaneState.swift`)
 - **`PaneState.endDeepSearch` cancellation window** — Spotlight results can arrive after `endDeepSearch()` is called but before `spotlightQuery = nil` is set; rapid navigation leaves search state inconsistent. (`ViewModels/PaneState.swift`)
 - **`NetworkVolumeMonitor.ejectAndRemove` ignores unmount failure** — `try? NSWorkspace.unmountAndEjectDevice` failure is silently discarded; volume is removed from `mountedVolumes` even if the unmount didn't succeed, so the sidebar shows it gone while it's still mounted. (`Models/NetworkVolumeMonitor.swift`)
-- **Sync plan not atomic** — `executeSyncPlan()` with `.overwrite` has no transaction log; a crash mid-operation leaves the destination partially overwritten with no way to resume or roll back. (`Views/ContentView.swift`)
-- **Partial trash failure unrecoverable** — `FileOperationService.trash()` collects errors but can't identify which items were successfully trashed before the failure; user has no way to undo the partial deletion. (`Models/FileOperationService.swift`)
 - **`SidebarModel.recordVisit` and `init` block main thread** — `FileManager.fileExists` called synchronously on the main actor per bookmark and per recent URL. Move to a background task. (`Models/SidebarModel.swift`)
 - **`TabbedPaneView` calls `pane.load()` on every tab switch** — fires a directory read even when tab contents are current, causing unnecessary I/O and flicker. Only load if the tab has never loaded or its URL changed. (`Views/TabbedPaneView.swift`)
 - **`NetworkVolumeMonitor` Bonjour delegate mutates `@Published` on background thread** — `BonjourBrowserDelegate` callbacks fire on the `NetServiceBrowser` queue without a `DispatchQueue.main` hop. (`Models/NetworkVolumeMonitor.swift`)
@@ -77,8 +62,6 @@ accessibility identifiers, then test.
 
 - **`QuickLookCoordinator.toggle` requires double-Space to change selection** — calls `orderOut` when panel is visible with new URLs instead of refreshing in place. (`Views/QuickLookCoordinator.swift`)
 - **`ColumnResizeHandle.anyIsDragging` stuck on missed mouseUp** — static flag never reset if `mouseUp` is missed (focus lost mid-drag), permanently suppressing cursor reset for all handles until restart. (`Views/ColumnResizeHandle.swift`)
-- **`SmartMetadataService.cache` not `Sendable`-verified** — `cache: [URL: String]` is a non-`Sendable` type accessed on `@MainActor`; correct today but fragile against future Swift concurrency strictness or accidental off-actor reads. (`Models/SmartMetadataService.swift`)
-- **`UserDefaults` writes have no transaction semantics** — each `@Published` setting's `didSet` writes to `UserDefaults` immediately and independently; rapid successive changes (e.g. import settings) could leave defaults in an inconsistent intermediate state. (`Models/AppSettings.swift`)
 
 - **Sort tiebreak ignores `sortAscending`** — for `.size`, `.kind` and `.modified`, equal values fall through to `a.name.localizedStandardCompare(b.name) == .orderedAscending`, which is hardcoded ascending. Sorting descending by size shows equal-size files in ascending name order. The comparator stays consistent so there is no crash risk, only visible inconsistency. (`ViewModels/PaneState.swift`)
 - **`DuplicateFinderViewModel` progress guard tests a value, not an identity** — callbacks check `vm?.phase == .scanning`, so callbacks queued by a superseded scan pass the *new* scan's guard and write stale `scannedFiles`/`hashedFiles`. Close the duplicate finder mid-scan and reopen on another folder: the counter briefly shows the previous scan's numbers. Tag each scan with a token and compare that. (`ViewModels/DuplicateFinderViewModel.swift`)
@@ -92,6 +75,14 @@ none
 ---
 
 ## Done
+### Build 397 — 4 design-decision fixes: sync atomicity, trash undo, atomic settings import, metadata isolation (2026-09-08)
+
+- **Medium: folder sync is now all-or-nothing** — `executeSyncPlan()` copied via `moveOrCopy` with per-item backups that were deleted the instant each item succeeded, so a failure partway through left earlier files overwritten with no rollback. New `FileOperationService.transactionalCopy(files:to:onProgress:)` backs up every existing destination, keeps all backups until the whole plan succeeds, and rolls the entire batch back (restoring overwritten files, removing newly-created ones) on any single failure. Sync-plan overwrite entries are files only (directories are excluded upstream in `FolderCompareService.overwritingEntry`), so no directory-merge rollback is needed. (`Models/FileOperationService.swift`, `Views/ContentView.swift`)
+- **Medium: a partial or complete delete is now undoable** — `trash()` returns `[TrashedItem]` pairing each original URL with its Trash location, and `restoreFromTrash(_:)` moves them back (skipping any whose original path is occupied again, so a restore never overwrites a newer file). `performDelete` shows an **Undo** button in the toast that restores the items. (`Models/FileOperationService.swift`, `Views/ContentView.swift`, `Views/GlobalToolbar.swift` — added `toolbar-delete-button` id)
+- **Low: Import Settings is now atomic** — `AppSettings.performBatchUpdate` collects each setting's `didSet` write while a batch is open and flushes them to `UserDefaults` in one pass; `applyImport` runs inside it, so a bulk import can no longer be observed in an inconsistent intermediate state. Single-setting writes stay immediate. Removed the now-unused `saveColumnWidths` helper. (`Models/AppSettings.swift`)
+- **Low: metadata cache off-main access now fails loudly** — `SmartMetadataService` gains a `dispatchPrecondition(.onQueue(.main))` assertion at every `cache`/`cacheOrder`/`pending` access point, turning an accidental off-actor read into a debug crash instead of a silent data race. (`Models/SmartMetadataService.swift`)
+- **14 new tests** — unit (`Build397BugTests.swift`): `TransactionalSyncCopyTests` (4), `TrashUndoTests` (4), `AppSettingsBatchWriteTests` (3), `SmartMetadataMainActorAccessTests` (1); e2e (`DuPaneEndToEndUITests.swift`): `testCriticalUndoAfterDeleteRestoresTheFile`, `testCriticalSyncCopiesLeftOnlyFilesToTheRightPane` (2). e2e added only where UI-observable — the atomic-import and metadata-assertion fixes stay unit-only (import consistency is unobservable through the UI; the metadata `dispatchPrecondition` would crash the runner, not assert). **Unit: 319 passed, 0 failed. E2E: 14 passed, 0 failed** (`xcodebuild` scheme `DuPane`, macOS 27.0, 2026-09-08). The delete-confirmation step in the Undo test is optional so it passes whether or not "delete without confirmation" is enabled.
+
 ### Build 395 — 2 High bug fixes with refactors for testability (2026-09-08)
 
 - **High: concurrent file operations no longer clobber each other's progress UI** — `fileOpInfo` / `fileOpVisible` / `fileOpRevealTask` were one shared set of `@State` slots in `ContentView` with nothing serialising operations, so whichever finished first tore down the overlay and the one still running had no progress display for the rest of its life. Extracted to `FileOperationProgressModel` (`ViewModels/`), where every mutation is addressed by the token issued at `begin()`: a finished operation can only retire itself, the overlay hides only when the last operation completes, and a stale `update`/`reveal` is ignored. Both call sites (`executeMoveOrCopy`, `executeSyncPlan`) now go through it. (`ViewModels/FileOperationProgressModel.swift`, `Views/ContentView.swift`)

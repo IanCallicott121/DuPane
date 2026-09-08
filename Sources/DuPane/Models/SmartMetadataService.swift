@@ -14,16 +14,28 @@ final class SmartMetadataService: ObservableObject {
     private static let cacheMaxSize = 500
     private var pending: Set<URL> = []
 
+    /// `cache`/`cacheOrder`/`pending` are plain (non-Sendable) collections whose only
+    /// safety guarantee is main-actor isolation. This precondition turns any accidental
+    /// off-main access into a loud debug crash instead of silent data-race corruption.
+    private func assertMainActor() {
+        dispatchPrecondition(condition: .onQueue(.main))
+    }
+
     /// An empty cache entry means "computed, nothing worth showing" — see loadIfNeeded.
     func info(for item: FileItem) -> String? {
+        assertMainActor()
         guard let value = cache[item.url], !value.isEmpty else { return nil }
         return value
     }
 
     /// True once metadata has been computed for `url`, whether or not it produced anything.
-    func hasResolved(_ url: URL) -> Bool { cache[url] != nil }
+    func hasResolved(_ url: URL) -> Bool {
+        assertMainActor()
+        return cache[url] != nil
+    }
 
     func loadIfNeeded(for items: [FileItem]) {
+        assertMainActor()
         for item in items where !item.isDirectory {
             guard cache[item.url] == nil, !pending.contains(item.url) else { continue }
             pending.insert(item.url)
@@ -32,6 +44,7 @@ final class SmartMetadataService: ObservableObject {
             Task.detached(priority: .background) {
                 let result = await Self.compute(url: url, ext: ext)
                 await MainActor.run {
+                    self.assertMainActor()
                     self.pending.remove(url)
                     // Record the negative result too. compute() returns nil for every
                     // extension outside its three lists, and not recording that made

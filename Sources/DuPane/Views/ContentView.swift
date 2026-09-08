@@ -22,6 +22,7 @@ struct ContentView: View {
     }()
     @State private var activeTagFilters: Set<String> = []
     @State private var toastMessage: String?
+    @State private var toastUndo: (() -> Void)?
     @State private var showDeleteConfirm = false
     @State private var showNewFolderSheet = false
     @State private var newFolderName = "New Folder"
@@ -231,13 +232,22 @@ struct ContentView: View {
         }
         .overlay(alignment: .bottom) {
             if let toastMessage {
-                Text(toastMessage)
-                    .font(.system(size: 12))
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 9)
-                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8))
-                    .padding(.bottom, 34)
-                    .transition(.opacity.combined(with: .move(edge: .bottom)))
+                HStack(spacing: 12) {
+                    Text(toastMessage)
+                        .font(.system(size: 12))
+                    if let toastUndo {
+                        Button("Undo") { toastUndo() }
+                            .font(.system(size: 12, weight: .semibold))
+                            .buttonStyle(.plain)
+                            .foregroundStyle(.tint)
+                            .accessibilityIdentifier("toast-undo-button")
+                    }
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 9)
+                .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8))
+                .padding(.bottom, 34)
+                .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
         }
     }
@@ -578,11 +588,9 @@ struct ContentView: View {
         let files = plan.entries.map(\.source)
 
         Task.detached {
-            let result = FileOperationService.moveOrCopy(
+            let result = FileOperationService.transactionalCopy(
                 files: files,
                 to: plan.destinationFolder,
-                isMove: false,
-                conflictResolution: .overwrite,
                 onProgress: { completed, _ in
                     Task { @MainActor in
                         self.fileOpProgress.update(token, completed: completed)
@@ -612,11 +620,17 @@ struct ContentView: View {
 
     // MARK: - Toast
 
-    private func showToast(_ message: String) {
-        withAnimation { toastMessage = message }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+    private func showToast(_ message: String, undo: (() -> Void)? = nil) {
+        withAnimation {
+            toastMessage = message
+            toastUndo = undo
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + (undo == nil ? 3 : 6)) {
             if toastMessage == message {
-                withAnimation { toastMessage = nil }
+                withAnimation {
+                    toastMessage = nil
+                    toastUndo = nil
+                }
             }
         }
     }
@@ -774,7 +788,27 @@ struct ContentView: View {
                     peer.load()
                 }
                 if result.succeeded > 0 {
-                    showToast("Moved \(result.succeeded) item\(result.succeeded == 1 ? "" : "s") to Trash.")
+                    let trashed = result.trashedItems
+                    let noun = "\(result.succeeded) item\(result.succeeded == 1 ? "" : "s")"
+                    showToast(
+                        "Moved \(noun) to Trash.",
+                        undo: trashed.isEmpty ? nil : { undoTrash(trashed) }
+                    )
+                }
+            }
+        }
+    }
+
+    private func undoTrash(_ items: [TrashedItem]) {
+        Task.detached {
+            let result = FileOperationService.restoreFromTrash(items)
+            await MainActor.run {
+                leftTabs.activePaneState.load()
+                rightTabs.activePaneState.load()
+                if let error = result.errors.last {
+                    active.errorMessage = error
+                } else {
+                    showToast("Restored \(result.succeeded) item\(result.succeeded == 1 ? "" : "s").")
                 }
             }
         }

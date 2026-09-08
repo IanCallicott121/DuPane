@@ -4,9 +4,26 @@ struct FileOperationResult {
     let succeeded: Int
     let errors: [String]
     let resultingURLs: [URL]
+    // Populated by trash(): pairs each trashed item's original location with its
+    // location inside the Trash, so a partial or full deletion can be undone.
+    let trashedItems: [TrashedItem]
+
+    init(succeeded: Int, errors: [String], resultingURLs: [URL], trashedItems: [TrashedItem] = []) {
+        self.succeeded = succeeded
+        self.errors = errors
+        self.resultingURLs = resultingURLs
+        self.trashedItems = trashedItems
+    }
 
     var hasSucceeded: Bool { succeeded > 0 }
     var lastError: String? { errors.last }
+}
+
+/// One item that was moved to the Trash: its original path and where it now lives inside
+/// the Trash, so `restoreFromTrash` can move it back.
+struct TrashedItem: Equatable {
+    let original: URL
+    let trashURL: URL
 }
 
 enum ConflictResolution {
@@ -163,6 +180,7 @@ enum FileOperationService {
         var succeeded = 0
         var errors: [String] = []
         var resultingURLs: [URL] = []
+        var trashedItems: [TrashedItem] = []
 
         for url in urls {
             do {
@@ -170,13 +188,110 @@ enum FileOperationService {
                 succeeded += 1
                 if let resultingURL {
                     resultingURLs.append(resultingURL)
+                    trashedItems.append(TrashedItem(original: url, trashURL: resultingURL))
                 }
             } catch {
                 errors.append(error.localizedDescription)
             }
         }
 
+        return FileOperationResult(
+            succeeded: succeeded, errors: errors,
+            resultingURLs: resultingURLs, trashedItems: trashedItems
+        )
+    }
+
+    /// Moves previously-trashed items back to their original locations. Skips any item
+    /// whose original path is occupied again so a restore never overwrites a newer file.
+    static func restoreFromTrash(_ items: [TrashedItem]) -> FileOperationResult {
+        var succeeded = 0
+        var errors: [String] = []
+        var resultingURLs: [URL] = []
+
+        for item in items {
+            do {
+                if FileManager.default.fileExists(atPath: item.original.path) {
+                    throw CocoaError(.fileWriteFileExists)
+                }
+                try FileManager.default.moveItem(at: item.trashURL, to: item.original)
+                succeeded += 1
+                resultingURLs.append(item.original)
+            } catch {
+                errors.append(
+                    "Couldn't restore '\(item.original.lastPathComponent)': \(error.localizedDescription)"
+                )
+            }
+        }
+
         return FileOperationResult(succeeded: succeeded, errors: errors, resultingURLs: resultingURLs)
+    }
+
+    /// All-or-nothing overwrite copy used by folder sync. Every existing destination is
+    /// backed up before it is overwritten and every newly-created file is tracked; if any
+    /// single copy fails the whole batch is rolled back, so a crash-free failure never
+    /// leaves the destination partially synced. Backups are deleted only once the entire
+    /// plan has succeeded. Sync plans only ever contain files (directories are excluded
+    /// upstream), so no directory-merge handling is needed here.
+    static func transactionalCopy(
+        files: [FileItem],
+        to destinationFolder: URL,
+        onProgress: ((Int, Int) -> Void)? = nil
+    ) -> FileOperationResult {
+        let fileManager = FileManager.default
+        var performed: [(destination: URL, backup: URL?)] = []
+
+        func rollback() {
+            for op in performed.reversed() {
+                try? fileManager.removeItem(at: op.destination)
+                if let backup = op.backup {
+                    try? fileManager.moveItem(at: backup, to: op.destination)
+                }
+            }
+        }
+
+        for (index, file) in files.enumerated() {
+            let destination = destinationFolder.appendingPathComponent(file.name)
+
+            guard !sameFileLocation(file.url, destination) else {
+                rollback()
+                return FileOperationResult(
+                    succeeded: 0,
+                    errors: ["Cannot sync '\(file.name)': source and destination are the same."],
+                    resultingURLs: []
+                )
+            }
+
+            var backup: URL? = nil
+            do {
+                if fileManager.fileExists(atPath: destination.path) {
+                    let tmp = destinationFolder.appendingPathComponent(
+                        ".\(destination.lastPathComponent).\(UUID().uuidString).tmp"
+                    )
+                    try fileManager.moveItem(at: destination, to: tmp)
+                    backup = tmp
+                }
+                try fileManager.copyItem(at: file.url, to: destination)
+                performed.append((destination, backup))
+                onProgress?(index + 1, files.count)
+            } catch {
+                // Undo this item's half-finished step, then roll back the committed ones.
+                try? fileManager.removeItem(at: destination)
+                if let backup { try? fileManager.moveItem(at: backup, to: destination) }
+                rollback()
+                return FileOperationResult(
+                    succeeded: 0,
+                    errors: ["Couldn't sync '\(file.name)': \(error.localizedDescription)"],
+                    resultingURLs: []
+                )
+            }
+        }
+
+        for op in performed {
+            if let backup = op.backup { try? fileManager.removeItem(at: backup) }
+        }
+        return FileOperationResult(
+            succeeded: performed.count, errors: [], resultingURLs: performed.map(\.destination)
+        )
     }
 
     /// Permanently removes items from the filesystem with no Trash recovery.

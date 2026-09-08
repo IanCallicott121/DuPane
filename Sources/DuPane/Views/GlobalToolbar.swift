@@ -99,6 +99,7 @@ struct GlobalToolbar: View {
             }
             .disabled(!canDelete)
             .keyboardShortcut(.delete, modifiers: .command)
+            .accessibilityIdentifier("toolbar-delete-button")
 
             Button(action: onRename) {
                 toolbarLabel("Rename", icon: "pencil")
