@@ -635,11 +635,8 @@ final class DuPaneFunctionTests: DuPaneTestCase {
     @MainActor
     func testDescendingSortEqualValuesTieBreakByName() {
         // Input: beta and alpha both have size 20, gamma has size 10.
-        // A correct descending-by-size sort must break ties alphabetically.
-        // The current sort has no tiebreaker, so equal-size items retain input
-        // order (beta before alpha), violating Swift's strict-weak-ordering
-        // contract. This test pins the desired behaviour and is expected to
-        // fail until a name tiebreaker is added.
+        // A descending-by-size sort applies the same descending direction to
+        // equal-size name tiebreaks.
         let pane = PaneState(initialURL: fixture.leftPaneURL)
         pane.items = [
             makeItem(name: "beta.txt", size: 20),
@@ -649,7 +646,7 @@ final class DuPaneFunctionTests: DuPaneTestCase {
         pane.sortKey = .size
         pane.sortAscending = false
 
-        XCTAssertEqual(pane.displayedItems.map(\.name), ["alpha.txt", "beta.txt", "gamma.txt"])
+        XCTAssertEqual(pane.displayedItems.map(\.name), ["beta.txt", "alpha.txt", "gamma.txt"])
     }
 
     @MainActor

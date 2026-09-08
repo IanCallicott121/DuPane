@@ -106,15 +106,15 @@ final class PaneState: ObservableObject {
                 let sizeA = a.size ?? 0
                 let sizeB = b.size ?? 0
                 if sizeA != sizeB { return ascending ? sizeA < sizeB : sizeA > sizeB }
-                return a.name.localizedStandardCompare(b.name) == .orderedAscending
+                return a.name.localizedStandardCompare(b.name) == (ascending ? .orderedAscending : .orderedDescending)
             case .kind:
                 if a.kind != b.kind { return ascending ? a.kind < b.kind : a.kind > b.kind }
-                return a.name.localizedStandardCompare(b.name) == .orderedAscending
+                return a.name.localizedStandardCompare(b.name) == (ascending ? .orderedAscending : .orderedDescending)
             case .modified:
                 let dateA = a.modified ?? .distantPast
                 let dateB = b.modified ?? .distantPast
                 if dateA != dateB { return ascending ? dateA < dateB : dateA > dateB }
-                return a.name.localizedStandardCompare(b.name) == .orderedAscending
+                return a.name.localizedStandardCompare(b.name) == (ascending ? .orderedAscending : .orderedDescending)
             case .info:
                 // Metadata loads asynchronously; PaneView re-sorts by loaded values.
                 // Fall back to name so displayedItems is always deterministic.
