@@ -122,7 +122,6 @@ struct TabbedPaneView: View {
             Button {
                 onActivate()
                 tabs.activateTab(at: index)
-                tabs.tabs[index].pane.load()
             } label: {
                 HStack(spacing: 4) {
                     if tab.isPinned {

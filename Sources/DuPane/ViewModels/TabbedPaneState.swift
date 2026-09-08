@@ -263,6 +263,7 @@ final class TabbedPaneState: ObservableObject {
         guard canCloseTab(at: index) else { return }
         objectWillChange.send()
         let wasActive = index == activeTabIndex
+        tabs[index].pane.prepareForClosure()
         tabs.remove(at: index)
         if index < activeTabIndex {
             activeTabIndex -= 1

@@ -30,9 +30,6 @@ struct PaneView: View {
     @State private var folderSizeItem: FileItem? = nil
     @State private var propertiesItem: FileItem? = nil
     @State private var pendingShellScript: FileItem? = nil
-    @State private var uncompressConflicts: [String] = []
-    @State private var pendingUncompressURL: URL? = nil
-    @State private var showUncompressAlert = false
     @State private var dropTargetURL: URL? = nil
     @State private var isPaneDropTarget: Bool = false
     @State private var pendingDropFiles: [FileItem] = []
@@ -117,15 +114,17 @@ struct PaneView: View {
         } message: { script in
             Text("\u{201C}\(script.name)\u{201D} is a shell script and could modify or delete files. Run it?")
         }
-        .alert("File conflicts found", isPresented: $showUncompressAlert, presenting: pendingUncompressURL) { zipURL in
-            Button("Overwrite") { performUncompress(url: zipURL, overwrite: true) }
-            Button("Skip existing") { performUncompress(url: zipURL, overwrite: false) }
+        .alert("File conflicts found", isPresented: Binding(
+            get: { pane.pendingArchiveConflict != nil },
+            set: { if !$0 { pane.pendingArchiveConflict = nil } }
+        ), presenting: pane.pendingArchiveConflict) { request in
+            Button("Overwrite") { performUncompress(url: request.url, overwrite: true) }
+            Button("Skip existing") { performUncompress(url: request.url, overwrite: false) }
             Button("Cancel", role: .cancel) {
-                uncompressConflicts = []
-                pendingUncompressURL = nil
+                pane.pendingArchiveConflict = nil
             }
-        } message: { _ in
-            let count = uncompressConflicts.count
+        } message: { request in
+            let count = request.conflicts.count
             Text("\(count) file\(count == 1 ? "" : "s") already exist in the destination folder.")
         }
         .alert("Items Already Exist", isPresented: $showDropConflictAlert) {
@@ -1198,9 +1197,7 @@ struct PaneView: View {
                 if conflicts.isEmpty {
                     performUncompress(url: url, overwrite: false)
                 } else {
-                    uncompressConflicts = conflicts
-                    pendingUncompressURL = url
-                    showUncompressAlert = true
+                    pane.pendingArchiveConflict = ArchiveConflictRequest(url: url, conflicts: conflicts)
                 }
             }
         }
@@ -1208,8 +1205,7 @@ struct PaneView: View {
 
     private func performUncompress(url: URL, overwrite: Bool) {
         let dir = url.deletingLastPathComponent()
-        uncompressConflicts = []
-        pendingUncompressURL = nil
+        pane.pendingArchiveConflict = nil
         Task.detached {
             let errorMessage: String?
             do {

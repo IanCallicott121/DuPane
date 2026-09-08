@@ -7,29 +7,36 @@ enum PaneSelectionMode {
     case range
 }
 
+struct ArchiveConflictRequest: Identifiable, Equatable {
+    let id = UUID()
+    let url: URL
+    let conflicts: [String]
+}
+
 /// nil currentURL means the virtual "Computer" root — a live list of mounted volumes.
 @MainActor
 final class PaneState: ObservableObject {
     @Published var currentURL: URL?
-    @Published var items: [FileItem] = []
+    @Published var items: [FileItem] = [] { didSet { invalidateDisplayedItems() } }
     @Published var selection: Set<URL> = []
-    @Published var sortKey: SortKey = .name
-    @Published var sortAscending: Bool = true
-    @Published var filterText: String = ""
-    @Published var activeTagFilters: Set<String> = []
+    @Published var sortKey: SortKey = .name { didSet { invalidateDisplayedItems() } }
+    @Published var sortAscending: Bool = true { didSet { invalidateDisplayedItems() } }
+    @Published var filterText: String = "" { didSet { invalidateDisplayedItems() } }
+    @Published var activeTagFilters: Set<String> = [] { didSet { invalidateDisplayedItems() } }
     @Published var errorMessage: String?
     @Published var isLoading: Bool = false
     @Published var showCommandRunner: Bool = false
     @Published var requestRename: Bool = false
     @Published var requestGoToPath: Bool = false
-    @Published private(set) var searchResults: [FileItem]? = nil
+    @Published private(set) var searchResults: [FileItem]? = nil { didSet { invalidateDisplayedItems() } }
     @Published private(set) var isSearching: Bool = false
     var isInSearchMode: Bool { searchResults != nil || isSearching }
     var showHiddenFiles: Bool = false
     var showHiddenFolders: Bool = false
-    @Published var foldersFirst: Bool = true
+    @Published var foldersFirst: Bool = true { didSet { invalidateDisplayedItems() } }
     @Published var requestGetInfo: Bool = false
     @Published var requestFocusFilter: Bool = false
+    @Published var pendingArchiveConflict: ArchiveConflictRequest?
 
     private var history: [URL?]
     private var historyIndex: Int = 0
@@ -37,6 +44,10 @@ final class PaneState: ObservableObject {
     private var spotlightQuery: NSMetadataQuery?
     private var spotlightObservers: [NSObjectProtocol] = []
     private var searchRootURL: URL?
+    private var cachedDisplayedItems: [FileItem]?
+#if DEBUG
+    private(set) var displayedItemsComputationCount = 0
+#endif
 
     /// Tracks the in-flight directory load so callers can await it and stale
     /// loads can be cancelled when the user navigates before they finish.
@@ -81,6 +92,10 @@ final class PaneState: ObservableObject {
     }
 
     var displayedItems: [FileItem] {
+        if let cachedDisplayedItems { return cachedDisplayedItems }
+#if DEBUG
+        displayedItemsComputationCount += 1
+#endif
         var result = searchResults ?? items
         if searchResults == nil {
             if !activeTagFilters.isEmpty {
@@ -121,7 +136,12 @@ final class PaneState: ObservableObject {
                 return a.name.localizedStandardCompare(b.name) == (ascending ? .orderedAscending : .orderedDescending)
             }
         }
+        cachedDisplayedItems = result
         return result
+    }
+
+    private func invalidateDisplayedItems() {
+        cachedDisplayedItems = nil
     }
 
     /// Selected items that are files only — used for byte-count display.
@@ -417,6 +437,16 @@ final class PaneState: ObservableObject {
         searchResults = nil
         isSearching = false
     }
+
+    func prepareForClosure() {
+        loadingTask?.cancel()
+        endDeepSearch()
+    }
+
+#if DEBUG
+    var hasActiveSpotlightQuery: Bool { spotlightQuery != nil }
+    var spotlightObserverCount: Int { spotlightObservers.count }
+#endif
 
 #if DEBUG
     func _setSearchResults(_ results: [FileItem]?) {
