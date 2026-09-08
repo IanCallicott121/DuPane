@@ -17,36 +17,46 @@ Green is necessary but not sufficient — it reads the filesystem, not another a
 session. Also check that the Xcode coding agent is idle (no spinner, input box empty) and
 that nothing was committed in the last few minutes. If in doubt, ask before proceeding.
 
-## 2. Analyse for bugs
+## 2. Analyse the TODO
 
 Read `Docs/TODO.md` first so you report new findings rather than re-reporting known ones.
-Re-verify open items against current `HEAD` — a previous build may have fixed or moved
-them. Trace each candidate to specific lines and prove it is reachable before logging it.
+The TODO may contain bug fixes, requested behaviour changes, enhancements, and
+infrastructure or test-quality work. Re-verify every open item against current `HEAD` —
+a previous build may have fixed, implemented, superseded, or moved it. For bugs, trace
+the candidate to specific lines and prove it is reachable before logging it. For changes
+and enhancements, state the intended outcome and concrete acceptance criteria.
 
-### 2.1 Update TODO.md with bugs ordered by criticality
+### 2.1 Keep TODO.md organised by type and priority
 
-Log findings under `## Next items` in these sections, in this order:
+Use the applicable sections under `## Next items`; omit empty sections:
 
 ```
 ### Bug fixes — Critical      data loss, corruption, crash
 ### Bug fixes — High          app-wide stall, silent wrong behaviour
 ### Bug fixes — Medium        wrong results, leaks, performance on hot paths
 ### Bug fixes — Low / Inconsistencies
+### Requested changes         explicit behaviour or workflow changes
+### Enhancements              new or improved capabilities
+### Infrastructure / Test quality
 ```
 
-Each entry: bolded symbol or summary, em-dash, the mechanism, a concrete failure
-scenario, the suggested fix, and the file path in backticks at the end.
+Order non-bug sections by user impact and dependency order. Each entry should include a
+bolded symbol or summary, the motivation or mechanism, a concrete scenario or acceptance
+criterion, the proposed implementation, and relevant file paths in backticks.
 
-## 3. Write a failing unit test for each bug
+## 3. Define verification before implementation
 
-One regression test per bug, in `Tests/DuPaneUITests/Build<N>BugTests.swift`. Write it to
-**fail against current code** — a test that passes before the fix proves nothing.
+Write one regression test per bug and an acceptance test for each testable change or
+enhancement. Put build-specific coverage in `Tests/DuPaneUITests/Build<N>Tests.swift`.
+Where existing behaviour is being changed, the new expectation should **fail against
+current code** before implementation.
 
-Not every bug is unit-testable. View-layer bugs (SwiftUI `@State`, view identity, UI
-affordances) need an e2e test or a refactor first. Say so plainly rather than writing a
-test that exercises nothing.
+Not every item is unit-testable. View-layer behaviour (SwiftUI `@State`, view identity,
+UI affordances) needs an e2e test or a refactor first. Documentation, workflow, and
+purely operational changes may use a targeted inspection or command instead. Record the
+chosen verification plainly rather than writing a test that exercises nothing.
 
-## 4. Fix each bug
+## 4. Implement each selected item
 
 Follow `CLAUDE.md`: no comments unless the *why* is non-obvious, no dead code, no
 backwards-compat shims, `@MainActor` on ViewModels, `Task.detached` for filesystem work.
@@ -68,8 +78,9 @@ Fix every failure before moving on. UI/e2e tests only on big changes.
 
 ## 6. Report status
 
-Test counts, what was fixed, what wasn't, and what remains unverified. If a fix was
-reasoned from source but never reproduced at runtime, say so — it matters.
+Test counts, what was fixed or added, what wasn't, and what remains unverified. If an
+implementation was reasoned from source but never reproduced at runtime, say so — it
+matters.
 
 ## 7. Update the TODO
 
@@ -78,8 +89,8 @@ them from `Next items`. Add anything newly discovered. Update the test count.
 
 ## 8. Commit, push, sync
 
-One commit per fix so any can be reverted alone. End commit messages with the
-`Co-Authored-By` / `Claude-Session` trailers.
+One commit per logical fix, change, or enhancement so any can be reverted alone. End
+commit messages with the `Co-Authored-By` / `Claude-Session` trailers.
 
 Then push. A cloud (Cowork) session **cannot push** — it has no SSH keys — so it commits
 locally and hands the push to you or to the Xcode agent, which runs as you and inherits
