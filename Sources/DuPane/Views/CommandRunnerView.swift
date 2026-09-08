@@ -9,6 +9,7 @@ struct CommandRunnerView: View {
     @State private var output = ""
     @State private var isRunning = false
     @State private var pendingCommand: PendingShellCommand?
+    @State private var runTask: Task<Void, Never>?
     @FocusState private var fieldFocused: Bool
 
     private struct PendingShellCommand: Identifiable {
@@ -71,6 +72,7 @@ struct CommandRunnerView: View {
             }
         }
         .onAppear { fieldFocused = true }
+        .onDisappear { runTask?.cancel() }
         .alert("Run Shell Command?", isPresented: Binding(
             get: { pendingCommand != nil },
             set: { if !$0 { pendingCommand = nil } }
@@ -110,7 +112,8 @@ struct CommandRunnerView: View {
         let wd = pending.workingDirectory
         let cmd = pending.command
 
-        Task.detached(priority: .userInitiated) {
+        runTask?.cancel()
+        runTask = Task(priority: .userInitiated) {
             do {
                 let result = try await ProcessRunner.run(
                     executableURL: URL(fileURLWithPath: shell),
@@ -126,15 +129,14 @@ struct CommandRunnerView: View {
                 } else {
                     displayOutput = "\(combined)\n(exit \(result.terminationStatus))"
                 }
-                await MainActor.run {
-                    output = displayOutput
-                    isRunning = false
-                }
+                try Task.checkCancellation()
+                output = displayOutput
+                isRunning = false
+            } catch is CancellationError {
+                isRunning = false
             } catch {
-                await MainActor.run {
-                    output = "Error: \(error.localizedDescription)"
-                    isRunning = false
-                }
+                output = "Error: \(error.localizedDescription)"
+                isRunning = false
             }
         }
     }

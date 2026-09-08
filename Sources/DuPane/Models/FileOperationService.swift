@@ -36,6 +36,23 @@ enum ConflictResolution {
 enum FileOperationService {
     typealias TrashHandler = (URL) throws -> URL?
 
+    static func peerNavigationTarget(peerURL: URL, deletedURLs: [URL]) -> URL? {
+        let standardizedDeleted = deletedURLs.map { $0.standardizedFileURL }
+        guard standardizedDeleted.contains(where: {
+            peerURL == $0 || peerURL.path.hasPrefix($0.path + "/")
+        }) else { return nil }
+
+        var target = peerURL.standardizedFileURL
+        while standardizedDeleted.contains(where: {
+            target == $0 || target.path.hasPrefix($0.path + "/")
+        }) {
+            let parent = target.deletingLastPathComponent()
+            guard parent != target else { return nil }
+            target = parent
+        }
+        return target
+    }
+
     @discardableResult
     static func createFolder(named rawName: String, in baseURL: URL) throws -> URL {
         let newURL = try validatedNewItemURL(named: rawName, in: baseURL)
@@ -423,10 +440,39 @@ struct ProcessExecutionResult {
 }
 
 enum ProcessRunner {
+    static let defaultTimeout: Duration = .seconds(300)
+
     static func run(
         executableURL: URL,
         arguments: [String],
-        currentDirectoryURL: URL? = nil
+        currentDirectoryURL: URL? = nil,
+        timeout: Duration = defaultTimeout
+    ) async throws -> ProcessExecutionResult {
+        try await withThrowingTaskGroup(of: ProcessExecutionResult.self) { group in
+            group.addTask {
+                try await execute(
+                    executableURL: executableURL,
+                    arguments: arguments,
+                    currentDirectoryURL: currentDirectoryURL
+                )
+            }
+            group.addTask {
+                try await Task.sleep(for: timeout)
+                throw ProcessRunnerError.timedOut
+            }
+
+            guard let result = try await group.next() else {
+                throw CancellationError()
+            }
+            group.cancelAll()
+            return result
+        }
+    }
+
+    private static func execute(
+        executableURL: URL,
+        arguments: [String],
+        currentDirectoryURL: URL?
     ) async throws -> ProcessExecutionResult {
         let process = Process()
         process.executableURL = executableURL
@@ -437,21 +483,26 @@ enum ProcessRunner {
         let errPipe = Pipe()
         process.standardOutput = outPipe
         process.standardError = errPipe
+        process.standardInput = FileHandle.nullDevice
 
         // Drain pipes concurrently to prevent pipe-buffer-full deadlocks with chatty processes.
         let stdoutTask = Task.detached { outPipe.fileHandleForReading.readDataToEndOfFile() }
         let stderrTask = Task.detached { errPipe.fileHandleForReading.readDataToEndOfFile() }
 
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Error>) in
-            process.terminationHandler = { _ in continuation.resume() }
-            do {
-                try process.run()
-            } catch {
-                // Close write ends so the drain tasks unblock on run failure.
-                outPipe.fileHandleForWriting.closeFile()
-                errPipe.fileHandleForWriting.closeFile()
-                continuation.resume(throwing: error)
+        try await withTaskCancellationHandler {
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Error>) in
+                process.terminationHandler = { _ in continuation.resume() }
+                do {
+                    try process.run()
+                } catch {
+                    outPipe.fileHandleForWriting.closeFile()
+                    errPipe.fileHandleForWriting.closeFile()
+                    continuation.resume(throwing: error)
+                }
             }
+            try Task.checkCancellation()
+        } onCancel: {
+            if process.isRunning { process.terminate() }
         }
 
         let stdoutData = await stdoutTask.value
@@ -462,4 +513,10 @@ enum ProcessRunner {
             stderr: String(data: stderrData, encoding: .utf8) ?? ""
         )
     }
+}
+
+enum ProcessRunnerError: LocalizedError {
+    case timedOut
+
+    var errorDescription: String? { "The process timed out." }
 }

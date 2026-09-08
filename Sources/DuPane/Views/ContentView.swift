@@ -781,9 +781,13 @@ struct ContentView: View {
                 if let error = result.errors.last { pane.errorMessage = error }
                 if pane.isInSearchMode { pane.endDeepSearch() }
                 pane.load()
+                let deletedURLs = result.trashedItems.map(\.original)
                 if let peerURL = peer.currentURL,
-                   let culprit = urls.first(where: { peerURL == $0 || peerURL.path.hasPrefix($0.path + "/") }) {
-                    peer.navigate(to: culprit.deletingLastPathComponent())
+                   let target = FileOperationService.peerNavigationTarget(
+                    peerURL: peerURL,
+                    deletedURLs: deletedURLs
+                   ) {
+                    peer.navigate(to: target)
                 } else {
                     peer.load()
                 }
