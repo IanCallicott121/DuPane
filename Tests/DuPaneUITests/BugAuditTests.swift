@@ -244,15 +244,12 @@ final class PaneStateHistoryBoundaryTests: DuPaneTestCase {
     }
 }
 
-// MARK: - Bug 4: NetworkVolumeMonitor.ejectAndRemove removes regardless of unmount result [must]
-// ejectAndRemove suppresses the path and removes the volume from the model even
-// if NSWorkspace.unmountAndEjectDevice fails. This documents the current behaviour;
-// a fix would only remove if unmount succeeds.
+// MARK: - Bug 4: NetworkVolumeMonitor.ejectAndRemove respects unmount failures [must]
 
 final class NetworkVolumeMonitorEjectTests: DuPaneTestCase {
 
     func testEjectAndRemoveUpdatesSuppressedPaths() {
-        let monitor = NetworkVolumeMonitor()
+        let monitor = NetworkVolumeMonitor { _ in }
         let fakeURL = URL(fileURLWithPath: "/tmp/FakeShare")
         let volume = NetworkVolume(url: fakeURL)
         monitor.mountedVolumes = [volume]
@@ -263,17 +260,29 @@ final class NetworkVolumeMonitorEjectTests: DuPaneTestCase {
                       "ejectAndRemove must add the volume path to suppressedPaths")
     }
 
-    func testEjectAndRemoveDropsVolumeFromModel() {
-        let monitor = NetworkVolumeMonitor()
+    func testSuccessfulEjectDropsVolumeFromModel() {
+        let monitor = NetworkVolumeMonitor { _ in }
         let fakeURL = URL(fileURLWithPath: "/tmp/FakeShare")
         let volume = NetworkVolume(url: fakeURL)
         monitor.mountedVolumes = [volume]
 
-        // NSWorkspace will fail on a non-existent URL — the model must still update.
         monitor.ejectAndRemove(volume)
 
         XCTAssertTrue(monitor.mountedVolumes.isEmpty,
-                      "ejectAndRemove removes volume from model even when unmount fails")
+                      "ejectAndRemove removes the volume after a successful unmount")
+    }
+
+    func testEjectFailureKeepsVolumeVisibleAndUnsuppressed() {
+        let fakeURL = URL(fileURLWithPath: "/tmp/FakeShare")
+        let volume = NetworkVolume(url: fakeURL)
+        let monitor = NetworkVolumeMonitor { _ in throw CocoaError(.fileNoSuchFile) }
+        monitor.clearSuppressedPaths()
+        monitor.mountedVolumes = [volume]
+
+        monitor.ejectAndRemove(volume)
+
+        XCTAssertEqual(monitor.mountedVolumes, [volume])
+        XCTAssertFalse(monitor.suppressedPaths.contains(fakeURL.path))
     }
 
     func testClearSuppressedPathsRestoresVolumes() {

@@ -16,6 +16,8 @@ struct BonjourServer: Identifiable, Equatable {
 }
 
 final class NetworkVolumeMonitor: ObservableObject {
+    typealias VolumeScan = (Set<String>) -> (network: [NetworkVolume], external: [NetworkVolume])
+
     @Published var mountedVolumes: [NetworkVolume] = []
     @Published var externalVolumes: [NetworkVolume] = []
     @Published var bonjourServers: [BonjourServer] = []
@@ -28,6 +30,17 @@ final class NetworkVolumeMonitor: ObservableObject {
     private var afpBrowser: NetServiceBrowser?
     private var smbDelegate: BonjourBrowserDelegate?
     private var afpDelegate: BonjourBrowserDelegate?
+    private let unmountAndEject: (URL) throws -> Void
+    private let volumeScan: VolumeScan
+    private let refreshQueue = DispatchQueue(label: "DuPane.NetworkVolumeMonitor.refresh", qos: .utility)
+    private var refreshGeneration = 0
+
+    init(unmountAndEject: @escaping (URL) throws -> Void = {
+        try NSWorkspace.shared.unmountAndEjectDevice(at: $0)
+    }, volumeScan: @escaping VolumeScan = NetworkVolumeMonitor.scanVolumes) {
+        self.unmountAndEject = unmountAndEject
+        self.volumeScan = volumeScan
+    }
 
     func startMonitoring(autoReconnect: Bool = false, pinnedURLs: [String] = []) {
         refresh()
@@ -62,6 +75,26 @@ final class NetworkVolumeMonitor: ObservableObject {
     private static let externalFSTypes: Set<String> = ["apfs", "hfs", "msdos", "exfat", "ntfs", "ufsd_NTFS", "ufsd_ExtFS", "udf", "cd9660"]
 
     func refresh() {
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async { [weak self] in self?.refresh() }
+            return
+        }
+
+        refreshGeneration += 1
+        let generation = refreshGeneration
+        let suppressedPaths = suppressedPaths
+        let volumeScan = volumeScan
+        refreshQueue.async { [weak self] in
+            let result = volumeScan(suppressedPaths)
+            DispatchQueue.main.async { [weak self] in
+                guard let self, self.refreshGeneration == generation else { return }
+                self.mountedVolumes = result.network
+                self.externalVolumes = result.external
+            }
+        }
+    }
+
+    private static func scanVolumes(suppressedPaths: Set<String>) -> (network: [NetworkVolume], external: [NetworkVolume]) {
         let opts: FileManager.VolumeEnumerationOptions = [.skipHiddenVolumes]
         let urls = FileManager.default.mountedVolumeURLs(includingResourceValuesForKeys: nil, options: opts) ?? []
         var network: [NetworkVolume] = []
@@ -79,18 +112,17 @@ final class NetworkVolumeMonitor: ObservableObject {
                 external.append(NetworkVolume(url: url))
             }
         }
-        mountedVolumes = network
-        externalVolumes = external
+        return (network, external)
     }
 
     func ejectExternal(_ volume: NetworkVolume) {
-        try? NSWorkspace.shared.unmountAndEjectDevice(at: volume.url)
+        try? unmountAndEject(volume.url)
     }
 
     func ejectAndRemove(_ volume: NetworkVolume) {
+        guard (try? unmountAndEject(volume.url)) != nil else { return }
         suppressedPaths.insert(volume.url.path)
         UserDefaults.standard.set(Array(suppressedPaths), forKey: Self.suppressedPathsKey)
-        try? NSWorkspace.shared.unmountAndEjectDevice(at: volume.url)
         mountedVolumes.removeAll { $0.id == volume.id }
     }
 
@@ -130,15 +162,24 @@ final class NetworkVolumeMonitor: ObservableObject {
     @discardableResult
     private func makeBrowser(type: String, scheme: String, store: @escaping (NetServiceBrowser) -> Void) -> BonjourBrowserDelegate {
         let del = BonjourBrowserDelegate(scheme: scheme) { [weak self] servers in
-            guard let self else { return }
-            let others = self.bonjourServers.filter { $0.scheme != scheme }
-            self.bonjourServers = others + servers
+            self?.receiveBonjourServers(servers, scheme: scheme)
         }
         let browser = NetServiceBrowser()
         browser.delegate = del
         browser.searchForServices(ofType: type, inDomain: "local.")
         store(browser)
         return del
+    }
+
+    func receiveBonjourServers(_ servers: [BonjourServer], scheme: String) {
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async { [weak self] in
+                self?.receiveBonjourServers(servers, scheme: scheme)
+            }
+            return
+        }
+        let others = bonjourServers.filter { $0.scheme != scheme }
+        bonjourServers = others + servers
     }
 
     deinit {
