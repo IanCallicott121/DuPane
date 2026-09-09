@@ -4,9 +4,8 @@
 ## Handover — next agent starts here
 
 **State:** Build 420. Unit suite **336 passed, 0 failed**. E2E suite **14 passed, 0
-failed** — run 2026-09-08 through `./Scripts/run-e2e.sh`, including a current
-machine-readable PASS log (e2e not re-run at Build 420; that build only aligns one
-view-layer sort tiebreak).
+failed** — re-run 2026-09-09 at Build 420 (`f64ef4e`) through `./Scripts/run-e2e.sh`,
+with a current machine-readable PASS log.
 
 ### How to run the tests
 - **Unit (336):** open the **DuPane folder** (not the `.xcodeproj`) for the
@@ -40,7 +39,7 @@ none
 
 - **Info-column name tiebreak now follows the sort direction** — `PaneView.visibleItems` sorts the async-loaded Info column; its primary comparison already honored `sortAscending`, but the equal-value name tiebreak was hardcoded ascending. Aligned it with the Build 403 decision already applied to Size/Kind/Modified in `PaneState` (and to `PaneState`'s own `.info` fallback), so a descending Info sort breaks ties in descending name order. (`Views/PaneView.swift`)
 - **Provenance** — surfaced by a stale external handover; that handover's other findings (duplicate-scan generation refactor, the size/kind/modified tiebreak revert, TODO/build-number/migration-script drift) were already resolved by Builds 403/404/418 or deliberately decided the other way, so only this one view-layer inconsistency remained.
-- **Tests: 336 passed, 0 failed** — full SPM unit suite. No new test: no test asserts `visibleItems` ordering, and this is a pure view-layer sort refinement consistent with the existing `testDescendingSortEqualValuesTieBreakByName` behavior.
+- **Tests: 336 unit passed, 0 failed; e2e 14 passed, 0 failed (re-run 2026-09-09 at this build)** — full SPM unit suite plus a fresh `./Scripts/run-e2e.sh` run against `f64ef4e`. No new unit test: no test asserts `visibleItems` ordering, and this is a pure view-layer sort refinement consistent with the existing `testDescendingSortEqualValuesTieBreakByName` behavior.
 
 ### Build 418 — outstanding bug closure and lifecycle hardening (2026-09-08)
 
