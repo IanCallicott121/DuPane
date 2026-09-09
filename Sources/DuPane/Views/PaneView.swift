@@ -606,7 +606,7 @@ struct PaneView: View {
                 let ia = metadataService.info(for: a) ?? ""
                 let ib = metadataService.info(for: b) ?? ""
                 if ia != ib { return pane.sortAscending ? ia < ib : ia > ib }
-                return a.name.localizedStandardCompare(b.name) == .orderedAscending
+                return a.name.localizedStandardCompare(b.name) == (pane.sortAscending ? .orderedAscending : .orderedDescending)
             }
         }
         return result

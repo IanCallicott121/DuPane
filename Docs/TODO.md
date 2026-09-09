@@ -3,9 +3,10 @@
 
 ## Handover — next agent starts here
 
-**State:** Build 418. Unit suite **336 passed, 0 failed**. E2E suite **14 passed, 0
+**State:** Build 420. Unit suite **336 passed, 0 failed**. E2E suite **14 passed, 0
 failed** — run 2026-09-08 through `./Scripts/run-e2e.sh`, including a current
-machine-readable PASS log.
+machine-readable PASS log (e2e not re-run at Build 420; that build only aligns one
+view-layer sort tiebreak).
 
 ### How to run the tests
 - **Unit (336):** open the **DuPane folder** (not the `.xcodeproj`) for the
@@ -35,6 +36,12 @@ none
 ---
 
 ## Done
+### Build 420 — sort tiebreak consistency for the Info column (2026-09-09)
+
+- **Info-column name tiebreak now follows the sort direction** — `PaneView.visibleItems` sorts the async-loaded Info column; its primary comparison already honored `sortAscending`, but the equal-value name tiebreak was hardcoded ascending. Aligned it with the Build 403 decision already applied to Size/Kind/Modified in `PaneState` (and to `PaneState`'s own `.info` fallback), so a descending Info sort breaks ties in descending name order. (`Views/PaneView.swift`)
+- **Provenance** — surfaced by a stale external handover; that handover's other findings (duplicate-scan generation refactor, the size/kind/modified tiebreak revert, TODO/build-number/migration-script drift) were already resolved by Builds 403/404/418 or deliberately decided the other way, so only this one view-layer inconsistency remained.
+- **Tests: 336 passed, 0 failed** — full SPM unit suite. No new test: no test asserts `visibleItems` ordering, and this is a pure view-layer sort refinement consistent with the existing `testDescendingSortEqualValuesTieBreakByName` behavior.
+
 ### Build 418 — outstanding bug closure and lifecycle hardening (2026-09-08)
 
 - **Pane and tab performance/lifecycle** — `displayedItems` is cached and invalidated only when one of its inputs changes; switching tabs no longer forces an unnecessary directory load; closing a tab now cancels its load and explicitly tears down Spotlight observers/query state. (`ViewModels/PaneState.swift`, `ViewModels/TabbedPaneState.swift`, `Views/TabbedPaneView.swift`)
