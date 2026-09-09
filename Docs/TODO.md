@@ -23,380 +23,315 @@ with a current machine-readable PASS log.
 No confirmed outstanding bugs remain in this list. Continue auditing before assuming the
 repository is defect-free.
 
+### Change of direction — read before resuming (2026-09-09)
+
+**Bobby: you have in-flight uncommitted work in the tree** (`BuildNumber.txt`,
+`Docs/UserGuide.html`, `Sources/DuPane/Models/SidebarModel.swift`). Ian has decided a
+change of direction and **you can back those changes out** — nothing was wrong with them,
+they are simply overtaken. Keep anything you judge still useful; discard the rest. Your
+call on the mechanics; nobody else will touch your working tree.
+
+**What changed:** the two-edition plan (Direct + Mac App Store) is **dropped**. DuPane
+ships as **one sandboxed free App Store app**. The unrestricted build is preserved as the
+**v1.0.0 tag**, not as a second product. Full background, the reasoning behind the
+decision, and the phased action list are under **Next items → Distribution — single free
+Mac App Store edition**. Start with Phase 0; it is blocking.
+
 
 ## Next items
 
 ### Enhancements
 
-#### Distribution — full Direct and free Mac App Store editions from one codebase
+#### Distribution — single free Mac App Store edition
 
-**Next: implementation plan, not a completed enhancement.** Keep one shared codebase
-with two explicit compile-time application targets and schemes: `DuPane-Direct` and
-`DuPane-MAS`. Direct retains the full feature set and remains unsandboxed; MAS enables
-App Sandbox. Both editions are free to download. MAS has **no IAP, subscription, trial,
-receipt-based feature unlock, license gate, or requirement to install Direct**. Store
-receipts, if present, must never control capabilities. Pricing is settled.
+**Status: decided. This is not a proposal and it is not open for re-litigation.** Ian has
+made this decision. Work through the phases below in order. If any phase produces evidence
+that contradicts the plan, record the evidence and raise it — but do not substitute a
+different approach on your own initiative.
 
-Use separate, permanent bundle IDs so both apps install and run together with independent
-preferences, containers, grants, and update channels. Recommended display names are
-**DuPane** (MAS) and **DuPane Direct**. Compile forbidden implementations out of the MAS
-binary and its embedded components; hiding a button or testing the edition at runtime
-is insufficient. Retain every other existing feature unless a specific Apple rule
-clearly prohibits it or a reproducible signed sandbox test proves it unreliable after
-supported implementation alternatives have been tried. Another app's feature comparison
-is not evidence that an API is prohibited. Command Runner, `.sh` execution in Terminal,
-self-update, and initially eject are explicitly Direct-only in this plan.
+##### Background — why this replaces the two-edition plan
 
-**Re-verified starting point:** `project.yml` currently generates one `DuPane` app target,
-uses `local.DuPane`, `Resources/Info.plist`, and sandbox-false
-`Resources/DuPane.entitlements`, and increments `BuildNumber.txt` in a target post-build
-script. `ProcessRunner` lives inside `Sources/DuPane/Models/FileOperationService.swift`;
-ZIP and Terminal launching use processes in `Views/PaneView.swift`, with another Terminal
-launcher in `Views/SidebarView.swift`. Eject and discovery share
-`Models/NetworkVolumeMonitor.swift`. `Models/SidebarModel.swift` persists bookmark paths,
-not security-scoped bookmark data. Source paths below are relative to `Sources/DuPane/`
-unless a repository-root path is given. Proposed new files are explicitly identified.
+Read this before touching anything; the previous plan in this file said something else.
 
-**Apple constraints and evidence:** MAS requires sandboxing and Store-delivered updates;
-use [App Sandbox](https://developer.apple.com/documentation/security/app-sandbox),
-[Accessing files from the macOS App Sandbox](https://developer.apple.com/documentation/security/accessing-files-from-the-macos-app-sandbox),
-and [App Review Guidelines, especially 2.4.5](https://developer.apple.com/app-store/review/guidelines/#software-requirements)
-as the implementation/review references. User-selected directory access can cover its
-descendants, but is not unrestricted disk access: protected locations, permissions,
-symlink targets, other volumes and providers still need appropriate access handling.
-**Full Disk Access is a separate macOS privacy permission, not an App Sandbox escape.**
-Remove the previous recommendation to use it to widen MAS sandbox access; never promise
-that selecting Home, `/`, or granting Full Disk Access unlocks the whole filesystem.
-Persistent bookmarks can become stale or unusable; approvals are not guaranteed one-time.
-For release signing use Apple's
-[Developer ID](https://developer.apple.com/developer-id/) and
-[notarization guidance](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution).
-Direct distribution still needs valid signing, hardened runtime, notarization and a
-Gatekeeper-tested package; notarization does not guarantee MAS review approval.
+- **What was previously planned.** An earlier revision of this section (see git history,
+  commit `f9e3872`) described **two editions built from one codebase**: `DuPane-Direct`
+  (unsandboxed, full feature set, Developer ID signed, notarized DMG, possibly Sparkle)
+  and `DuPane-MAS` (sandboxed, reduced), separated by `DIRECT_BUILD` / `MAS_BUILD`
+  compile-time conditions, with per-edition Info.plist, entitlements, bundle IDs, schemes
+  and release channels. It ran to eleven dependency-ordered work packets, WP0–WP10.
+- **That approach has been dropped.** Reasons of record:
+  - It doubles the *permanent* cost of the project — two targets, two signing paths, two
+    release channels, two support streams, an edition tag on every bug report, doubled CI
+    time, and every future bug fix verified in two configurations — for an app that is 36
+    Swift files and roughly 9,100 lines.
+  - It ordered the work backwards. The genuinely unknown question — whether a sandboxed
+    DuPane is still a usable file manager — sat in WP7, *behind* a from-scratch ZIP
+    reimplementation (WP4) and a from-scratch security-scoped access layer (WP5/WP6). A
+    negative answer in WP7 would have wasted all of it.
+  - "Keep Direct as it is" was never free. The repository has no Developer ID signing and
+    no notarization today (`project.yml` uses `CODE_SIGN_STYLE: Automatic` with no
+    distribution identity), so the Direct edition would have needed its own new signing,
+    notarization, stapling, Gatekeeper and DMG pipeline before it could be given to
+    anyone.
+- **What replaces it: one app, sandboxed, free on the Mac App Store.** One target, one
+  bundle ID, one product, one release channel. No Direct edition, no DMG, no Developer ID,
+  no notarization pipeline, no Sparkle, no edition flags, no per-edition Info.plist or
+  entitlements files, no capability matrix, no runtime edition switch.
+- **The unrestricted build is preserved as source, not as a second product.** Before any
+  sandboxing work begins, `main` is tagged and published as **v1.0** — the last stable
+  fully-capable unsandboxed build. Anyone who wants unrestricted DuPane, Ian included,
+  clones that tag and builds it locally in an unrestricted environment. This is why Phase 0
+  is first and blocking: once sandboxing lands, that build only exists as a tag.
+- **Objective.** Ship DuPane free on the Mac App Store with the largest feature set the
+  sandbox genuinely allows, without maintaining a second edition. The goal is distribution,
+  discovery and installation without Gatekeeper friction. There is **no revenue model**:
+  free, no IAP, no subscription, no trial, no receipt check, no license gate. Store
+  receipts must never control capabilities.
 
-##### Edition capability matrix — intended behavior and verification gates
+**Do not restart the two-edition work.** If you find yourself adding a build flag to keep a
+feature "for the Direct build", stop — there is no Direct build. Cut the feature, or prove
+it works sandboxed.
 
-“Retain / spike” means retain as the implementation goal and verify in WP7 before MAS
-release; it is neither a claim of current sandbox support nor permission to drop it.
+##### Phase 0 — release and tag v1.0 first. Blocking; nothing else starts until this is done
 
-| Capability | Direct | Free MAS | Implementation / release gate |
-|---|---|---|---|
-| Dual panes, tabs/pins/history, sorting/filtering, themes, keyboard navigation, settings import/export | Retain all | Retain all | Grant-aware restored locations; unchanged core behavior (WP3, WP6, WP9). |
-| Browse, create, rename, copy/move, duplicate, compare/sync, duplicate finder, folder size, metadata | Retain all | Retain all within authorized locations | Source/destination leases, conflict/rollback/partial-error behavior (WP6). |
-| ZIP creation, inspection and extraction | Shared native implementation | Same shared native implementation | No shell-outs; archive safety, conflicts, progress and cancellation (WP4). |
-| Command Runner | Retain | Compile out | Direct source membership and all invocation routes (WP5). |
-| `.sh` execution via Terminal | Retain | Compile out | File browsing/copying remains; MAS must not fall through to execution (WP5). |
-| Self-update / Sparkle | Direct only; initial inclusion undecided | Compile out; updates from Mac App Store | No MAS updater code, framework, helper or feed keys (WP5, WP10). |
-| Eject network/removable volumes | Retain | Initially compile out | Keep enumeration/access; any later MAS eject requires its own documented policy and signed proof (WP5). |
-| Quick Look and Finder reveal | Retain | Retain / spike | Granted files, preview lifetime and brokered reveal (WP7). |
-| Open With, sharing, ordinary document opening and `.app` launch | Retain | Retain / spike | Supported workspace/share APIs, no shell/AppleScript workaround (WP7). |
-| Finder tags and Spotlight/deep search | Retain | Retain / spike | Grant-scoped queries, read/write tags, inaccessible results (WP7). |
-| iCloud Drive, OneDrive and removable-volume file management | Retain | Retain / spike | Provider/offline/reconnect/grant lifecycle; eject is separate (WP7). |
-| Trash and undo; internal/external drag/drop | Retain | Retain / spike | Access lifetime, safe restore, partial failures and denied destinations (WP7). |
-| Mounted shares, Connect to Server, SMB/AFP, pinned reconnect, Bonjour | Retain | Retain / spike, individually | Separate mount/access/discovery tests and minimum networking permissions (WP7). |
-| Help/FAQs, remaining current features and OS-conditional features | Retain | Retain wherever supported | Inventory remaining source/UI paths; preserve existing OS availability checks (WP3, WP8, WP9). |
+1. Bring `main` to a clean, green state: `./Scripts/handoff-check.sh` with zero blocking
+   issues, full unit suite and e2e suite passing, working tree clean, in sync with
+   `origin/main`.
+2. Confirm `MARKETING_VERSION` is `1.0` in `project.yml` and record the current
+   `BuildNumber.txt` value in the release notes.
+3. Tag the commit `v1.0.0` (annotated, not lightweight) with a message stating this is the
+   final unsandboxed, fully-capable build, and push the tag.
+4. Create a **GitHub Release** from that tag. In the release notes, state plainly:
+   - This is the last release with Command Runner, Terminal integration, `.sh` execution,
+     volume eject and unrestricted whole-disk browsing.
+   - It is source-only — build locally with Xcode to run it unrestricted.
+   - Subsequent releases are App Store builds and are sandboxed.
+5. Only source is released. Do **not** attach a built `.app`, `.zip` or `.dmg` — the app is
+   not signed for distribution and shipping an unsigned binary is not on the plan.
+6. Record the tag and release URL in this file under Done.
 
-##### Dependency-ordered work packets
+##### Phase 1 — sandbox feasibility spike. Throwaway branch, target ~2 days
 
-Implement serially in this checkout, with small reviewable commits. Dependency graph:
-WP0 → WP1 → WP2 → WP3 → WP4 → WP5 → WP6 → WP7 → WP8 → WP9 → WP10.
-WP1/WP2 share an integration gate: remove the mutating build phase in WP2 before
-building the new app targets. Introduce WP9's SPM selector with WP1's compilation flags
-and evolve its exclusions with WP5; grow all other checks with each packet.
-Direct may ship after its applicable WP9/WP10 gates while MAS spikes/review continue;
-MAS ships only after every MAS gate is resolved. No implementation, build bump or new
-test result is claimed by this documentation-only plan.
+Purpose: establish what actually survives the sandbox *before* any production refactor.
+This branch is deleted afterwards. Do not refactor, do not introduce protocols, do not
+build anything reusable.
 
-**WP0 — identity, enrollment and signing prerequisites.**
+Setup (target: half a day):
 
-- Areas: Apple Developer account/App Store Connect; future signing configuration in
-  `project.yml`, and a proposed `Docs/Distribution.md` for non-secret identifiers and
-  release instructions. Confirm developer-program enrollment and Team ID. Reserve distinct
-  explicit IDs using the chosen vendor prefix, for example `<vendor>.DuPane` (MAS) and
-  `<vendor>.DuPane.Direct` (Direct); these are placeholders, not final IDs.
-- Provision Apple Development signing for development/sandbox tests; Developer ID
-  Application for Direct; the Apple-supported Mac App Store application distribution
-  identity/profile and installer identity where required by the upload/export method.
-  Keep private keys, profiles and App Store Connect credentials out of Git and limit CI
-  access to protected release jobs. Do not reuse Developer ID signing for MAS delivery.
-- Verification / acceptance: verify installed signing identities against the chosen team;
-  record bundle/profile/certificate mappings and expiry/renewal ownership. Both explicit
-  IDs must be available and provisionable before signed testing. Separate identities and
-  matching export methods are a release gate, not an ad-hoc-signing substitute.
+- Branch `spike/sandbox` off the v1.0.0 tag.
+- `Resources/DuPane.entitlements`: set `com.apple.security.app-sandbox` to `true` and add
+  `com.apple.security.files.user-selected.read-write` and
+  `com.apple.security.files.bookmarks.app-scope`. Add nothing else — no network, no
+  temporary exceptions, no iCloud container entitlements.
+- Add one crude "Grant Folder…" button anywhere convenient that runs `NSOpenPanel`, stores
+  the resulting `.withSecurityScope` bookmark data in `UserDefaults`, and resolves it at
+  launch.
+- Wrap the pane directory load in balanced
+  `startAccessingSecurityScopedResource()` / `stopAccessingSecurityScopedResource()`.
+- Sign with an Apple Development identity, build **Release**, and **launch the built `.app`
+  by double-clicking it**. Running from Xcode inherits debugger privileges and will produce
+  false passes on almost every check below. Test in a normal user session, with Full Disk
+  Access **off**.
 
-**WP1 — two XcodeGen targets, schemes, settings, Info and entitlements. Depends on WP0.**
+Then grant it `~/Documents` and one external drive and work down this table. Record OS
+version, signing identity, effective entitlements, steps and actual result for each row.
 
-- Areas: `project.yml`, generated `DuPane.xcodeproj/project.pbxproj`,
-  `Resources/Info.plist`, `Resources/DuPane.entitlements`; proposed
-  `Resources/Direct/Info.plist`, `Resources/Direct/DuPane.entitlements`,
-  `Resources/MAS/Info.plist`, `Resources/MAS/DuPane.entitlements`. Factor common XcodeGen
-  settings/source definitions, with explicit per-edition overrides and separate products.
-  Keep macOS 13+ support, shared assets and bundled HTML help. Remove obsolete resource
-  files/references once the split is complete.
-- Define mutually exclusive `DIRECT_BUILD` / `MAS_BUILD` Swift compilation conditions
-  in Debug and Release; fail compilation if both or neither are set. Configure bundle
-  IDs, names, Info paths, signing/profile settings and entitlements independently.
-  MAS starts with `com.apple.security.app-sandbox`,
-  `com.apple.security.files.user-selected.read-write`, and
-  `com.apple.security.files.bookmarks.app-scope` true. Direct remains unsandboxed with
-  hardened runtime. No blanket file-access, temporary-exception, automation or network
-  entitlements by default. Privacy usage descriptions do not grant sandbox access.
-- Verification / acceptance: `xcodegen generate`, inspect generated source membership and
-  `xcodebuild -showBuildSettings` for both schemes/configurations; after WP2, rebuild both
-  and inspect built Info plists and effective signed entitlements. Install/run both simultaneously;
-  verify isolated defaults/container data and correct help resources. Generated project
-  must match `project.yml`; MAS Release must actually be sandboxed. Reopen Xcode after
-  structural edits when implementation resumes through the normal repository workflow.
+| # | Check | Pass criterion |
+|---|---|---|
+| 1 | Quick Look a granted file | Panel opens, arrow-keys between selection, closes without leaking access |
+| 2 | Drag a file **from Finder** into a pane | Copy/move completes correctly |
+| 3 | Drag **out** to Finder, and between panes | Same |
+| 4 | Reveal in Finder | Correct file selected |
+| 5 | Open With, and double-click a `.app` | Opens in the expected app |
+| 6 | Read and write a Finder tag | Tag visible in Finder afterwards |
+| 7 | Global Tags sidebar | Populates across the disk — **expected to fail**, the query uses `NSMetadataQueryIndexedLocalComputerScope` |
+| 8 | Deep / Spotlight search inside a granted folder | Returns results |
+| 9 | Browse an already-mounted SMB share | Grant `/Volumes/<share>`, list and copy files |
+| 10 | `smb://` Connect to Server | Finder mounts it; share can then be granted |
+| 11 | Bonjour discovery (`_smb._tcp`, `_afpovertcp._tcp`) | Servers appear after the local-network prompt |
+| 12 | Trash a file, then undo | File returns to its original parent folder |
+| 13 | External drive after granting it | Full read and write |
+| 14 | Relaunch the app | Stored bookmarks still resolve; granted folders still accessible |
 
-**WP2 — deterministic shared build numbering. Depends on WP1.**
+Write the results to `Docs/SandboxSpikeResults.md` — one row per check, with actual
+observed behaviour, not expectations. That file is the evidence base for every later
+decision in this section, and it is the deliverable of this phase. Then delete the branch.
 
-- Areas: `project.yml`, `BuildNumber.txt`, proposed `Scripts/prepare-release.sh` and
-  generated build-settings file, `.github/workflows/ci.yml`, `Scripts/handoff-check.sh`,
-  `CLAUDE.md`, `Docs/AGENT-WORKFLOW.md`. Remove the per-target “Increment Build Number”
-  script and post-build Info stamping before building editions together.
-- Make `BuildNumber.txt` the checked-in shared release value. One explicit release-prep
-  operation increments it once per release candidate, atomically, and records it in the
-  release commit. Preparation emits the same read-only `CURRENT_PROJECT_VERSION` input
-  for both targets; Info plists use build settings before signing. Local/debug/no-op/
-  clean builds and CI matrix jobs consume that value and never increment or rewrite it.
-  A replacement upload uses a new shared number; never reuse a submitted build number.
-- Verification / acceptance: script tests cover invalid/missing numbers, serialized
-  allocation, idempotent consumption and failed preparation. Build Direct→MAS, MAS→Direct,
-  repeat/no-op/clean and parallel CI consumers: both artifacts report the same version and
-  build; Git stays clean and signatures remain valid. Release manifest records commit,
-  marketing version and build. Update About/manual/workflow numbering during implementation
-  releases only; **this plan keeps Build 420 and `BuildNumber.txt` unchanged**.
+##### Phase 2 — go/no-go against the spike results
 
-**WP3 — central edition/capability model and service seams. Depends on WP2.**
+Assess against the recorded evidence, not against expectations.
 
-- Areas: proposed `Models/AppEdition.swift`, `Models/AppCapabilities.swift` and service
-  protocol files; `DuPaneApp.swift`, `Models/AppLaunchConfiguration.swift`,
-  `Models/AppSettings.swift`, `Views/ContentView.swift`, `Views/GlobalToolbar.swift`,
-  `Views/PaneView.swift`, `Views/SidebarView.swift`, `Views/SettingsView.swift`.
-- Select the edition at compile time at the composition root. Introduce focused protocols
-  for file-access leases, archive operations, workspace actions, volume discovery/eject,
-  command execution and update delivery. Inject production implementations and test fakes;
-  keep ordinary file operations shared. Direct-only implementations must not enter the
-  MAS compile/link inputs. Runtime capability states may express missing grants, OS or
-  provider support, but cannot enable code absent from the edition.
-- Inventory menus, toolbar/context actions, shortcuts, notifications, restored settings,
-  launch paths and background work against the matrix. Use one capability source for UI
-  and dispatch; absent commands must not remain reachable by keyboard or saved state.
-  Preserve unrelated functionality rather than wrapping entire shared views in a flag.
-- Verification / acceptance: build-specific tests in `Tests/DuPaneUITests/Build<N>Tests.swift`
-  cover both capability sets, unavailable actions, fake service errors and persisted
-  Direct settings imported into MAS. No settings/receipt/license flag can turn MAS into
-  Direct. Both compile modes must type-check without referencing excluded implementations.
+- **Stop and escalate to Ian if** check 2 or 3 (Finder drag) fails, or check 12
+  (trash/undo) cannot be made safe. Without Finder drag-and-drop or a trustworthy undo,
+  a sandboxed DuPane is not the app it set out to be, and the App Store plan should be
+  reconsidered rather than pushed through.
+- **Any other single failure narrows that one feature** and the plan continues. Move the
+  affected feature into the dropped list in Phase 3 and update this section.
+- A capability that could not be tested — no server available, no suitable hardware — is
+  recorded as **unverified**, not as a failure and not as a pass. Unverified capabilities
+  block submission until tested.
+- Once Phase 2 is signed off, update this section so the Phase 3/4/5 lists reflect the
+  actual evidence, and note in Done what changed.
 
-**WP4 — shared native ZIP service. Depends on WP3; precedes removing ProcessRunner from MAS.**
+##### Phase 3 — features to remove
 
-- Areas: `Views/PaneView.swift`, `Models/ArchiveExtractionSafety.swift`,
-  `Models/FileOperationService.swift`, `ViewModels/PaneState.swift`,
-  `ViewModels/FileOperationProgressModel.swift`, proposed `Models/NativeArchiveService.swift`,
-  `Package.swift` and `project.yml`. Select and pin a maintained in-process ZIP library
-  compatible with macOS 13, both build systems, distribution licenses and sandbox use;
-  verify real ZIP read/write support rather than assuming compression APIs provide it.
-- Replace `/usr/bin/zip` and all `/usr/bin/unzip` listing/extraction calls for both editions.
-  Parse entry metadata directly. Preserve zip-slip rejection (absolute paths, traversal,
-  empty/dot components, backslashes, NUL), rejection of archive symlinks, intermediate-file
-  conflicts, overwrite/skip/cancel choices, collision-safe output names and the stable
-  `PaneState.pendingArchiveConflict` behavior across tab switches. Recheck destination
-  containment against existing symlinks and changes between inspection and extraction.
-- Preserve operation error reporting and cancellation semantics, and integrate native
-  byte/entry progress with the shared progress model; current archive UI has limited
-  progress and must not be described as already providing full byte progress. Use bounded
-  streaming, cancellation checks and temporary/staged output; clean partial new output
-  and protect pre-existing content on failure/cancel. Keep scopes alive through cleanup.
-- Verification / acceptance: fixtures cover nested/empty/Unicode/hidden files, large ZIPs,
-  corrupt/truncated archives, hostile paths/symlinks, intermediate conflicts, tab switches,
-  cancellation mid-read/write and existing-file preservation. Round-trip both editions
-  and external ZIP tools; explicitly report unsupported formats/encryption. No runtime
-  zip/unzip process remains; signed MAS round-trip within granted roots passes WP6/WP9.
+These are cut unconditionally. Remove the code, the UI, the menu items, the keyboard
+shortcuts, the settings keys, the tests and the documentation. Do not gate them behind a
+flag; do not leave them reachable from saved state or the keyboard.
 
-**WP5 — isolate Direct-only code and dependencies. Depends on WP4.**
-
-- Areas: split `ProcessRunner`, `ProcessExecutionResult` and errors out of
-  `Models/FileOperationService.swift` into proposed `Direct/ProcessRunner.swift`; move
-  `Views/CommandRunnerView.swift` and Terminal-launch implementations from
-  `Views/PaneView.swift` / `Views/SidebarView.swift` into Direct source membership.
-  Extract eject from `Models/NetworkVolumeMonitor.swift` into a Direct volume service,
-  retaining shared enumeration, mount notifications and connection/discovery behavior.
-  Update toolbar, menu, shortcut, state and service call sites via WP3.
-- `project.yml` must exclude Direct files from MAS compilation and omit Sparkle linkage,
-  embedding, helpers, resources, feed/public-key Info entries and updater startup there.
-  If Sparkle is selected, add a Direct-only adapter/package product and preserve a manual
-  download path. Do not add a MAS shell, external helper or Terminal/AppleScript workaround.
-  MAS may view/copy `.sh` files but must not execute them through a generic-open fallback.
-- Verification / acceptance: keep Direct process timeout/cancellation/output-drain tests
-  and eject-failure sidebar tests. Add MAS UI/dispatch absence tests for every restricted
-  action, including `.sh` in pane/sidebar and imported settings. Audit Debug and Release
-  compile inputs, link maps, executable symbols/selectors and embedded bundles for
-  ProcessRunner, process-launch calls, Terminal launch, eject and Sparkle. Strings alone
-  are not proof of absence. A hidden-but-linked implementation fails the MAS release gate.
-
-**WP6 — MAS grants, security-scoped bookmarks and all file operations. Depends on WP5.**
-
-- Areas: proposed `MAS/FileAccessGrantStore.swift` and `MAS/SecurityScopedAccessService.swift`,
-  Direct access adapter; `Models/SidebarModel.swift`, `Models/AppLaunchConfiguration.swift`,
-  `ViewModels/PaneState.swift`, `ViewModels/TabbedPaneState.swift`,
-  `Models/FileOperationService.swift`, `Models/FolderCompareService.swift`,
-  `Models/SmartMetadataService.swift`, duplicate/folder-size view models, `Views/ContentView.swift`,
-  `Views/PaneView.swift`, `Views/SidebarView.swift`, `Views/SettingsView.swift`, `DuPaneApp.swift`.
-- Provide first-use and later **Add Folder Access** via `NSOpenPanel`, plus grant management
-  and reauthorization. Persist `.withSecurityScope` bookmark data per edition; resolve
-  with security scope, refresh stale data, and acquire/release access in balanced,
-  concurrency-safe leases using `startAccessingSecurityScopedResource()` and matching
-  `stopAccessingSecurityScopedResource()` for successful acquisitions. A lease covers
-  async work, callbacks, enumeration, previews,
-  file coordination and cleanup; every success, error and cancellation path releases it.
-  Preserve unavailable/offline locations for retry instead of pruning them as nonexistent.
-- Separate navigation bookmarks/pins from authority grants. Restored tabs, recents, Places,
-  Go to Folder, Computer root, launch arguments and imported paths are hints, not grants.
-  Offer a picker when access is missing; cancellation leaves the current pane usable.
-  Do not treat a successful `fileExists` or prefix string match as proof of access. Resolve
-  symlink targets and volume boundaries safely; explicitly authorize additional roots.
-- Apply leases to source and destination/parent directories for create, rename, move/copy,
-  duplicate, delete/undo, compare/sync and archive operations, plus background metadata,
-  search and scans. Keep existing rollback/conflict/partial-success semantics. Distinguish
-  missing grant, read-only media, TCC denial, unavailable provider and missing file;
-  report failures without silently dropping entries or promising elevation. Settings
-  import/export uses panel-authorized files and never exports/transfers bookmark authority.
-- Verification / acceptance: fake grant-store tests cover stale/failed resolution, overlapping
-  leases, cancellation, relaunch, move/revoke/offline and both-endpoint access. Signed MAS
-  tests begin with empty container/no grants: deny, cancel, grant one folder, access its
-  descendants, deny a sibling, then grant a second root and transfer between panes.
-  Relaunch and upgrade must retain valid grants; invalid grants trigger recovery without
-  data loss. Test with Full Disk Access off; it is never a prerequisite or sandbox bypass.
-
-**WP7 — signed sandbox feature spikes and least privilege. Depends on WP6.**
-
-- Areas: workspace/volume services from WP3; `Views/QuickLookCoordinator.swift`,
-  `Views/PaneView.swift`, `Views/SidebarView.swift`, `Views/RowMouseEventView.swift`,
-  `Models/DragSession.swift`, `Models/SidebarModel.swift`, `Models/SmartMetadataService.swift`,
-  `Models/NetworkVolumeMonitor.swift`, `ViewModels/PaneState.swift`,
-  `Models/FileOperationService.swift`, MAS Info/entitlements; proposed
-  `Docs/SandboxFeatureEvidence.md` and signed integration fixtures.
-- Run the actual Apple Development-signed, sandbox-entitled MAS app outside the debugger
-  in a clean test account, then repeat critical cases with the TestFlight build. Cover
-  macOS 13 where supported and the current release, fresh/remembered/denied grants,
-  relaunch and asynchronous completion. An unsigned build or SPM test is not sandbox proof.
-  Record OS, signing identity, effective entitlements, commit/build, steps, expected/actual
-  results and relevant sandbox logs for each capability; redact personal file paths.
-- Test each row separately; passing one brokered API does not prove another works:
-
-| Spike | Required scenarios and acceptance |
+| Feature | Where it lives |
 |---|---|
-| Quick Look | Single/multiple granted files, selection changes, close/reopen, cloud placeholder and denied file; retain scope for preview lifetime, no stuck panel or leaked leases. |
-| Finder reveal | Reveal selected granted files and missing/offline files with `activateFileViewerSelecting`; correct selection or actionable failure. |
-| Open With / share / `.app` launch | Default opening, enumerated and panel-selected apps, multiple documents, share completion/cancel and app double-click through supported APIs; successful brokered access without enabling `.sh` execution. |
-| Tags | Read/add/remove tags, multi-selection, denied writes and provider support; UI reflects actual result and retains tag filters. |
-| Spotlight / deep search | Scope queries to granted roots, handle unindexed roots and inaccessible results, cancel/close tabs safely; do not advertise whole-disk results when only granted roots are searchable. |
-| iCloud / OneDrive | Discover/select provider roots without assuming `NSHomeDirectory()` is the real home; online-only hydration, offline errors, coordinated copy/rename/sync, reconnect and changed provider paths. Do not add iCloud container entitlements merely to browse user-selected files. |
-| Removable volumes | Enumerate, grant, read/write/copy, read-only media, unplug during work, remount and restore grants; preserve sidebar stability. Eject remains Direct-only. |
-| Trash / undo | Granted source to system Trash, undo to original parent, occupied destination, partial deletion and volume-specific Trash; prove authority survives for undo. Never substitute permanent delete. A failing undo needs a supported safe solution or documented evidence before narrowing capability. |
-| Drag/drop | Between panes and from/to Finder or another sandboxed app, files/directories and supported promised-file paths, copy/move modifiers, denied destination and cancellation; hold brokered access through transfer without treating arbitrary pasted paths as grants. |
-| SMB / AFP | Existing mounted-share enumeration and grant, `NSWorkspace.open` Connect to Server, cancel/failed authentication, pinned reconnect, offline timeout and file operations; test SMB and AFP separately using available servers. Missing test infrastructure is “unverified,” not evidence to remove a feature. |
-| Bonjour | `_smb._tcp` and `_afpovertcp._tcp` discovery, resolve, denied/revoked local-network permission, stop/restart and disabled setting; no stalled UI or background browse after cancellation. |
+| Command Runner panel | `Views/CommandRunnerView.swift`; `showCommandRunner` in `ViewModels/`; toolbar button in `Views/GlobalToolbar.swift` (~L11, L28, L126–128); wiring in `Views/ContentView.swift` (~L371, L388) |
+| Open in Terminal — pane | `Views/PaneView.swift` (~L1005–1007, `/usr/bin/open -a Terminal`) |
+| Open in Terminal — sidebar | `Views/SidebarView.swift` (~L270–272) |
+| Executing `.sh` files | The open/launch path in `Views/PaneView.swift`; MAS must not fall through to execution via a generic-open handler |
+| Eject volumes (external and network) | `Models/NetworkVolumeMonitor.swift` — `ejectExternal` (~L118) and `NSWorkspace.shared.unmountAndEjectDevice` (~L38–41). Keep mount/unmount **notifications** and volume enumeration |
+| `ProcessRunner` and all process spawning | `Models/FileOperationService.swift` — `ProcessRunner`, `ProcessExecutionResult`, `Process()` (~L477). Remove once Phase 4 lands |
+| Self-update | Nothing exists in the repo today. Do not add Sparkle or any updater. Updates come from the App Store |
 
-- Start networking spikes without network entitlements; isolate what the app itself needs
-  versus Finder/system services. Add `com.apple.security.network.client` only if a retained
-  path needs outgoing sockets and signed evidence proves it; add
-  `com.apple.security.network.server` only if necessary incoming behavior is demonstrated.
-  Do not enable both speculatively. Local-network privacy declarations/consent are separate
-  from App Sandbox entitlements: apply `NSLocalNetworkUsageDescription` and `NSBonjourServices`
-  for proven local-network/Bonjour use on the relevant OS, following
-  [TN3179: Understanding local network privacy](https://developer.apple.com/documentation/technotes/tn3179-understanding-local-network-privacy).
-  No guessed “local network” or multicast entitlement; record each added permission's
-  platform requirement, justification and denial test, and retest after removing extras.
-- Acceptance / gate: every retained feature has signed passing evidence and graceful
-  denial handling. A proposed restriction requires a cited Apple prohibition or recorded
-  reproducible failure plus attempted supported alternatives, and narrows only the failing
-  operation. Unverified capabilities block MAS release until tested; they are not silently
-  cut. Update the matrix and review notes to match the evidence.
+Acceptance for this phase: no `Process`, `NSTask`, `NSAppleScript` or `osascript` reference
+remains anywhere in `Sources/`; no menu item, context-menu entry, toolbar control or
+keyboard shortcut reaches a removed feature; imported settings from a v1.0 install cannot
+re-enable any of them.
 
-**WP8 — edition UX, migration and documentation. Depends on WP7.**
+##### Phase 4 — features to rework
 
-- Areas: `Views/SettingsView.swift`, `Views/GlobalToolbar.swift`, `Views/PaneView.swift`,
-  `Views/SidebarView.swift`, `DuPaneApp.swift`, `Models/AppSettings.swift`,
-  `Docs/UserGuide.html`, `Docs/FAQs.html`, `Docs/README.md`, root `README.md` as applicable,
-  and proposed distribution/evidence docs. About shows edition, version and the shared
-  build. MAS onboarding explains folder access and recovery; Direct keeps full commands.
-- Describe free pricing, factual capability differences and Store versus Direct updates.
-  Remove dead controls/shortcuts; avoid purchase/upgrade/license prompts. Explain grants,
-  provider limitations and TCC separately, with no Full Disk Access sandbox workaround or
-  promise of permanent approval. Settings export/import may transfer preferences and path
-  hints between editions, but MAS reauthorizes access; changing from `local.DuPane` must
-  not silently abandon existing users' settings without a documented export/import path.
-- Verification / acceptance: inspect both editions' onboarding, menus, About, keyboard
-  accessibility and bundled help from installed apps on a machine without the checkout.
-  Every matrix difference and grant-recovery path is accurate; no inaccessible control
-  remains. Update guide/build strings in implementation releases, not in this plan commit.
+| Feature | Required change |
+|---|---|
+| ZIP create / inspect / extract | Replace the four `/usr/bin/zip` and `/usr/bin/unzip` calls in `Views/PaneView.swift` (~L1116, L1144, L1163, L1212) with an in-process implementation. Select and pin a maintained ZIP library compatible with macOS 13, both SPM and XcodeGen, and App Store distribution licensing; confirm it does real ZIP read *and* write. Preserve every existing safety behaviour in `Models/ArchiveExtractionSafety.swift`: zip-slip rejection (absolute paths, traversal, empty and dot components, backslashes, NUL), archive-symlink rejection, intermediate-file conflicts, overwrite/skip/cancel, collision-safe output names, and `PaneState.pendingArchiveConflict` stability across tab switches. Keep cancellation and error reporting; integrate entry/byte progress with `ViewModels/FileOperationProgressModel.swift` |
+| Home and standard folder paths | In a sandbox, `FileManager.default.homeDirectoryForCurrentUser` and `NSHomeDirectory()` return the **container**, not the real home. Fix all call sites to resolve the real home (`NSHomeDirectoryForUser(NSUserName())`) and treat the result as a *path hint that still requires a grant*: `Models/SidebarModel.swift` (~L122 Home, L128 iCloud Drive, L130 OneDrive), `Models/AppLaunchConfiguration.swift` (~L45 Downloads default), `Views/SettingsView.swift` (~L68, L71 iCloud/OneDrive detection), `Views/ContentView.swift` (~L331–335 Go Home / Go Desktop / Go Documents) |
+| Breadcrumb and Computer-root navigation | `ViewModels/PaneState.swift` builds the breadcrumb by walking up from `/` (~L77–86) and special-cases `/Volumes` (~L240–245). Rework so unreadable ancestors render without failing, and the Computer root shows granted roots and mounted volumes rather than an unrestricted listing of `/` |
+| Global Tags sidebar | `Models/SidebarModel.swift` (~L109, L160–161) queries `NSMetadataQueryIndexedLocalComputerScope`. Narrow to granted roots, and make the empty/partial state explicit in the UI rather than silently showing nothing |
+| Deep / Spotlight search | `ViewModels/PaneState.swift` (~L376+). Scope queries to granted roots; handle unindexed roots and inaccessible results; never present results as whole-disk when only granted roots were searched |
+| Duplicate Finder, Folder Size, Folder Compare & Sync | `ViewModels/DuplicateFinderViewModel.swift`, `ViewModels/FolderSizeViewModel.swift`, `Models/FolderCompareService.swift`. Operate only within granted roots; hold access leases for the whole scan including async completion; report inaccessible subtrees rather than silently skipping them |
+| Volume enumeration | `ViewModels/PaneState.swift` (~L463) and `Models/NetworkVolumeMonitor.swift` (~L99) use `mountedVolumeURLs`. Enumeration is fine; **listing a volume's contents needs a grant.** Present ungranted volumes as needing access, not as empty |
+| Background metadata | `Models/SmartMetadataService.swift` must acquire and hold a lease for the lifetime of its work and release it on every success, error and cancellation path |
 
-**WP9 — dual-target unit, e2e and CI gates. Depends on WP8; develop checks throughout.**
+##### Phase 5 — folder-access approval UI. This is new work, not a refactor
 
-- Areas: `Package.swift`, `Tests/DuPaneUITests/Build<N>Tests.swift` (and
-  `Build<N>BugTests.swift` for bug regressions), `UITests/DuPaneEndToEndUITests/`,
-  `Scripts/run-e2e.sh`, `Scripts/handoff-check.sh`, `project.yml`, `.github/workflows/ci.yml`.
-  Give SPM an explicit edition selector that sets the matching compilation condition and
-  excludes Direct sources/dependencies for MAS; default/document Direct and reject invalid
-  modes. Use distinct scratch paths and edition-conditional process/eject tests, preserving
-  shared coverage in both runs. Fake-service tests do not replace signed acceptance.
-- Run `swift test --filter DuPaneUITests` in each edition environment. Parameterize the
-  e2e wrapper, UI-test host target/bundle identity, result logs, result bundles and build
-  directories per scheme; retain exit-status propagation and machine-readable markers.
-  Exercise the existing critical flows for both apps and add MAS picker/relaunch/denial,
-  cross-root operations, archive safety, restricted-action absence and coexistence tests.
-- CI must regenerate/check the XcodeGen project, build both schemes/configurations, run
-  both unit modes, audit source/dependency/binary membership and effective entitlements,
-  and verify shared version/build values without dirtying Git. Run signed e2e/integration
-  on a suitable macOS runner with required user session, accounts/devices/providers;
-  keep release credentials out of untrusted PR jobs. Unsigned PR compilation is useful
-  but cannot satisfy the signed release gate. Required skips count as unresolved.
-- Acceptance / gate: retain all relevant existing regressions, all new tests pass, no
-  unexplained skips, no MAS forbidden code/dependencies, correct sandbox/signing and
-  reproducible numbering; attach separate edition results to the release candidate.
-  **Baseline remains Build 420: 336 unit / 14 e2e passed, 0 failed.** These are historical
-  single-target results, not evidence that either proposed target has passed. This
-  docs-only edit uses `git diff --check` and diff inspection, with no compilation/e2e rerun.
+The app has **zero** security-scoped bookmark code today. All of the following is
+greenfield.
 
-**WP10 — packaging and delivery. Depends on applicable WP9 gates.**
+1. **Access service.** A single service owning grant storage and leases. Persist
+   `.withSecurityScope` bookmark data (not paths — `Models/SidebarModel.swift` currently
+   persists paths). Resolve with security scope, refresh stale bookmarks, and acquire and
+   release access in balanced, concurrency-safe leases. A lease must cover async work,
+   callbacks, enumeration, previews, file coordination and cleanup.
+2. **First-run onboarding.** On first launch, explain in plain language that DuPane can
+   only see folders the user grants it, and offer to grant one. Cancelling must leave a
+   usable app, not a dead one.
+3. **"Add Folder Access…" command.** Permanently available from the menu and Settings, via
+   `NSOpenPanel`. Granting a folder grants its descendants.
+4. **Grant management UI in Settings.** List granted folders; allow removing a grant;
+   show grants that have gone stale, offline or unresolvable, and offer re-authorisation.
+   Never silently prune a grant because the location is temporarily unavailable.
+5. **Inline access prompts.** When navigation lands somewhere ungranted — a restored tab,
+   a Place, a Recent, Go to Folder, a sidebar entry, a launch argument, an imported
+   setting, a mounted volume — show an in-pane "grant access to this folder" affordance
+   rather than an error or an empty list. Cancelling leaves the current pane intact.
+6. **Grants are separate from navigation.** Pins, tabs, history, Recents and Places are
+   *hints*. A successful `fileExists` or a path-prefix match is **not** proof of access.
+   Resolve symlink targets and volume boundaries explicitly rather than assuming a grant
+   on the parent covers them.
+7. **Honest error reporting.** Distinguish missing grant, read-only media, TCC denial,
+   unavailable provider and missing file. Never promise that granting Home, `/`, or
+   enabling Full Disk Access unlocks the filesystem — **Full Disk Access is a separate
+   macOS privacy permission, not a sandbox escape, and must never be presented as one.**
+8. **Settings import/export** uses panel-authorised files and never exports or transfers
+   bookmark authority.
 
-- Areas: proposed release scripts under `Scripts/`, protected release workflow under
-  `.github/workflows/`, `project.yml` archive/export settings, distribution instructions,
-  GitHub/website artifacts and App Store Connect. Archive both products from the same
-  commit and WP2 version/build inputs; retain artifact checksums, signing information,
-  test evidence and export/notarization logs.
-- **Direct:** sign app and all embedded code with Developer ID Application and hardened
-  runtime; package as a DMG, submit with `notarytool`, inspect successful completion,
-  staple/validate the ticket on supported artifacts, and verify code signature and
-  Gatekeeper assessment. Smoke-test a quarantined download on a clean Mac without
-  clearing quarantine, including commands, ZIP, eject and grants/TCC error behavior.
-  If Sparkle ships, sign update artifacts, validate feed/signature keys and test an actual
-  old→new update; otherwise publish manual download/update instructions. App replacement
-  must preserve Direct settings and cannot overwrite the MAS app.
-- **MAS:** create the App Store Connect record for its own bundle ID, set price to free,
-  configure no IAP products, prepare screenshots, support/privacy URLs, App Privacy
-  answers, required dependency privacy declarations and review notes explaining grants.
-  Archive/export with the correct Store signing/profile, validate/upload and distribute
-  via TestFlight. Prove fresh install and update retain identity/settings/bookmarks;
-  repeat critical signed tests, then submit for App Review with reproducible sample-folder
-  steps and explanations for necessary entitlements. Resolve validation/review findings
-  before release; TestFlight success does not guarantee App Review approval.
-- Acceptance / release gates: Direct requires valid signatures, accepted notarization,
-  stapling/Gatekeeper and clean-machine smoke tests; MAS requires upload validation,
-  passing TestFlight evidence, approved review, free pricing/no gates and Store-only
-  updating. Both require accurate edition docs, matrix/evidence closure, matching release
-  manifest and clean handoff. A release blocked in one channel need not block a separately
-  qualified Direct release, but must not be described as delivered.
+Apple references: [App Sandbox](https://developer.apple.com/documentation/security/app-sandbox),
+[Accessing files from the macOS App Sandbox](https://developer.apple.com/documentation/security/accessing-files-from-the-macos-app-sandbox),
+[App Review Guidelines](https://developer.apple.com/app-store/review/guidelines/).
 
-##### Only remaining product/identity decisions
+##### Phase 6 — identity, licensing and repository housekeeping
 
-- **Vendor/reverse-DNS prefix and Apple Team ID** for the two permanent bundle IDs and signing.
-- **Final display names** — recommend **DuPane** (MAS) and **DuPane Direct**.
-- **Whether Sparkle ships in the first Direct release** or follows a manual-download launch.
+Items here are easy to forget and each one blocks submission.
 
-All other items above are implementation tasks or evidence-based release gates, not open
-pricing, edition-scope, licensing or distribution-model decisions.
+1. **Bundle identifier.** `project.yml` currently uses `local.DuPane` (~L36), which is not
+   a registrable reverse-DNS identifier. Choose a real vendor prefix and set one permanent
+   ID. It cannot be changed after the first submission.
+2. **Settings migration.** The app uses no custom `UserDefaults` suite, so preferences are
+   keyed by bundle ID. Changing away from `local.DuPane` **orphans every existing user's
+   settings.** Implement a one-time first-launch migration that reads the old
+   `local.DuPane` domain and copies it forward. Do not rely on a manual export/import as
+   the answer.
+3. **LICENSE file.** The repository is public, has a `CONTRIBUTING.md`, and has **no
+   licence** — which currently means all rights reserved. Ian must choose a licence and add
+   it. Being the copyright holder is what permits App Store submission of open source, so
+   the licence chosen must not conflict with App Store distribution terms.
+4. **Privacy manifest.** Add `PrivacyInfo.xcprivacy` for the app, plus any privacy
+   declaration required by the ZIP dependency chosen in Phase 4.
+5. **Build numbering.** Remove the mutating "Stamp Build Number" post-build script from
+   `project.yml` (~L27–32). Make `BuildNumber.txt` the checked-in shared value, incremented
+   once per release candidate by an explicit release-prep step and consumed read-only by
+   builds and CI. Never reuse a build number that has been submitted.
+6. **Entitlements.** Start from `app-sandbox`, `files.user-selected.read-write`,
+   `files.bookmarks.app-scope` only. Add `com.apple.security.network.client` or
+   `.network.server` **only** with recorded evidence from Phase 1 that a retained feature
+   needs it. If Bonjour is retained, add `NSLocalNetworkUsageDescription` and
+   `NSBonjourServices` per
+   [TN3179](https://developer.apple.com/documentation/technotes/tn3179-understanding-local-network-privacy).
+   No speculative entitlements — every one must be justifiable to App Review.
+7. **App name and icon** must not imply a Finder or Apple affiliation.
+8. **Documentation.** Update `Docs/UserGuide.html`, `Docs/FAQs.html`, `Docs/README.md` and
+   the root `README.md`: remove the dropped features, document folder grants and grant
+   recovery, and state that the unrestricted build is available as the v1.0.0 tag for local
+   building.
+
+##### Phase 7 — tests and CI
+
+- Retain every existing regression test that still applies. Delete tests for removed
+  features rather than leaving them skipped.
+- New unit coverage: grant store with stale/failed resolution, overlapping leases,
+  cancellation, relaunch, revoked and offline grants; ZIP round-trip and the full hostile-
+  archive fixture set; every removed feature proven unreachable from UI, keyboard and
+  imported settings.
+- New e2e coverage in `UITests/DuPaneEndToEndUITests/`: first-run with an empty container
+  and no grants, deny, cancel, grant one folder, browse its descendants, deny a sibling,
+  grant a second root, transfer files between panes across two roots, relaunch and confirm
+  grants survive.
+- Signed acceptance: repeat the Phase 1 table against the real signed sandboxed build
+  before submission. **A passing SPM or unsigned test is not sandbox proof.** A required
+  skip counts as unresolved.
+- CI (`.github/workflows/ci.yml`) must regenerate and verify the XcodeGen project, build
+  Debug and Release, run the unit suite, and assert the effective signed entitlements and
+  the absence of process-spawning symbols — without dirtying Git.
+- Update `Scripts/handoff-check.sh`, `Scripts/verify-change.sh`, `Scripts/run-e2e.sh`,
+  `CLAUDE.md` and `Docs/AGENT-WORKFLOW.md` to match the single-target reality.
+
+##### Phase 8 — App Store Connect and submission
+
+1. Confirm Apple Developer Program enrolment and Team ID.
+2. Register the bundle ID; create the App Store Connect record; set price to **free**;
+   configure **no** in-app purchases.
+3. Prepare screenshots, description, keywords, support URL, privacy policy URL, App
+   Privacy answers, and review notes that explain the folder-grant model with reproducible
+   sample-folder steps.
+4. Archive and export with Mac App Store distribution signing, validate, upload,
+   distribute via TestFlight.
+5. Prove that a fresh install and an update both retain identity, settings and bookmarks.
+6. Repeat the critical signed tests on the TestFlight build, then submit for review.
+   TestFlight success does not guarantee approval. Resolve every validation and review
+   finding before release; do not describe the app as shipped until it is approved and
+   live.
+
+##### Decisions still needed from Ian
+
+- **Vendor / reverse-DNS prefix and Apple Team ID** for the permanent bundle ID.
+- **Licence** for the public repository.
+- **App Store display name** (recommend keeping **DuPane**).
+
+##### Explicitly not in this plan
+
+Two build targets or schemes. `DIRECT_BUILD` / `MAS_BUILD` compilation conditions. A second
+bundle ID. Per-edition Info.plist or entitlements files. Developer ID signing,
+notarization, stapling or DMG packaging. Sparkle or any self-update mechanism. A capability
+matrix or runtime edition switch. Any paid tier, IAP, trial, licence key or receipt check.
+Any helper process, XPC shell, or AppleScript workaround to restore a removed feature.
+
+**No implementation, build increment or test result is claimed by this planning entry.**
+Baseline at the time of writing remains Build 420: 336 unit / 14 e2e passed, 0 failed.
 
 
 ## Clarifications
