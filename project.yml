@@ -24,14 +24,11 @@ targets:
     sources:
       - path: Sources/DuPane
     postBuildScripts:
-      - name: "Increment Build Number"
+      - name: "Stamp Build Number"
         showEnvVarsInLog: false
         script: |
           BUILD_FILE="${SRCROOT}/BuildNumber.txt"
-          if [ ! -f "$BUILD_FILE" ]; then echo "0" > "$BUILD_FILE"; fi
           BUILD=$(cat "$BUILD_FILE")
-          BUILD=$((BUILD + 1))
-          printf "%d" "$BUILD" > "$BUILD_FILE"
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || \
           /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $BUILD" "${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
     settings:

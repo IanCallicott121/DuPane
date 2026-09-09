@@ -1,130 +1,77 @@
 #!/usr/bin/env bash
-# Is this repo safe to hand between agents (Cowork <-> Claude Agent in Xcode)?
-#
-# Checks the things git can tell you, plus proxies for the one thing it can't:
-# Xcode caching the project structure in memory and disagreeing with disk.
-#
-# Editing file CONTENTS outside Xcode is safe — Xcode reloads those buffers.
-# STRUCTURAL changes made outside Xcode are not: files added or removed, or
-# project.yml / project.pbxproj rewritten. Restart Xcode after those.
-#
-# Run from the project root:  ./Scripts/handoff-check.sh
-# Exit 0 = safe to hand over, 1 = something needs your attention.
-
 set -uo pipefail
 cd "$(dirname "$0")/.." || exit 1
+mode="${1:---finish}"
+case "$mode" in --start|--finish) ;; *) echo "Usage: $0 [--start|--finish]" >&2; exit 2 ;; esac
 
-PBX="DuPane.xcodeproj/project.pbxproj"
+pbx="DuPane.xcodeproj/project.pbxproj"
 issues=0
-note() { printf '  \033[33m!\033[0m %s\n' "$1"; issues=$((issues + 1)); }
-ok()   { printf '  \033[32mok\033[0m %s\n' "$1"; }
-info() { printf '  \033[34mi\033[0m  %s\n' "$1"; }  # informational; does not affect exit code
+warnings=0
+issue() { printf '  ! %s\n' "$1"; issues=$((issues + 1)); }
+warn() { printf '  ? %s\n' "$1"; warnings=$((warnings + 1)); }
+ok() { printf '  ok %s\n' "$1"; }
+info() { printf '  i  %s\n' "$1"; }
 
-echo
-echo "Handoff check — $(basename "$PWD") on $(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '?')"
-echo
-
-# ---------------------------------------------------------------- git state
+printf '\n%s check — %s on %s\n\n' "${mode#--}" "$(basename "$PWD")" "$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '?')"
 echo "Git"
 if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
-    note "working tree is dirty — read these before handing over:"
-    git status --short | sed 's/^/       /'
+  issue "working tree is dirty"
+  git status --short | sed 's/^/       /'
 else
-    ok "working tree clean"
+  ok "working tree clean"
 fi
-
 upstream=$(git rev-parse --abbrev-ref '@{upstream}' 2>/dev/null || true)
 if [ -n "$upstream" ]; then
-    ahead=$(git rev-list --count "$upstream"..HEAD 2>/dev/null || echo 0)
-    if [ "$ahead" -gt 0 ]; then
-        note "$ahead commit(s) not pushed to $upstream:"
-        git log --format='       %h %s' "$upstream"..HEAD
-    else
-        ok "in sync with $upstream"
-    fi
+  ahead=$(git rev-list --count "$upstream"..HEAD 2>/dev/null || echo 0)
+  behind=$(git rev-list --count HEAD.."$upstream" 2>/dev/null || echo 0)
+  if [ "$ahead" -gt 0 ]; then
+    [ "$mode" = "--finish" ] && issue "$ahead commit(s) not pushed to $upstream" || warn "$ahead local commit(s) not pushed"
+  elif [ "$behind" -gt 0 ]; then
+    warn "$behind commit(s) behind $upstream (remote refs may be stale)"
+  else
+    ok "in sync with $upstream"
+  fi
+else
+  warn "no upstream configured"
 fi
 
-# ------------------------------------------------- stale Xcode project state
 echo
 echo "Xcode project"
-if [ ! -f "$PBX" ]; then
-    note "$PBX not found"
+if [ ! -f "$pbx" ]; then
+  issue "$pbx not found"
 else
-    # Files the project references that no longer exist. This is the Build 377
-    # failure mode: sources deleted, references left behind. A clean clone fails
-    # to build; SPM never notices because it reads Package.swift instead.
-    missing=""
-    for name in $(grep -oE '[A-Za-z0-9_+-]+\.swift' "$PBX" | sort -u | grep -v '^sourcecode\.swift$'); do
-        if ! find . -name "$name" -not -path './.git/*' -not -path './build/*' \
-                    -not -path './.build/*' -print -quit 2>/dev/null | grep -q .; then
-            missing="$missing $name"
-        fi
-    done
-    if [ -n "$missing" ]; then
-        note "project references files that don't exist:$missing"
-        note "  -> run 'xcodegen generate'"
-    else
-        ok "every referenced source file exists"
-    fi
+  missing=""
+  for name in $(grep -oE '[A-Za-z0-9_+-]+\.swift' "$pbx" | sort -u | grep -v '^sourcecode\.swift$'); do
+    find . -name "$name" -not -path './.git/*' -not -path './build/*' -not -path './.build/*' -print -quit 2>/dev/null | grep -q . || missing="$missing $name"
+  done
+  [ -z "$missing" ] && ok "every referenced source exists" || issue "project references missing sources:$missing"
 
-    # Sources present on disk but absent from the project — a new file added by
-    # the other agent that Xcode won't compile until the project is regenerated.
-    unreferenced=""
-    while IFS= read -r f; do
-        base=$(basename "$f")
-        [ "$base" = "DuPaneApp.swift" ] && continue   # excluded from the SPM target by design
-        grep -q "$base" "$PBX" || unreferenced="$unreferenced $base"
-    done < <(find Sources -name '*.swift' 2>/dev/null)
-    if [ -n "$unreferenced" ]; then
-        note "sources not referenced by the project:$unreferenced"
-        note "  -> run 'xcodegen generate'"
-    else
-        ok "every source file is referenced"
-    fi
+  unreferenced=""
+  while IFS= read -r file; do
+    base=$(basename "$file")
+    [ "$base" = "DuPaneApp.swift" ] && continue
+    grep -q "$base" "$pbx" || unreferenced="$unreferenced $base"
+  done < <(find Sources -name '*.swift' 2>/dev/null)
+  [ -z "$unreferenced" ] && ok "every source is referenced" || issue "sources absent from project:$unreferenced"
 
-    # project.yml is the source of truth; the pbxproj is generated from it.
-    # This is an mtime heuristic and prone to false positives: a newer project.yml
-    # often produces no semantic pbxproj change (xcodegen also reshuffles object
-    # UUIDs on every run, and fileGroups can pick up stray files on disk). So this
-    # is informational, not a blocker.
-    if [ -f project.yml ] && [ project.yml -nt "$PBX" ]; then
-        info "project.yml is newer than the generated project (mtime only)"
-        info "  -> regenerate, then 'git diff $PBX' and revert unless the diff is semantic"
-    else
-        ok "generated project is up to date with project.yml"
-    fi
+  if [ -f project.yml ] && [ project.yml -nt "$pbx" ]; then
+    info "project.yml is newer than generated project (mtime heuristic)"
+  else
+    ok "generated project is current"
+  fi
 fi
 
-# ------------------------------------------------------- build location sanity
 echo
 echo "Build location"
-if [ -d build ]; then
-    files=$(find build -type f 2>/dev/null | wc -l | tr -d ' ')
-    if [ "$files" -gt 0 ]; then
-        note "build/ in the project directory holds $files build product(s)"
-        note "  -> Xcode is using build settings that disagree with the file on disk;"
-        note "     quit and reopen Xcode, then delete build/"
-        if command -v xattr >/dev/null 2>&1; then
-            tainted=$(xattr -r build 2>/dev/null | grep -c 'com.apple.FinderInfo' || true)
-            [ "${tainted:-0}" -gt 0 ] && note "  -> $tainted item(s) carry iCloud xattrs; codesign will refuse these"
-        fi
-    else
-        note "empty build/ directory left behind — safe to delete, but nothing built there"
-    fi
+if [ -d build ] && find build -type f -print -quit 2>/dev/null | grep -q .; then
+  issue "build products exist inside checkout; use external SYMROOT"
 else
-    ok "no stray build/ in the project directory"
+  ok "no build products inside checkout"
 fi
 
-# --------------------------------------------------------------------- verdict
 echo
-if [ "$issues" -eq 0 ]; then
-    printf '\033[32mSafe to hand over.\033[0m\n\n'
-    exit 0
+if [ "$issues" -gt 0 ]; then
+  printf '%d blocking issue(s); %d warning(s).\n' "$issues" "$warnings"
+  exit 1
 fi
-printf '\033[33m%d thing(s) to look at before handing over.\033[0m\n' "$issues"
-echo "If anything OUTSIDE Xcode added or removed files, or rewrote project.yml or"
-echo "project.pbxproj, quit and reopen Xcode regardless. It caches the project"
-echo "structure and won't reliably re-read it. (Content edits outside Xcode are"
-echo "fine — those it does reload. Changes made inside Xcode are already in sync.)"
-echo
-exit 1
+printf 'Check passed; %d warning(s).\n' "$warnings"

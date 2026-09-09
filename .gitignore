@@ -19,3 +19,4 @@ xcuserdata/
 
 # Test result log (written by TestResultLog)
 .test-results/
+.dupane-agent.lock/

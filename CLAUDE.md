@@ -26,19 +26,17 @@ Xcode project in sync.
 - Fix all build errors before declaring work done.
 - update the build number in settings > about and in the user manual
 
-## Producing the runnable .app (and the build-number bump)
+## Producing the runnable .app (and explicit build numbering)
 - The `BuildProject` MCP tool / the open `.swiftpm/xcode` workspace build the
-  **`DuPane-Package`** SPM scheme. That compiles the library + tests but does **not**
-  produce `DuPane.app` and does **not** run the version-bump script — so it never
-  changes `BuildNumber.txt` or the app's `CFBundleVersion`.
+  **`DuPane-Package`** SPM scheme. That compiles the library + tests but does not
+  produce `DuPane.app` and does not stamp `CFBundleVersion`.
 - The real app comes from the xcodegen-generated `DuPane.xcodeproj` (`DuPane` scheme):
   `xcodebuild -project DuPane.xcodeproj -scheme DuPane -configuration Debug build`
   (regenerate first with `xcodegen generate` if `project.yml` changed).
-- That target's `postBuildScripts` "Increment Build Number" phase reads `BuildNumber.txt`,
-  increments it, writes it back, and stamps `CFBundleVersion` on the built app. It only
-  fires on an actual (re)compile — a no-op build leaves the number unchanged. Force a bump
-  with a clean build if needed. Settings › About reads `CFBundleVersion` at runtime, so it
-  updates automatically; only `Docs/UserGuide.html` (Build string, 2 places) is hardcoded.
+- The read-only `postBuildScripts` "Stamp Build Number" phase stamps the value in
+  `BuildNumber.txt`; builds never modify the repository. Run
+  `./Scripts/bump-build-number.sh` once when a completed implementation or release needs
+  a new number. Settings › About reads `CFBundleVersion`; `Docs/UserGuide.html` is hardcoded.
 - Output goes to `SYMROOT = ~/Library/Developer/DuPane-build/<Config>/DuPane.app`
   (overridden in `project.yml` to stay out of iCloud), **not** DerivedData.
 - Convenience symlink to the latest Debug build:
