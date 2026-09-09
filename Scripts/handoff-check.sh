@@ -18,6 +18,7 @@ PBX="DuPane.xcodeproj/project.pbxproj"
 issues=0
 note() { printf '  \033[33m!\033[0m %s\n' "$1"; issues=$((issues + 1)); }
 ok()   { printf '  \033[32mok\033[0m %s\n' "$1"; }
+info() { printf '  \033[34mi\033[0m  %s\n' "$1"; }  # informational; does not affect exit code
 
 echo
 echo "Handoff check — $(basename "$PWD") on $(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '?')"
@@ -82,9 +83,13 @@ else
     fi
 
     # project.yml is the source of truth; the pbxproj is generated from it.
+    # This is an mtime heuristic and prone to false positives: a newer project.yml
+    # often produces no semantic pbxproj change (xcodegen also reshuffles object
+    # UUIDs on every run, and fileGroups can pick up stray files on disk). So this
+    # is informational, not a blocker.
     if [ -f project.yml ] && [ project.yml -nt "$PBX" ]; then
-        note "project.yml is newer than the generated project"
-        note "  -> run 'xcodegen generate'"
+        info "project.yml is newer than the generated project (mtime only)"
+        info "  -> regenerate, then 'git diff $PBX' and revert unless the diff is semantic"
     else
         ok "generated project is up to date with project.yml"
     fi
