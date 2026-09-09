@@ -16,6 +16,8 @@ with a current machine-readable PASS log.
   <issue>`. The wrapper is required because the UI-test sandbox cannot write directly to
   the checkout.
 - `./Scripts/handoff-check.sh` before and after. `Docs/AGENT-WORKFLOW.md` has the process.
+- **Fast workflow:** use `./Scripts/verify-change.sh docs` for text-only edits; choose
+  `logic`, `service`, `ui`, `project`, or `release` for code and build changes.
 
 ### Remaining work
 No confirmed outstanding bugs remain in this list. Continue auditing before assuming the
