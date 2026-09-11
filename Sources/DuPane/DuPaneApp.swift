@@ -21,12 +21,12 @@ struct DuPaneApp: App {
         }
         .commands {
             CommandGroup(replacing: .help) {
-                Button("Open DuPane User Guide") {
+                Button("Open User Guide") {
                     openUserGuide()
                 }
                 .keyboardShortcut("?", modifiers: .command)
 
-                Button("Open DuPane FAQs") {
+                Button("Open FAQs") {
                     openFAQs()
                 }
             }
