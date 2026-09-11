@@ -4,9 +4,9 @@
 
 **Last verified working local build: Build 420.** No confirmed outstanding bugs at
 that point. Unit suite: **336 passed, 0 failed**. E2E suite: **14 passed, 0 failed**,
-last verified on 2026-09-09.
+re-verified on 2026-09-11 with `./Scripts/verify-change.sh release`; app build also passed.
 
-This is the verified baseline, not a claim that later uncommitted work has been tested.
+The uncommitted Build 421 changes were backed out before verification.
 
 ## Next items
 
