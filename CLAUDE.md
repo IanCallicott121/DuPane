@@ -1,11 +1,11 @@
-# /Opus — Claude Code Instructions
+# DuPane — Claude Code Instructions
 
 ## Project overview
 macOS dual-pane file manager built with SwiftUI. Sources live in `Sources/DuPane/`
 (used by both Xcode via `project.yml`/XcodeGen and SPM tests via `Package.swift`).
 `DuPane/DuPane/` in the Xcode project navigator maps to the same physical files.
-Use `XcodeWrite` / `XcodeRead` MCP tools — they resolve paths correctly and keep the
-Xcode project in sync.
+Use the CLI workflow in `Docs/AGENT-WORKFLOW.md`; `project.yml` is the source of
+truth for the generated Xcode project.
 
 ## After every session — always do these
 - Update `Docs/TODO.md`:
@@ -17,14 +17,16 @@ Xcode project in sync.
 - Save relevant memories (patterns, decisions, user preferences) using the memory system.
 
 ## Build & test workflow
-- Build: use `BuildProject` MCP tool targeting `DuPane`.
+- Verification: use the appropriate `./Scripts/verify-change.sh` lane from
+  `Docs/AGENT-WORKFLOW.md`; documentation-only changes use `docs`.
 - Tests: `swift test --filter DuPaneUITests` (SPM unit tests). All 336 tests pass; 0 failures.
   In Xcode, open the DuPane **folder** (not the .xcodeproj) to get the `DuPane-Package`
   scheme — ⌘U there runs the unit tests. The .xcodeproj scheme only runs the 14 e2e UI tests.
 - E2E from a terminal: `./Scripts/run-e2e.sh` (14 tests). The wrapper writes
   `.test-results/DuPaneEndToEndUITests.log`.
 - Fix all build errors before declaring work done.
-- update the build number in settings > about and in the user manual
+- Bump the build number only for an implementation or release that needs a new visible
+  number; documentation-only edits do not require a bump.
 
 ## Producing the runnable .app (and explicit build numbering)
 - The `BuildProject` MCP tool / the open `.swiftpm/xcode` workspace build the
@@ -48,9 +50,9 @@ Xcode project in sync.
   `xattr -dr com.apple.quarantine /path/to/DuPane.app`.
 
 ## Post-build checklist — run after every build that completes a feature or fix
-1. **Run all tests** — `swift test --filter DuPaneUITests`. All tests must pass, including any new ones written for this build. Fix failures before proceeding.
-2. **Update `Docs/UserGuide.html`** — reflect every UI or feature change: new/removed settings, changed keyboard shortcuts, corrected descriptions, new sections. Bump the version string in the sidebar and footer.
-3. **Update `Docs/TODO.md`** — move every completed "Next items" entry into the **Done** section under the new build number and today's date. Remove the completed entries from "Next items". Add any new issues discovered during this build to "Next items".
+1. **Run the appropriate verification lane** from `Docs/AGENT-WORKFLOW.md`. Fix failures before proceeding.
+2. **Update `Docs/UserGuide.html`** — reflect every UI or feature change: new/removed settings, changed keyboard shortcuts, corrected descriptions, new sections. Update the version string in the sidebar and footer only when the build number changes.
+3. **Update `Docs/TODO.md`** — move every completed "Next items" entry into the **Done** section under the relevant build number and today's date; record documentation-only work separately. Remove the completed entries from "Next items". Add any new issues discovered during this build to "Next items".
 
 ## Code conventions
 - No comments unless the WHY is non-obvious.
@@ -58,21 +60,19 @@ Xcode project in sync.
 - `@MainActor` on ViewModels. `Task.detached` for filesystem/IO work.
 - `onChange(of:perform:)` form (macOS 13-compatible). Avoid `onKeyPress` unless
   guarded with `#available(macOS 14.0, *)`.
-- EnvironmentObject for app-wide shared models (CustomActionsModel, etc.).
+- `@EnvironmentObject` for shared models such as `AppSettings` and `SidebarModel`.
 - Singleton services (SmartMetadataService) observed via `@ObservedObject`.
 - New tests for every non-trivial feature. No tests for pure UI layout changes.
 
 ## Architecture notes
 - `TabbedPaneState` wraps multiple `PaneState` tabs; Combine forwards child
   `objectWillChange` to parent.
-- `ContentView` owns `leftTabs`, `rightTabs`, `sidebarModel`, `warpViewModel`,
-  `customActionsModel` as `@StateObject`.
-- `PaneView` gets `customActionsModel` via `@EnvironmentObject`.
+- `ContentView` owns `leftTabs`, `rightTabs`, `sidebarModel`, `duplicateFinderViewModel`
+  and `fileOpProgress` as `@StateObject`.
+- `PaneView` gets `settings` and `sidebarModel` via `@EnvironmentObject`.
 - `SmartMetadataService.shared` loads metadata lazily in background tasks.
 - `QuickLookCoordinator.shared` — class-level `@MainActor` removed to avoid
   ObjC protocol conflict with `QLPreviewPanelDataSource`.
-- AI search: `SemanticSearchViewModel` uses `#if canImport(FoundationModels)` guards
-  so it compiles on all SDK versions; `@available(macOS 26.0, *)` guards runtime use.
 
 ## User preferences
 - Quality over speed. No regressions. Performance matters on hot paths (selection, sort).

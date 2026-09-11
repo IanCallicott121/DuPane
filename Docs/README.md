@@ -1,4 +1,4 @@
-# /DuPane
+# DuPane
 
 A native macOS dual-pane file manager built with SwiftUI. Real, unsandboxed
 code that moves, copies, renames, and trashes actual files.
@@ -48,8 +48,6 @@ code that moves, copies, renames, and trashes actual files.
 - Compare / Sync is shallow current-folder only; recursive folder diff,
   hash-based comparison, delete mirroring, and existing-folder overwrites are
   deferred.
-- Some toolbar file operations still run synchronously and need progress UI for
-  large batches.
 - Breadcrumbs show raw folder names (e.g. `/` rather than "Macintosh HD").
 - Deployment target is macOS 13 (Ventura).
 
@@ -70,27 +68,23 @@ build settings, etc.), regenerate with:
 xcodegen generate
 ```
 
-**Run primitive tests without Xcode**
+**Run unit tests without Xcode**
 
 ```bash
 cd DuPane
-swift test
+swift test --filter DuPaneUITests
 ```
 
 **Run end-to-end UI tests**
 
-Open `DuPane.xcodeproj` in Xcode and press ⌘U, or use the Test navigator.
-The UI test scheme (`DuPaneEndToEndUITests`) launches a real instance of the
-app against a temporary fixture directory.
+Run `./Scripts/run-e2e.sh`, or open `DuPane.xcodeproj` and test the `DuPane` scheme.
+The `DuPaneEndToEndUITests` test target launches the app against temporary fixtures.
 
 **Test run policy**
 
-Use `swift test --disable-sandbox` for the standard no-UI suite. Run the
-critical UI subset after functional-area changes, broad change sets, or any
-request for full tests. Critical UI tests are tagged by the `testCritical`
-method-name prefix in `DuPaneEndToEndUITests`; run the whole UI suite when a
-change touches launch, accessibility, file-list input, dialogs, or Xcode project
-test configuration.
+Follow the verification lanes in `Docs/AGENT-WORKFLOW.md` (relative to the repository
+root). Use `./Scripts/verify-change.sh docs` for documentation-only edits and the
+appropriate code-change lane for implementation work.
 
 **First-run permissions**
 
@@ -124,12 +118,11 @@ DuPane/
       PaneView.swift           — single pane: toolbar, file list, context menu
       GlobalToolbar.swift      — Move Selected / Copy Selected / New Folder / Delete
       FileRowView.swift        — one row in the file list
-      TitleBar.swift
       DividerBadge.swift
       TextPromptSheet.swift    — shared sheet for New Folder and Rename prompts
       RowMouseEventView.swift  — NSView overlay that captures mouse-down events
   Tests/DuPaneUITests/       — primitive unit, click, function, and latency tests
   UITests/
     DuPaneEndToEndUITests/   — XCUIApplication end-to-end tests (Xcode only)
-  TODO.md                    — work log: completed items and remaining tasks
+  Docs/TODO.md               — work log: completed items and remaining tasks
 ```

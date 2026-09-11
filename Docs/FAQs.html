@@ -96,7 +96,7 @@
   <div class="nav-section">
     <div class="nav-heading">Advanced</div>
     <a href="#compare" class="nav-item">Compare &amp; Sync</a>
-    <a href="#actions" class="nav-item">Custom Actions</a>
+    <a href="#scripts" class="nav-item">Shell Scripts</a>
     <a href="#dupes" class="nav-item">Duplicate Finder</a>
     <a href="#tags" class="nav-item">Colour Tags</a>
     <a href="#settings" class="nav-item">Settings</a>
@@ -277,7 +277,7 @@
 
       <div class="faq-item">
         <div class="faq-q">Can I run multi-line scripts?</div>
-        <div class="faq-a"><p>The Command Runner is designed for single-line shell commands. For complex scripts, use Custom Actions (bolt-circle ⚡ toolbar button) where you can store named scripts that run on selected files.</p></div>
+        <div class="faq-a"><p>The Command Runner is designed for single-line shell commands. For multi-line scripts, save a <code>.sh</code> file and open it from DuPane to run it in Terminal after confirmation.</p></div>
       </div>
     </section>
 
@@ -306,23 +306,10 @@
 
     <hr class="divider">
 
-    <!-- Custom Actions -->
-    <section class="faq-section" id="actions">
+    <!-- Shell Scripts -->
+    <section class="faq-section" id="scripts">
       <div class="section-label">Advanced</div>
-      <h2>Custom Actions</h2>
-
-      <div class="faq-item">
-        <div class="faq-q">What are Custom Actions?</div>
-        <div class="faq-a">
-          <p>Custom Actions are named shell one-liners that appear at the bottom of the right-click context menu. Select files, right-click, and choose an action to run it on your selection.</p>
-          <p>In your script, <code>$@</code> expands to the full paths of all selected files, and <code>$PWD</code> is the current directory. Example: <code>for f in $@; do cp "$f" ~/Desktop/; done</code> copies all selected files to the Desktop.</p>
-        </div>
-      </div>
-
-      <div class="faq-item">
-        <div class="faq-q">How do I add a Custom Action?</div>
-        <div class="faq-a"><p>Click the <strong>Actions</strong> (⚡) button in the toolbar. In the panel, click the <strong>+</strong> button at the top, type a name and a shell command, then click <strong>Save</strong>. The action immediately appears in the right-click menu on any file.</p></div>
-      </div>
+      <h2>Shell Scripts</h2>
 
       <div class="faq-item">
         <div class="faq-q">How do I run a shell script file (.sh) from the sidebar?</div>
@@ -513,7 +500,7 @@
 
 <footer>
   <div><strong>DuPane</strong> · Dual-Pane File Manager for macOS</div>
-  <div>FAQs · Build 393 · macOS 13+</div>
+  <div>FAQs · Build 420 · macOS 13+</div>
 </footer>
 
 </body>

@@ -1,5 +1,5 @@
 #!/usr/bin/env swift
-// Generates /Opus app icon PNGs at all required macOS sizes.
+// Generates DuPane app icon PNGs at all required macOS sizes.
 // Run from the project root: swift Scripts/make_icon.swift
 import AppKit
 

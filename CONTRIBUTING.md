@@ -20,11 +20,13 @@ Set your signing team in Xcode (project target → Signing & Capabilities → Te
 
 ## Before you submit
 
-1. **Run the tests** — all must pass:
+1. **Run the appropriate verification lane** from `Docs/AGENT-WORKFLOW.md`:
    ```bash
-   swift test --filter DuPaneUITests
+   ./Scripts/verify-change.sh docs  # documentation-only changes
+   ./Scripts/verify-change.sh ui    # UI or cross-process changes
    ```
-2. **Build and run the app** in Xcode (⌘R) and manually test the affected feature.
+   Use the documented `logic`, `service`, `project` or `release` lane for other changes.
+2. **Manually check the affected behavior** when changing the app.
 3. **Write tests** for any non-trivial logic change. Pure UI layout changes don't need tests.
 4. **Update the docs** if the UI or any user-facing behaviour changed:
    - `Docs/UserGuide.html`
@@ -42,7 +44,7 @@ Set your signing team in Xcode (project target → Signing & Capabilities → Te
 ## What we won't merge
 
 - Features that duplicate macOS Finder capabilities without adding clear value.
-- Changes that break the existing 189 unit tests without a documented reason.
+- Changes that break the existing regression tests without a documented reason.
 - PRs without a description explaining *what* changed and *why*.
 
 ## Reporting bugs

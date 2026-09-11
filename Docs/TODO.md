@@ -23,6 +23,13 @@ The previous distribution plans and change-of-direction instructions are withdra
 - Repository workflow: `Docs/AGENT-WORKFLOW.md`.
 
 ## Done
+
+### Documentation cleanup — 2026-09-11 (Build 420 unchanged)
+
+- Corrected stale project names, removed obsolete Custom Actions guidance and model
+  references, and aligned test instructions with the current workflow. Documentation
+  checks passed; application code and the existing verified test results are unchanged.
+
 ### Build 420 — sort tiebreak consistency for the Info column (2026-09-09)
 
 - **Info-column name tiebreak now follows the sort direction** — `PaneView.visibleItems` sorts the async-loaded Info column; its primary comparison already honored `sortAscending`, but the equal-value name tiebreak was hardcoded ascending. Aligned it with the Build 403 decision already applied to Size/Kind/Modified in `PaneState` (and to `PaneState`'s own `.info` fallback), so a descending Info sort breaks ties in descending name order. (`Views/PaneView.swift`)
