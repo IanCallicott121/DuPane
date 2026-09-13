@@ -328,6 +328,17 @@ final class PaneState: ObservableObject {
         }
     }
 
+    @discardableResult
+    func moveSelection(by offset: Int, in displayedItems: [FileItem]) -> FileItem? {
+        guard !displayedItems.isEmpty, offset != 0 else { return nil }
+        let currentIndex = displayedItems.firstIndex { selection.contains($0.url) }
+        let startIndex = currentIndex ?? (offset > 0 ? -1 : displayedItems.count)
+        let targetIndex = min(max(startIndex + offset, 0), displayedItems.count - 1)
+        let item = displayedItems[targetIndex]
+        select(item, from: displayedItems, mode: .replace)
+        return item
+    }
+
     func selectAll() {
         selection = Set(displayedItems.map { $0.url })
     }

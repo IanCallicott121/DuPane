@@ -43,6 +43,16 @@ struct ContentView: View {
     private var inactive: PaneState { activePane == .left ? rightTabs.activePaneState : leftTabs.activePaneState }
     private var activeTabs: TabbedPaneState { activePane == .left ? leftTabs : rightTabs }
 
+    static func shouldSynchronizeFollowedPane(
+        isFollowMode: Bool,
+        activePane: PaneSide,
+        sourcePane: PaneSide,
+        sourceURL: URL?,
+        targetURL: URL?
+    ) -> Bool {
+        isFollowMode && activePane == sourcePane && sourceURL != targetURL
+    }
+
     private var bookmarkTarget: URL? {
         guard active.selectedItems.count == 1 else { return nil }
         return active.selectedItems.first?.url
@@ -205,18 +215,12 @@ struct ContentView: View {
         .onChange(of: leftTabs.activePaneState.currentURL, perform: { url in
             if let url { sidebarModel.recordVisit(url) }
             disableCompareIfNeeded()
-            if isFollowMode, activePane == .left, let url,
-               rightTabs.activePaneState.currentURL != url {
-                rightTabs.activePaneState.navigate(to: url)
-            }
+            synchronizeFollowedPane(from: .left, url: url)
         })
         .onChange(of: rightTabs.activePaneState.currentURL, perform: { url in
             if let url { sidebarModel.recordVisit(url) }
             disableCompareIfNeeded()
-            if isFollowMode, activePane == .right, let url,
-               leftTabs.activePaneState.currentURL != url {
-                leftTabs.activePaneState.navigate(to: url)
-            }
+            synchronizeFollowedPane(from: .right, url: url)
         })
         .background { keyboardButtons }
         .overlay(alignment: .bottom) {
@@ -402,9 +406,8 @@ struct ContentView: View {
             onToggleTerminal: { self.active.showCommandRunner.toggle() },
             onToggleFollow: {
                 self.isFollowMode.toggle()
-                if self.isFollowMode, let url = self.active.currentURL,
-                   self.inactive.currentURL != url {
-                    self.inactive.navigate(to: url)
+                if self.isFollowMode, self.inactive.currentURL != self.active.currentURL {
+                    self.inactive.navigate(to: self.active.currentURL)
                 }
             },
             onToggleCompare: toggleCompareMode,
@@ -658,6 +661,18 @@ struct ContentView: View {
         } else {
             NSWorkspace.shared.open(item.url)
         }
+    }
+
+    private func synchronizeFollowedPane(from sourcePane: PaneSide, url: URL?) {
+        let target = sourcePane == .left ? rightTabs.activePaneState : leftTabs.activePaneState
+        guard Self.shouldSynchronizeFollowedPane(
+            isFollowMode: isFollowMode,
+            activePane: activePane,
+            sourcePane: sourcePane,
+            sourceURL: url,
+            targetURL: target.currentURL
+        ) else { return }
+        target.navigate(to: url)
     }
 
     // MARK: - New Folder

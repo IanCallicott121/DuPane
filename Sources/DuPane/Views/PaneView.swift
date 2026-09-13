@@ -37,6 +37,7 @@ struct PaneView: View {
     @State private var pendingDropIsMove: Bool = false
     @State private var pendingDropSourceURL: URL? = nil
     @State private var showDropConflictAlert = false
+    @FocusState private var paneFocused: Bool
 
     private var panelBgColor: Color {
         if let themed = settings.appColorScheme.panelBackground { return themed }
@@ -68,7 +69,12 @@ struct PaneView: View {
         .contentShape(Rectangle())
         .accessibilityIdentifier("\(side.accessibilityIDPrefix)-pane")
         .accessibilityValue(isActive ? "active" : "inactive")
-        .onTapGesture { onActivate() }
+        .focusable(true)
+        .focused($paneFocused)
+        .onTapGesture {
+            paneFocused = true
+            onActivate()
+        }
         .sheet(item: $renamingItem) { item in
             TextPromptSheet(
                 title: "Rename",
@@ -166,10 +172,20 @@ struct PaneView: View {
         })
         .onAppear {
             typeAhead.isActive = isActive
-            typeAhead.install { char in handleTypeAhead(char: char) }
+            typeAhead.install(
+                onCharacter: { char in handleTypeAhead(char: char) },
+                onMove: { offset in moveSelection(by: offset) }
+            )
         }
         .onDisappear { typeAhead.remove() }
         .onChange(of: isActive) { typeAhead.isActive = $0 }
+        .onReceive(NotificationCenter.default.publisher(for: .paneNavigationRequested)) { notification in
+            guard isActive,
+                  let offset = notification.userInfo?["offset"] as? Int
+            else { return }
+            paneFocused = true
+            moveSelection(by: offset)
+        }
         // ⌥` toggles the command runner from anywhere in the pane
         .background {
             Button("Toggle Command Runner") { pane.showCommandRunner.toggle() }
@@ -972,6 +988,7 @@ struct PaneView: View {
     // MARK: - Actions
 
     private func select(_ item: FileItem, modifierFlags: NSEvent.ModifierFlags) {
+        paneFocused = true
         onActivate()
         pane.select(item, from: pane.displayedItems, mode: selectionMode(from: modifierFlags))
     }
@@ -1024,6 +1041,12 @@ struct PaneView: View {
         typeBufferTimer = Timer.scheduledTimer(withTimeInterval: 0.6, repeats: false) { _ in
             Task { @MainActor in typeBuffer = "" }
         }
+    }
+
+    private func moveSelection(by offset: Int) {
+        onActivate()
+        guard let item = pane.moveSelection(by: offset, in: visibleItems) else { return }
+        typeAheadScrollURL = item.url
     }
 
     private func commitGoToPath() {
@@ -1457,9 +1480,11 @@ private final class TypeAheadController: ObservableObject {
     var isActive: Bool = false
     private var monitor: Any?
     private var onCharacter: ((String) -> Void)?
+    private var onMove: ((Int) -> Void)?
 
-    func install(onCharacter: @escaping (String) -> Void) {
+    func install(onCharacter: @escaping (String) -> Void, onMove: @escaping (Int) -> Void) {
         self.onCharacter = onCharacter
+        self.onMove = onMove
         guard monitor == nil else { return }
         monitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
             self?.handle(event: event) ?? event
@@ -1470,6 +1495,7 @@ private final class TypeAheadController: ObservableObject {
         if let m = monitor { NSEvent.removeMonitor(m) }
         monitor = nil
         onCharacter = nil
+        onMove = nil
     }
 
     private func handle(event: NSEvent) -> NSEvent? {
@@ -1477,6 +1503,16 @@ private final class TypeAheadController: ObservableObject {
         let responder = NSApp.keyWindow?.firstResponder
         if responder is NSTextView || responder is NSTextField { return event }
         let modifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+        let navigationModifiers = modifiers.intersection([.command, .control, .option, .shift])
+        if navigationModifiers.isEmpty {
+            switch event.keyCode {
+            case 126: onMove?(-1); return nil
+            case 125: onMove?(1); return nil
+            case 116: onMove?(-10); return nil
+            case 121: onMove?(10); return nil
+            default: break
+            }
+        }
         guard modifiers.isSubset(of: [.shift, .capsLock]) else { return event }
         guard event.specialKey == nil else { return event }
         guard let chars = event.charactersIgnoringModifiers,

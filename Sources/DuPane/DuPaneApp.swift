@@ -131,11 +131,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         keyEventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-            if event.keyCode == 49 {
-                if let responder = NSApp.keyWindow?.firstResponder,
-                   responder is NSTextView || responder is NSTextField {
-                    return event
+            let responder = NSApp.keyWindow?.firstResponder
+            if responder is NSTextView || responder is NSTextField {
+                return event
+            }
+
+            let modifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+            let navigationModifiers = modifiers.intersection([.command, .control, .option, .shift])
+            if navigationModifiers.isEmpty {
+                let navigationOffset: Int?
+                switch event.keyCode {
+                case 126: navigationOffset = -1
+                case 125: navigationOffset = 1
+                case 116: navigationOffset = -10
+                case 121: navigationOffset = 10
+                default: navigationOffset = nil
                 }
+                if let navigationOffset {
+                    NotificationCenter.default.post(
+                        name: .paneNavigationRequested,
+                        object: nil,
+                        userInfo: ["offset": navigationOffset]
+                    )
+                    return nil
+                }
+            }
+
+            if event.keyCode == 49 {
                 NotificationCenter.default.post(name: .quickLookRequested, object: nil)
                 return nil
             }
@@ -150,7 +172,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
             guard let shortcut,
                   event.modifierFlags.intersection([.command, .control, .option, .shift]).isEmpty,
-                  let responder = NSApp.keyWindow?.firstResponder,
                   !(responder is NSTextView || responder is NSTextField)
             else { return event }
             NotificationCenter.default.post(

@@ -10,24 +10,12 @@ The uncommitted Build 421 changes were backed out before verification.
 
 ## Action Items
 
-
 ## Pending items
 - Discuss whether DuPane can be submitted to the Mac App Store.** Feasibility and
   any necessary changes are still to be discussed. No distribution approach has been
   chosen, and no code changes are authorized by this item.
 
-A . BUG : in one scenario the fillow 'Follow' button is not working
-steps
-1. with source pane selected and is a folder not Computer
-2. target pane is Computer
-3. click on Follow button
-4. expected -  target pane navigates to same path source pane
-actual - right hand pane remains on 'Computer'
-Also a similar bug if the target is a regular folder and the source is computer, then when clicking the follow the target pane is not moved to 'Computer'
-Notes : the feature works when the both source and target not the 'Computer'
-END of A BUG
 
-b. Change : implement the arrow keys to allow the user move up/down and the standard mac key for page up and down - remind me what they key would be
 
 ## Verification reference
 
@@ -36,6 +24,12 @@ b. Change : implement the arrow keys to allow the user move up/down and the stan
 - Repository workflow: `Docs/AGENT-WORKFLOW.md`.
 
 ## Done
+
+### Follow mode and keyboard navigation — 2026-09-13
+
+- Fixed Follow synchronization between Computer and regular folders in both directions.
+- Added Up/Down selection movement and repeated Page Up/Page Down navigation without requiring a selected item; verified manually on internal and external keyboards.
+- Added regression coverage for Follow mode and keyboard selection movement.
 
 ### Function-key and pane-focus shortcuts — 2026-09-12
 
