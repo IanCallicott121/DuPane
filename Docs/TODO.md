@@ -8,13 +8,26 @@ re-verified on 2026-09-11 with `./Scripts/verify-change.sh release`; app build a
 
 The uncommitted Build 421 changes were backed out before verification.
 
-## Next items
+## Action Items
 
-- **Discuss whether DuPane can be submitted to the Mac App Store.** Feasibility and
+
+## Pending items
+- Discuss whether DuPane can be submitted to the Mac App Store.** Feasibility and
   any necessary changes are still to be discussed. No distribution approach has been
   chosen, and no code changes are authorized by this item.
 
-The previous distribution plans and change-of-direction instructions are withdrawn.
+A . BUG : in one scenario the fillow 'Follow' button is not working
+steps
+1. with source pane selected and is a folder not Computer
+2. target pane is Computer
+3. click on Follow button
+4. expected -  target pane navigates to same path source pane
+actual - right hand pane remains on 'Computer'
+Also a similar bug if the target is a regular folder and the source is computer, then when clicking the follow the target pane is not moved to 'Computer'
+Notes : the feature works when the both source and target not the 'Computer'
+END of A BUG
+
+b. Change : implement the arrow keys to allow the user move up/down and the standard mac key for page up and down - remind me what they key would be
 
 ## Verification reference
 
@@ -23,6 +36,11 @@ The previous distribution plans and change-of-direction instructions are withdra
 - Repository workflow: `Docs/AGENT-WORKFLOW.md`.
 
 ## Done
+
+### Function-key and pane-focus shortcuts — 2026-09-12
+
+- Added Fn+F5 copy, Fn+F6 move, Fn+F7 new folder, Fn+F8 delete, and Tab active-pane switching.
+- Reused the existing action handlers and documented the shortcuts in the User Guide.
 
 ### Documentation cleanup — 2026-09-11 (Build 420 unchanged)
 

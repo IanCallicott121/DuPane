@@ -28,9 +28,15 @@ project changes; content-only edits reload normally.
 - Number questions so the user can refer to them directly.
 - Use lettered choices only for true alternatives; use bullets for non-alternative lists.
 
+Use standard Codex file-editing and version-control practices; do not require a
+repository-wide checkout lock or block changes because unrelated files are modified.
+
 ## Scope and inner loop
 
 - Re-verify TODO items against current code.
+- Treat `Docs/TODO.md`'s `Action Items` as active, authorized work candidates.
+- Treat `Pending items` as deferred discussion or decisions; do not implement them
+  unless the user explicitly authorizes the work.
 - For bugs, prove reachability and define a regression test.
 - For requested changes or enhancements, define acceptance criteria.
 - Use targeted inspection for documentation and operational work.

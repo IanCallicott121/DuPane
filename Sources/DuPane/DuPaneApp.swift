@@ -96,6 +96,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         static let minimumVisibleSize = NSSize(width: 160, height: 120)
     }
 
+    private enum OperationShortcut: String {
+        case copy
+        case move
+        case newFolder
+        case delete
+    }
+
     private var keyEventMonitor: Any?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -124,9 +131,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         keyEventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-            guard event.keyCode == 49 else { return event } // 49 = space
-            if let fr = NSApp.keyWindow?.firstResponder, fr is NSTextView { return event }
-            NotificationCenter.default.post(name: .quickLookRequested, object: nil)
+            if event.keyCode == 49 {
+                if let responder = NSApp.keyWindow?.firstResponder,
+                   responder is NSTextView || responder is NSTextField {
+                    return event
+                }
+                NotificationCenter.default.post(name: .quickLookRequested, object: nil)
+                return nil
+            }
+
+            let shortcut: OperationShortcut?
+            switch event.keyCode {
+            case 96: shortcut = .copy  // F5
+            case 97: shortcut = .move  // F6
+            case 98: shortcut = .newFolder  // F7
+            case 100: shortcut = .delete  // F8
+            default: shortcut = nil
+            }
+            guard let shortcut,
+                  event.modifierFlags.intersection([.command, .control, .option, .shift]).isEmpty,
+                  let responder = NSApp.keyWindow?.firstResponder,
+                  !(responder is NSTextView || responder is NSTextField)
+            else { return event }
+            NotificationCenter.default.post(
+                name: .operationShortcutRequested,
+                object: nil,
+                userInfo: ["operation": shortcut.rawValue]
+            )
             return nil
         }
     }

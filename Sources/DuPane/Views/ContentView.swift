@@ -173,6 +173,16 @@ struct ContentView: View {
             guard !urls.isEmpty else { return }
             QuickLookCoordinator.shared.toggle(urls: urls)
         }
+        .onReceive(NotificationCenter.default.publisher(for: .operationShortcutRequested)) { notification in
+            guard let operation = notification.userInfo?["operation"] as? String else { return }
+            switch operation {
+            case "copy": moveOrCopy(isMove: false)
+            case "move": moveOrCopy(isMove: true)
+            case "newFolder": requestNewFolder()
+            case "delete": requestDelete()
+            default: break
+            }
+        }
         .onReceive(NotificationCenter.default.publisher(for: .paneContentsChanged)) { notif in
             guard let changedURL = notif.userInfo?["url"] as? URL else { return }
             reloadPeerIfSameFolder(changedURL: changedURL)
@@ -324,6 +334,10 @@ struct ContentView: View {
                 .keyboardShortcut("a", modifiers: .command)
             Button("Go to Path") { active.requestGoToPath = true }
                 .keyboardShortcut("l", modifiers: .command)
+            Button("Switch Active Pane") {
+                activePane = activePane == .left ? .right : .left
+            }
+            .keyboardShortcut(.tab, modifiers: [])
         }
         Group {
             Button("Go to Path") { active.requestGoToPath = true }
