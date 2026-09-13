@@ -29,7 +29,8 @@ if [ "$lane" = "docs" ]; then printf 'TIMING total                    %ss\n' "$(
 [ -z "$filter" ] || run_stage "focused-unit" swift test --filter "$filter"
 run_stage "full-unit" swift test --filter DuPaneUITests
 if [ "$lane" = "project" ]; then run_stage "xcodegen" xcodegen generate; fi
-build_args=(-project DuPane.xcodeproj -scheme DuPane -configuration Debug -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO)
+derived_data_path="${HOME}/Library/Developer/DuPane-build"
+build_args=(-project DuPane.xcodeproj -scheme DuPane -configuration Debug -destination 'platform=macOS' -derivedDataPath "$derived_data_path" CODE_SIGNING_ALLOWED=NO)
 if [ "$clean" -eq 1 ]; then
   run_stage "clean-app-build" xcodebuild "${build_args[@]}" clean build
 else

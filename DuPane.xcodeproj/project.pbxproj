@@ -9,13 +9,17 @@
 /* Begin PBXBuildFile section */
 		03682D6AC4FA28FFB72FDD9E /* TestResultLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C847D9BF9689F499023880A /* TestResultLog.swift */; };
 		094541A0B1B9AC9B18C41D53 /* FileRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 360E6EB5F8EAEE4205C6E7C2 /* FileRowView.swift */; };
+		0EEBFCA5FEB5AE09CF016747 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = A6BE16E98B74A031766D0F69 /* ZIPFoundation */; };
 		1A7C6C85FD621712DE58772E /* FileOperationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CABF7D3C5CD1BA9F8C4992C /* FileOperationService.swift */; };
 		1F8F5D5F0CFE9119AA97748F /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45BCD3F60603830DD11FE1B /* SettingsView.swift */; };
 		213B843C9041B776E3F31CE9 /* AppNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D23189709AA33FA3A8D8BFE /* AppNotifications.swift */; };
 		2C0601D6507B6004103D36D5 /* FileOperationProgressModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0E4E73FFA19A285A2BE1DB /* FileOperationProgressModel.swift */; };
 		30D79A6D06F14E5D199A3443 /* RowMouseEventView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61EE8B5F694954DD4C5A4696 /* RowMouseEventView.swift */; };
+		316F4D927753034E787EE85A /* ArchiveCompressionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D3B82225BF2D5031B2B4B09 /* ArchiveCompressionService.swift */; };
 		34280C2DB977BC615581F0B0 /* TabbedPaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39E987ED4C8E3B99EF9428BC /* TabbedPaneView.swift */; };
 		34DC8D25232881D9D58E18D8 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D06BE3328E728A2679B9CFF /* ContentView.swift */; };
+		573714D82C9690D307BA926A /* ArchiveExtractionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BCC8D1A7C7C208D1324CA07 /* ArchiveExtractionService.swift */; };
+		5765E8149DC430998B14C905 /* ArchiveExtendedAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4A4FEAA660B3B795971DC18 /* ArchiveExtendedAttributes.swift */; };
 		5A6ACFFD0D249142FAC20D73 /* DragSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB61086CBBC46886E669CD83 /* DragSession.swift */; };
 		5BC659FEF0C3C3C3BAFB53F1 /* FolderCompareService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC91B0171B9C5B4E5E2F4A8E /* FolderCompareService.swift */; };
 		5CB104C680E47D19D10B63B1 /* FolderSizeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17381CC6988A2C190C84FEE0 /* FolderSizeView.swift */; };
@@ -77,12 +81,13 @@
 		4D23189709AA33FA3A8D8BFE /* AppNotifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNotifications.swift; sourceTree = "<group>"; };
 		579C8620AB7283EDC8CA3867 /* SidebarModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarModel.swift; sourceTree = "<group>"; };
 		5BD4687C8D9A67385CE7D668 /* ColumnResizeHandle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColumnResizeHandle.swift; sourceTree = "<group>"; };
+		5D3B82225BF2D5031B2B4B09 /* ArchiveCompressionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveCompressionService.swift; sourceTree = "<group>"; };
 		61EE8B5F694954DD4C5A4696 /* RowMouseEventView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RowMouseEventView.swift; sourceTree = "<group>"; };
-		61F3AF3CB9C5AD80A0F32A22 /* AGENT-WORKFLOW.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "AGENT-WORKFLOW.md"; sourceTree = "<group>"; };
 		671AAE746A4A42DD2C278770 /* project.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = project.yml; sourceTree = "<group>"; };
 		6C847D9BF9689F499023880A /* TestResultLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestResultLog.swift; sourceTree = "<group>"; };
 		6D64A3C378B4FF4EF43433C4 /* DuPaneApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuPaneApp.swift; sourceTree = "<group>"; };
 		758602FCCE4910A15CA120AB /* UserGuide.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = UserGuide.html; sourceTree = "<group>"; };
+		7BCC8D1A7C7C208D1324CA07 /* ArchiveExtractionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExtractionService.swift; sourceTree = "<group>"; };
 		89C00AB8AD080B4BD0FF4EA8 /* CommandRunnerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandRunnerView.swift; sourceTree = "<group>"; };
 		8B87EF64BFE9EEE1477D5A72 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		8C35EC2889C3F38EB2F90071 /* DuPaneEndToEndUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DuPaneEndToEndUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -93,6 +98,7 @@
 		AAF5479CA2471200940138C9 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		B28EEE1BD89BF68C22BFBE35 /* FAQs.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = FAQs.html; sourceTree = "<group>"; };
 		BBD4C822071AB0B8AC372B9B /* DuPane.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DuPane.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C4A4FEAA660B3B795971DC18 /* ArchiveExtendedAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveExtendedAttributes.swift; sourceTree = "<group>"; };
 		C61418D97A5F9621A9AE1341 /* GlobalToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalToolbar.swift; sourceTree = "<group>"; };
 		CC91B0171B9C5B4E5E2F4A8E /* FolderCompareService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderCompareService.swift; sourceTree = "<group>"; };
 		D5AA27DF55CCADB499D6FE85 /* DividerBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DividerBadge.swift; sourceTree = "<group>"; };
@@ -109,6 +115,17 @@
 		FDB59E6732FAF14C48E23627 /* PropertiesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PropertiesView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFrameworksBuildPhase section */
+		4717047C06839DB86D561AE2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0EEBFCA5FEB5AE09CF016747 /* ZIPFoundation in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
 /* Begin PBXGroup section */
 		3BA1763AD34B3F613883B484 /* Models */ = {
 			isa = PBXGroup;
@@ -116,7 +133,10 @@
 				23CB56998520ADE5AACB1D31 /* AppLaunchConfiguration.swift */,
 				4D23189709AA33FA3A8D8BFE /* AppNotifications.swift */,
 				F9B6670DC7F86CE59A77BDCB /* AppSettings.swift */,
+				5D3B82225BF2D5031B2B4B09 /* ArchiveCompressionService.swift */,
+				C4A4FEAA660B3B795971DC18 /* ArchiveExtendedAttributes.swift */,
 				359D76E90A07D857C14708EF /* ArchiveExtractionSafety.swift */,
+				7BCC8D1A7C7C208D1324CA07 /* ArchiveExtractionService.swift */,
 				EB61086CBBC46886E669CD83 /* DragSession.swift */,
 				111CD0B2A6FF020EEE44C249 /* FileItem.swift */,
 				0CABF7D3C5CD1BA9F8C4992C /* FileOperationService.swift */,
@@ -144,7 +164,6 @@
 		58025404CDB712543E4C1852 /* Docs */ = {
 			isa = PBXGroup;
 			children = (
-				61F3AF3CB9C5AD80A0F32A22 /* AGENT-WORKFLOW.md */,
 				B28EEE1BD89BF68C22BFBE35 /* FAQs.html */,
 				8B87EF64BFE9EEE1477D5A72 /* README.md */,
 				242142C46649ECFB3699CB31 /* TODO.md */,
@@ -231,6 +250,7 @@
 			buildPhases = (
 				098DDD96B7E75ADD77B17A11 /* Sources */,
 				3E63D2CB2B3E1DA65EA11AB2 /* Resources */,
+				4717047C06839DB86D561AE2 /* Frameworks */,
 				DB15CA2A94A0F3F57189E82A /* Stamp Build Number */,
 			);
 			buildRules = (
@@ -239,6 +259,7 @@
 			);
 			name = DuPane;
 			packageProductDependencies = (
+				A6BE16E98B74A031766D0F69 /* ZIPFoundation */,
 			);
 			productName = DuPane;
 			productReference = BBD4C822071AB0B8AC372B9B /* DuPane.app */;
@@ -288,6 +309,9 @@
 			);
 			mainGroup = 8AB39055498441FB550A58C2;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				A01C9F509E675AE2B64CE733 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A686BB9C9AD469A904F25961 /* Products */;
 			projectDirPath = "";
@@ -339,7 +363,10 @@
 				A507F6C200F53A5E914E37BD /* AppLaunchConfiguration.swift in Sources */,
 				213B843C9041B776E3F31CE9 /* AppNotifications.swift in Sources */,
 				620A1F3DFC688184020B03CB /* AppSettings.swift in Sources */,
+				316F4D927753034E787EE85A /* ArchiveCompressionService.swift in Sources */,
+				5765E8149DC430998B14C905 /* ArchiveExtendedAttributes.swift in Sources */,
 				6793005AD5224B8FB82BED1B /* ArchiveExtractionSafety.swift in Sources */,
+				573714D82C9690D307BA926A /* ArchiveExtractionService.swift in Sources */,
 				B694F1F8731D44F98C3CFF61 /* ColumnResizeHandle.swift in Sources */,
 				DD9BAB730BA5574BA2F3F2D3 /* CommandRunnerView.swift in Sources */,
 				34DC8D25232881D9D58E18D8 /* ContentView.swift in Sources */,
@@ -542,7 +569,6 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				SYMROOT = "$(HOME)/Library/Developer/DuPane-build";
 			};
 			name = Debug;
 		};
@@ -599,7 +625,6 @@
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
-				SYMROOT = "$(HOME)/Library/Developer/DuPane-build";
 			};
 			name = Release;
 		};
@@ -634,6 +659,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A01C9F509E675AE2B64CE733 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/weichsel/ZIPFoundation.git";
+			requirement = {
+				kind = exactVersion;
+				version = 0.9.20;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A6BE16E98B74A031766D0F69 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A01C9F509E675AE2B64CE733 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = CE2AC3FBAB3744C87CFC76CA /* Project object */;
 }

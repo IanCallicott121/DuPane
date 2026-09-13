@@ -2,13 +2,29 @@
 
 ## Current state
 
-**Last verified working local build: Build 420.** No confirmed outstanding bugs at
-that point. Unit suite: **336 passed, 0 failed**. E2E suite: **14 passed, 0 failed**,
-re-verified on 2026-09-11 with `./Scripts/verify-change.sh release`; app build also passed.
-
-The uncommitted Build 421 changes were backed out before verification.
+**Last verified working local build: Build 420.** The archive compression and extraction
+rewrite has been implemented and manually verified.
 
 ## Action Items
+
+### Other data-integrity findings
+
+- additional feature - add 'Date Added' as a new attribute which the user can can to the pane
+
+4. **High — Folder overwrite merge is not transactional.** A colliding destination entry
+   is deleted before its replacement succeeds, so an interrupted or failed copy/move can
+   permanently lose the original destination entry.
+5. **High — Copy and move have an unconfirmed-overwrite race.** A destination created after
+   conflict detection but before the operation begins can be overwritten without the user
+   approving that conflict.
+6. **High — Folder Sync can execute a stale confirmation plan.** A destination changed by
+   another process while the confirmation is open can be overwritten without revalidation.
+7. **Medium — Duplicate Finder can act on stale scan results.** A file modified after the
+   duplicate scan can still be moved to Trash by an individual action or **Keep First**.
+8. **Medium — Folder Compare can report different files as identical.** Matching file size
+   and modification time are treated as sufficient evidence without comparing contents.
+9. **Medium — Folder Sync suppresses rollback failures.** Failed restoration of an original
+   destination is ignored and may leave the only recoverable copy in a hidden temporary file.
 
 ## Pending items
 - Discuss whether DuPane can be submitted to the Mac App Store.** Feasibility and
@@ -24,6 +40,12 @@ The uncommitted Build 421 changes were backed out before verification.
 - Repository workflow: `Docs/AGENT-WORKFLOW.md`.
 
 ## Done
+
+### Archive compression and extraction rewrite — 2026-09-13 (Build 420 unchanged)
+
+- Replaced `/usr/bin/zip` and `/usr/bin/unzip` subprocesses with in-process ZIPFoundation handling.
+- Preserved symbolic links and extended attributes, prevented partial destination archives, and added transactional extraction with rollback.
+- Added regression coverage for option-like filenames, archive fidelity, and failed extraction cleanup.
 
 ### Follow mode and keyboard navigation — 2026-09-13
 

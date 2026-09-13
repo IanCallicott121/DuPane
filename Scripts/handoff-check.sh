@@ -64,7 +64,7 @@ fi
 echo
 echo "Build location"
 if [ -d build ] && find build -type f -print -quit 2>/dev/null | grep -q .; then
-  issue "build products exist inside checkout; use external SYMROOT"
+  issue "build products exist inside checkout; use external DerivedData"
 else
   ok "no build products inside checkout"
 fi

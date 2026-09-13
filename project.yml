@@ -11,11 +11,10 @@ fileGroups:
   - Package.swift
   - project.yml
 
-settings:
-  base:
-    # Project-level so EVERY target (incl. UI test bundles) builds outside
-    # iCloud Drive - iCloud xattrs make codesign fail on the .xctest bundle.
-    SYMROOT: $(HOME)/Library/Developer/DuPane-build
+packages:
+  ZIPFoundation:
+    url: https://github.com/weichsel/ZIPFoundation.git
+    exactVersion: 0.9.20
 
 targets:
   DuPane:
@@ -23,6 +22,8 @@ targets:
     platform: macOS
     sources:
       - path: Sources/DuPane
+    dependencies:
+      - package: ZIPFoundation
     postBuildScripts:
       - name: "Stamp Build Number"
         showEnvVarsInLog: false

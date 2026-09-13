@@ -1131,19 +1131,15 @@ struct PaneView: View {
             destPath = dir.appendingPathComponent(archiveName + " \(n).zip").path
             n += 1
         }
-        let names = urls.map { $0.lastPathComponent }
         let finalDestPath = destPath
         Task.detached {
             let errorMessage: String?
             do {
-                let result = try await ProcessRunner.run(
-                    executableURL: URL(fileURLWithPath: "/usr/bin/zip"),
-                    arguments: ["-r", finalDestPath] + names,
-                    currentDirectoryURL: dir
+                try ArchiveCompressionService.compress(
+                    items: urls,
+                    to: URL(fileURLWithPath: finalDestPath)
                 )
-                errorMessage = result.terminationStatus == 0
-                    ? nil
-                    : Self.processErrorMessage(action: "compress", result: result)
+                errorMessage = nil
             } catch {
                 errorMessage = "Couldn't compress: \(error.localizedDescription)"
             }
@@ -1162,51 +1158,18 @@ struct PaneView: View {
     private func uncompressItem(_ url: URL) {
         let dir = url.deletingLastPathComponent()
         Task.detached {
-            let listResult: ProcessExecutionResult
+            let entries: [String]
             do {
-                listResult = try await ProcessRunner.run(
-                    executableURL: URL(fileURLWithPath: "/usr/bin/unzip"),
-                    arguments: ["-Z1", url.path]
-                )
+                entries = try ArchiveExtractionService.entryNames(at: url)
             } catch {
                 await MainActor.run {
                     pane.errorMessage = "Couldn't inspect archive: \(error.localizedDescription)"
                 }
                 return
             }
-            guard listResult.terminationStatus == 0 else {
-                await MainActor.run {
-                    pane.errorMessage = Self.processErrorMessage(action: "inspect archive", result: listResult)
-                }
-                return
-            }
-
-            let infoResult: ProcessExecutionResult
-            do {
-                infoResult = try await ProcessRunner.run(
-                    executableURL: URL(fileURLWithPath: "/usr/bin/unzip"),
-                    arguments: ["-Z", "-l", url.path]
-                )
-            } catch {
-                await MainActor.run {
-                    pane.errorMessage = "Couldn't inspect archive metadata: \(error.localizedDescription)"
-                }
-                return
-            }
-            guard infoResult.terminationStatus == 0 else {
-                await MainActor.run {
-                    pane.errorMessage = Self.processErrorMessage(action: "inspect archive metadata", result: infoResult)
-                }
-                return
-            }
-
-            let entries = ArchiveExtractionSafety.listedEntryNames(from: listResult.stdout)
             let fileEntries: [String]
             do {
                 fileEntries = try ArchiveExtractionSafety.validatedFileEntries(from: entries)
-                if let symlink = ArchiveExtractionSafety.symbolicLinkEntries(from: infoResult.stdout).first {
-                    throw ArchiveExtractionSafetyError.unsupportedSymbolicLink(symlink)
-                }
             } catch {
                 await MainActor.run {
                     pane.errorMessage = "Couldn't uncompress: \(error.localizedDescription)"
@@ -1232,13 +1195,12 @@ struct PaneView: View {
         Task.detached {
             let errorMessage: String?
             do {
-                let result = try await ProcessRunner.run(
-                    executableURL: URL(fileURLWithPath: "/usr/bin/unzip"),
-                    arguments: [overwrite ? "-o" : "-n", url.path, "-d", dir.path]
+                try ArchiveExtractionService.extract(
+                    archiveURL: url,
+                    to: dir,
+                    overwrite: overwrite
                 )
-                errorMessage = result.terminationStatus == 0
-                    ? nil
-                    : Self.processErrorMessage(action: "uncompress", result: result)
+                errorMessage = nil
             } catch {
                 errorMessage = "Couldn't uncompress: \(error.localizedDescription)"
             }

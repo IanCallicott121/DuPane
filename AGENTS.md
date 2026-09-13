@@ -88,13 +88,15 @@ via `Package.swift`. `project.yml` is the source of truth for the generated Xcod
 - Report the actual test result when tests are run; do not preserve fixed expected test counts in guidance.
 - Fix known build errors before reporting completion.
 - Bump the build number only for implementation or release work that needs a new visible number.
+- During iterative local builds, increment the temporary visible internal test marker so manual testers can identify the latest build. Remove the marker before committing the completed change.
+- A source change is not present in the running app until it is rebuilt. Before manual testing, rebuild the app, quit any running instance, relaunch `~/Applications/DuPane.app`, and confirm the expected internal test marker.
 
 ## Application builds
 
 - SPM builds compile the library and tests but do not produce the runnable `DuPane.app`.
 - Build the app with `xcodebuild -project DuPane.xcodeproj -scheme DuPane -configuration Debug build`.
 - Run `xcodegen generate` first when `project.yml` changes.
-- Application build output uses the external `SYMROOT` configured in `project.yml`.
+- Verification builds use external DerivedData at `~/Library/Developer/DuPane-build`.
 - The convenience symlink is `~/Applications/DuPane.app` to the latest Debug build.
 
 ## Post-build checklist

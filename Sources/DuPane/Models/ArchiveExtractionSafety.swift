@@ -60,6 +60,10 @@ enum ArchiveExtractionSafety {
         }
     }
 
+    static func validateEntryPath(_ entry: String) throws {
+        try validate(entry)
+    }
+
     private static func validate(_ entry: String) throws {
         guard !entry.hasPrefix("/"),
               !entry.contains("\\"),
