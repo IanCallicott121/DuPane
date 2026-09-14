@@ -36,6 +36,7 @@ struct PaneView: View {
     @State private var pendingDropDest: URL? = nil
     @State private var pendingDropIsMove: Bool = false
     @State private var pendingDropSourceURL: URL? = nil
+    @State private var pendingDropDestinationStates: [String: FileState] = [:]
     @State private var showDropConflictAlert = false
     @FocusState private var paneFocused: Bool
 
@@ -1266,19 +1267,22 @@ struct PaneView: View {
             pendingDropDest = destination
             pendingDropIsMove = effectiveIsMove
             pendingDropSourceURL = effectiveSourceURL
+            pendingDropDestinationStates = FileOperationService.destinationStates(files: fileItems, in: destination)
             showDropConflictAlert = true
             return true
         }
 
         performDrop(files: fileItems, destination: destination, isMove: effectiveIsMove,
-                    sourceURL: effectiveSourceURL, resolution: .overwrite)
+                    sourceURL: effectiveSourceURL, resolution: .overwrite,
+                    expectedDestinationStates: FileOperationService.destinationStates(files: fileItems, in: destination))
         return true
     }
 
     private func resolveDropConflict(_ resolution: ConflictResolution) {
         guard let dest = pendingDropDest else { return }
         performDrop(files: pendingDropFiles, destination: dest, isMove: pendingDropIsMove,
-                    sourceURL: pendingDropSourceURL, resolution: resolution)
+                    sourceURL: pendingDropSourceURL, resolution: resolution,
+                    expectedDestinationStates: pendingDropDestinationStates)
         clearDropConflictState()
     }
 
@@ -1286,13 +1290,19 @@ struct PaneView: View {
         pendingDropFiles = []
         pendingDropDest = nil
         pendingDropSourceURL = nil
+        pendingDropDestinationStates = [:]
     }
 
     private func performDrop(files: [FileItem], destination: URL, isMove: Bool,
-                              sourceURL: URL?, resolution: ConflictResolution) {
+                              sourceURL: URL?, resolution: ConflictResolution,
+                              expectedDestinationStates: [String: FileState]? = nil) {
         Task.detached {
             let result = FileOperationService.moveOrCopy(
-                files: files, to: destination, isMove: isMove, conflictResolution: resolution
+                files: files,
+                to: destination,
+                isMove: isMove,
+                conflictResolution: resolution,
+                expectedDestinationStates: expectedDestinationStates
             )
             await MainActor.run {
                 pane.load()

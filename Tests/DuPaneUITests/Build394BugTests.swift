@@ -77,6 +77,28 @@ final class FolderOverwriteMergeTests: DuPaneTestCase {
     }
 
     @MainActor
+    func testFailedCollidingReplacementRestoresDestinationVersion() throws {
+        let (src, dst) = try makeFolders(sourceFiles: ["shared.txt"], destFiles: ["shared.txt"])
+        let blockedSource = src.appendingPathComponent("shared.txt")
+        try FileManager.default.setAttributes([.posixPermissions: 0], ofItemAtPath: blockedSource.path)
+        defer { try? FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: blockedSource.path) }
+        let item = try fixture.fileItem(named: "Photos", in: .left)
+
+        let result = FileOperationService.moveOrCopy(
+            files: [item], to: fixture.rightPaneURL, isMove: false, conflictResolution: .overwrite
+        )
+
+        XCTAssertEqual(result.succeeded, 0)
+        XCTAssertFalse(result.errors.isEmpty)
+        XCTAssertEqual(try contents(dst.appendingPathComponent("shared.txt")), "dst-shared.txt")
+        XCTAssertFalse(
+            try FileManager.default.contentsOfDirectory(atPath: fixture.rightPaneURL.path).contains {
+                $0.hasSuffix(".merge-tmp")
+            }
+        )
+    }
+
+    @MainActor
     func testOverwriteMergeIsRecursive() throws {
         let src = try fixture.createFolder(named: "Photos", in: .left)
         let dst = try fixture.createFolder(named: "Photos", in: .right)

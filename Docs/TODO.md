@@ -9,28 +9,13 @@ rewrite has been implemented and manually verified.
 
 ### Other data-integrity findings
 
-- additional feature - add 'Date Added' as a new attribute which the user can can to the pane
-
-4. **High — Folder overwrite merge is not transactional.** A colliding destination entry
-   is deleted before its replacement succeeds, so an interrupted or failed copy/move can
-   permanently lose the original destination entry.
-5. **High — Copy and move have an unconfirmed-overwrite race.** A destination created after
-   conflict detection but before the operation begins can be overwritten without the user
-   approving that conflict.
-6. **High — Folder Sync can execute a stale confirmation plan.** A destination changed by
-   another process while the confirmation is open can be overwritten without revalidation.
-7. **Medium — Duplicate Finder can act on stale scan results.** A file modified after the
-   duplicate scan can still be moved to Trash by an individual action or **Keep First**.
-8. **Medium — Folder Compare can report different files as identical.** Matching file size
-   and modification time are treated as sufficient evidence without comparing contents.
-9. **Medium — Folder Sync suppresses rollback failures.** Failed restoration of an original
-   destination is ignored and may leave the only recoverable copy in a hidden temporary file.
-
 ## Pending items
 - Discuss whether DuPane can be submitted to the Mac App Store.** Feasibility and
   any necessary changes are still to be discussed. No distribution approach has been
   chosen, and no code changes are authorized by this item.
-
+- additional feature - add 'Date Added' as a new attribute which the user can can to the pane
+- bug : click new file button, press escape repeat 8 times and they the UI becomes locked - it does clear if you click New Folder, then the File File panel appears. Same for New Folder, repeatingly pressing New folder button and escape eventually locks up the UI
+- bug : after adding the paste keybaord shortcut CMD-V, now not able to paste file paths from the clipbaord into the new file panel, same issue when trying to paste into the go to folder pannel
 
 
 ## Verification reference
@@ -40,6 +25,18 @@ rewrite has been implemented and manually verified.
 - Repository workflow: `Docs/AGENT-WORKFLOW.md`.
 
 ## Done
+
+### Data-integrity safeguards — 2026-09-14 (Build 420 unchanged)
+
+- Folder overwrite merges now preserve destination-only entries and roll back safely when
+  a merge fails.
+- Copy, move, and Folder Sync revalidate destinations after confirmation; Folder Sync uses
+  best-effort per-file copying, so successful files remain when a later file fails.
+- Duplicate Finder blocks every action for a group when any member changed, then refreshes
+  the scan results.
+- Folder Compare verifies file contents when metadata alone is inconclusive.
+- Added regression coverage for the safeguards and the six Duplicate Finder stale-group
+  scenarios.
 
 ### Archive compression and extraction rewrite — 2026-09-13 (Build 420 unchanged)
 

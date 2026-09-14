@@ -88,8 +88,9 @@ via `Package.swift`. `project.yml` is the source of truth for the generated Xcod
 - Report the actual test result when tests are run; do not preserve fixed expected test counts in guidance.
 - Fix known build errors before reporting completion.
 - Bump the build number only for implementation or release work that needs a new visible number.
-- During iterative local builds, increment the temporary visible internal test marker so manual testers can identify the latest build. Remove the marker before committing the completed change.
-- A source change is not present in the running app until it is rebuilt. Before manual testing, rebuild the app, quit any running instance, relaunch `~/Applications/DuPane.app`, and confirm the expected internal test marker.
+- During iterative local builds, increment the temporary visible internal test marker and add it to the app menu so manual testers can identify the latest build. In every manual-test handoff, quote the exact marker and instruct the tester to confirm it in the menu.
+- Keep the marker in place while manual testing and review are in progress. Remove it only after the user approves the completed change for commit; do not change `BuildNumber.txt` for this purpose.
+- A source change is not present in the running app until it is rebuilt. Before manual testing, rebuild the app, quit any running instance, relaunch `~/Applications/DuPane.app`, and confirm the quoted internal test marker.
 
 ## Application builds
 

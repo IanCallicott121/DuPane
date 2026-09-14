@@ -127,10 +127,7 @@ struct DuplicateFinderView: View {
                 DuplicateHeaderRow(
                     fileName: name, count: count, isResolved: resolved,
                     onKeepFirst: {
-                        guard gi < viewModel.groups.count else { return }
-                        for url in viewModel.groups[gi].dropFirst() {
-                            viewModel.moveToTrash(url)
-                        }
+                        viewModel.keepFirst(in: gi)
                     }
                 )
                 .listRowBackground(resolved

@@ -16,6 +16,8 @@ final class DuplicateFinderViewModel: ObservableObject {
     // Phase alone cannot distinguish callbacks queued by a superseded scan.
     private(set) var scanGeneration = 0
     private let trash: ([URL]) -> FileOperationResult
+    private var scannedFileSnapshots: [URL: DuplicateFileSnapshot] = [:]
+    private var scanRootURL: URL?
 
     var totalDuplicateCount: Int { groups.reduce(0) { $0 + $1.count - 1 } }
     var totalWastedBytes: Int64 = 0
@@ -28,12 +30,14 @@ final class DuplicateFinderViewModel: ObservableObject {
         scanTask?.cancel()
         scanGeneration += 1
         let generation = scanGeneration
+        scanRootURL = rootURL
         phase = .scanning
         groups = []
         scannedFiles = 0
         hashedFiles = 0
         filesToHash = 0
         totalWastedBytes = 0
+        scannedFileSnapshots = [:]
         errorMessage = nil
 
         let vm = self
@@ -58,7 +62,12 @@ final class DuplicateFinderViewModel: ObservableObject {
             )
             guard !Task.isCancelled else { return }
             await MainActor.run { [weak vm] in
-                vm?.completeScan(groups: result.groups, wastedBytes: result.wastedBytes, generation: generation)
+                vm?.completeScan(
+                    groups: result.groups,
+                    wastedBytes: result.wastedBytes,
+                    snapshots: result.snapshots,
+                    generation: generation
+                )
             }
         }
     }
@@ -84,13 +93,28 @@ final class DuplicateFinderViewModel: ObservableObject {
     }
 
     func completeScan(groups: [[URL]], wastedBytes: Int64, generation: Int) {
+        completeScan(groups: groups, wastedBytes: wastedBytes, snapshots: [:], generation: generation)
+    }
+
+    private func completeScan(
+        groups: [[URL]],
+        wastedBytes: Int64,
+        snapshots: [URL: DuplicateFileSnapshot],
+        generation: Int
+    ) {
         guard isCurrentScan(generation) else { return }
         self.groups = groups
         self.totalWastedBytes = wastedBytes
+        self.scannedFileSnapshots = snapshots
         self.phase = .done
     }
 
     func moveToTrash(_ url: URL) {
+        if let group = groups.first(where: { group in
+            group.contains { FileState.canonicalURL($0) == FileState.canonicalURL(url) }
+        }), rejectIfGroupChanged(group) {
+            return
+        }
         let result = trash([url])
         guard result.hasSucceeded else {
             errorMessage = result.lastError ?? "Couldn't move \(url.lastPathComponent) to Trash."
@@ -102,6 +126,31 @@ final class DuplicateFinderViewModel: ObservableObject {
         }
     }
 
+    func keepFirst(in groupIndex: Int) {
+        guard groupIndex < groups.count else { return }
+        let group = groups[groupIndex]
+        guard group.count > 1, !rejectIfGroupChanged(group) else { return }
+        for url in group.dropFirst() {
+            moveToTrash(url)
+        }
+    }
+
+    private func rejectIfGroupChanged(_ group: [URL]) -> Bool {
+        guard let changedURL = group.first(where: { url in
+            guard let snapshot = scannedFileSnapshots[FileState.canonicalURL(url)] else { return false }
+            return FileState.snapshot(at: url) != snapshot.state || DuplicateFinderViewModel.fnv1a64(url: url) != snapshot.hash
+        }) else {
+            return false
+        }
+
+        let message = "\(changedURL.lastPathComponent) changed since the scan; duplicate results are being refreshed."
+        if let scanRootURL {
+            startScan(at: scanRootURL)
+        }
+        errorMessage = message
+        return true
+    }
+
     func cancel() {
         scanTask?.cancel()
         phase = .idle
@@ -110,6 +159,12 @@ final class DuplicateFinderViewModel: ObservableObject {
     private struct ScanResult {
         var groups: [[URL]]
         var wastedBytes: Int64
+        var snapshots: [URL: DuplicateFileSnapshot]
+    }
+
+    private struct DuplicateFileSnapshot {
+        let state: FileState
+        let hash: String
     }
 
     private static func scan(
@@ -119,16 +174,17 @@ final class DuplicateFinderViewModel: ObservableObject {
         onHashProgress: @escaping (Int) -> Void
     ) async -> ScanResult {
         var sizeMap: [Int64: [URL]] = [:]
+        var snapshots: [URL: DuplicateFileSnapshot] = [:]
         let keys: [URLResourceKey] = [.isRegularFileKey, .fileSizeKey, .isSymbolicLinkKey]
         let fm = FileManager.default
         guard let enumerator = fm.enumerator(at: rootURL, includingPropertiesForKeys: keys, options: [.skipsHiddenFiles]) else {
-            return ScanResult(groups: [], wastedBytes: 0)
+            return ScanResult(groups: [], wastedBytes: 0, snapshots: [:])
         }
 
         var visited = 0   // all items (files + dirs) — drives the progress counter
         var scanned = 0   // regular files only — reported as the final count
         while let item = enumerator.nextObject() as? URL {
-            if Task.isCancelled { return ScanResult(groups: [], wastedBytes: 0) }
+            if Task.isCancelled { return ScanResult(groups: [], wastedBytes: 0, snapshots: [:]) }
             visited += 1
             if visited % 100 == 0 { onScanProgress(visited) }
             guard let values = try? item.resourceValues(forKeys: Set(keys)) else { continue }
@@ -151,10 +207,11 @@ final class DuplicateFinderViewModel: ObservableObject {
         var hashMap: [String: [URL]] = [:]
         var hashed = 0
         for (_, urls) in sizeMap where urls.count > 1 {
-            if Task.isCancelled { return ScanResult(groups: [], wastedBytes: 0) }
+            if Task.isCancelled { return ScanResult(groups: [], wastedBytes: 0, snapshots: [:]) }
             for url in urls {
                 guard let hash = fnv1a64(url: url) else { continue }
                 hashMap[hash, default: []].append(url)
+                snapshots[FileState.canonicalURL(url)] = DuplicateFileSnapshot(state: FileState.snapshot(at: url), hash: hash)
                 hashed += 1
                 if hashed % 5 == 0 { onHashProgress(hashed) }
             }
@@ -173,7 +230,7 @@ final class DuplicateFinderViewModel: ObservableObject {
             return sorted
         }.sorted { $0[0].lastPathComponent < $1[0].lastPathComponent }
 
-        return ScanResult(groups: allGroups, wastedBytes: wastedBytes)
+        return ScanResult(groups: allGroups, wastedBytes: wastedBytes, snapshots: snapshots)
     }
 
     nonisolated static func verifiedDuplicateGroups(for urls: [URL]) -> [[URL]] {
@@ -216,7 +273,7 @@ final class DuplicateFinderViewModel: ObservableObject {
     }
 
     // FNV-1a 64-bit hash — reads in 1 MB chunks so large files don't load entirely into RAM.
-    private static func fnv1a64(url: URL) -> String? {
+    fileprivate static func fnv1a64(url: URL) -> String? {
         guard let fh = try? FileHandle(forReadingFrom: url) else { return nil }
         defer { try? fh.close() }
         var hash: UInt64 = 14695981039346656037

@@ -31,6 +31,7 @@ struct ContentView: View {
     @State private var pendingConflictFiles: [FileItem] = []
     @State private var pendingConflictDest: URL? = nil
     @State private var pendingConflictIsMove: Bool = false
+    @State private var pendingConflictDestinationStates: [String: FileState] = [:]
     @State private var showConflictAlert = false
     @State private var isCompareModeEnabled: Bool = false
     @State private var isFollowMode: Bool = false
@@ -115,7 +116,11 @@ struct ContentView: View {
                 Button("Overwrite") { executeConflictResolution(.overwrite) }
                 Button("Skip") { executeConflictResolution(.skip) }
                 Button("Keep Both") { executeConflictResolution(.rename) }
-                Button("Cancel", role: .cancel) { pendingConflictFiles = []; pendingConflictDest = nil }
+                Button("Cancel", role: .cancel) {
+                    pendingConflictFiles = []
+                    pendingConflictDest = nil
+                    pendingConflictDestinationStates = [:]
+                }
             } message: {
                 Text(conflictAlertMessage)
             }
@@ -605,9 +610,12 @@ struct ContentView: View {
         let files = plan.entries.map(\.source)
 
         Task.detached {
-            let result = FileOperationService.transactionalCopy(
+            let result = FileOperationService.copyFilesBestEffort(
                 files: files,
                 to: plan.destinationFolder,
+                expectedDestinationStates: Dictionary(uniqueKeysWithValues: plan.entries.map {
+                    (FileState.canonicalURL($0.destination).path, $0.expectedDestinationState)
+                }),
                 onProgress: { completed, _ in
                     Task { @MainActor in
                         self.fileOpProgress.update(token, completed: completed)
@@ -739,20 +747,40 @@ struct ContentView: View {
             pendingConflictFiles = files
             pendingConflictDest = destBase
             pendingConflictIsMove = isMove
+            pendingConflictDestinationStates = FileOperationService.destinationStates(files: files, in: destBase)
             showConflictAlert = true
             return
         }
-        executeMoveOrCopy(files: files, destination: destBase, isMove: isMove, resolution: .overwrite)
+        executeMoveOrCopy(
+            files: files,
+            destination: destBase,
+            isMove: isMove,
+            resolution: .overwrite,
+            expectedDestinationStates: FileOperationService.destinationStates(files: files, in: destBase)
+        )
     }
 
     private func executeConflictResolution(_ resolution: ConflictResolution) {
         guard let dest = pendingConflictDest else { return }
-        executeMoveOrCopy(files: pendingConflictFiles, destination: dest, isMove: pendingConflictIsMove, resolution: resolution)
+        executeMoveOrCopy(
+            files: pendingConflictFiles,
+            destination: dest,
+            isMove: pendingConflictIsMove,
+            resolution: resolution,
+            expectedDestinationStates: pendingConflictDestinationStates
+        )
         pendingConflictFiles = []
         pendingConflictDest = nil
+        pendingConflictDestinationStates = [:]
     }
 
-    private func executeMoveOrCopy(files: [FileItem], destination: URL, isMove: Bool, resolution: ConflictResolution) {
+    private func executeMoveOrCopy(
+        files: [FileItem],
+        destination: URL,
+        isMove: Bool,
+        resolution: ConflictResolution,
+        expectedDestinationStates: [String: FileState]? = nil
+    ) {
         let label = "\(isMove ? "Moving" : "Copying") \(files.count) item\(files.count == 1 ? "" : "s") to \(destination.lastPathComponent)…"
         let total = files.count
         let token = fileOpProgress.begin(label: label, total: total)
@@ -766,6 +794,7 @@ struct ContentView: View {
         Task.detached {
             let result = FileOperationService.moveOrCopy(
                 files: files, to: destination, isMove: isMove, conflictResolution: resolution,
+                expectedDestinationStates: expectedDestinationStates,
                 onProgress: { completed, _ in
                     Task { @MainActor in
                         self.fileOpProgress.update(token, completed: completed)

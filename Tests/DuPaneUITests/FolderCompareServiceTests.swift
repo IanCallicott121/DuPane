@@ -69,6 +69,20 @@ final class FolderCompareServiceTests: DuPaneTestCase {
         XCTAssertTrue(rightItems.allSatisfy { snapshot.rightStatuses[$0.url] == .different })
     }
 
+    func testCompareMarksSameSizeAndDateFilesDifferentWhenContentsDiffer() throws {
+        let leftURL = try fixture.writeFile(named: "same.txt", contents: "left", in: .left)
+        let rightURL = try fixture.writeFile(named: "same.txt", contents: "right", in: .right)
+        let date = Date(timeIntervalSince1970: 100)
+        let left = makeItem(name: "same.txt", pane: .left, size: 4, modified: date)
+        let right = makeItem(name: "same.txt", pane: .right, size: 4, modified: date)
+
+        XCTAssertNotEqual(leftURL, rightURL)
+        let snapshot = FolderCompareService.compare(leftItems: [left], rightItems: [right])
+
+        XCTAssertEqual(snapshot.entries.first?.status, .different)
+        XCTAssertEqual(snapshot.summary.different, 1)
+    }
+
     func testSyncPlanLeftToRightCopiesMissingAndOverwritesOnlyEligibleSourceDifferences() {
         let older = Date(timeIntervalSince1970: 100)
         let newer = Date(timeIntervalSince1970: 200)

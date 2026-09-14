@@ -128,6 +128,144 @@ final class DuplicateFinderViewModelTests: DuPaneTestCase {
         XCTAssertNotNil(vm.errorMessage)
     }
 
+    func testDuplicateMoveToTrashRefreshesResultsWhenFileChangedSinceScan() async throws {
+        let content = "shared bytes"
+        let url1 = dir.appendingPathComponent("dup1.txt")
+        let url2 = dir.appendingPathComponent("dup2.txt")
+        try content.write(to: url1, atomically: true, encoding: .utf8)
+        try content.write(to: url2, atomically: true, encoding: .utf8)
+        var trashCalls = 0
+        let vm = DuplicateFinderViewModel { _ in
+            trashCalls += 1
+            return FileOperationResult(succeeded: 1, errors: [], resultingURLs: [])
+        }
+
+        vm.startScan(at: dir)
+        try await waitForDone(vm)
+        try "changed bytes".write(to: url2, atomically: true, encoding: .utf8)
+        vm.moveToTrash(url2)
+
+        XCTAssertEqual(trashCalls, 0)
+        try await waitForDone(vm)
+        XCTAssertTrue(vm.groups.isEmpty, "the stale duplicate group must disappear after the automatic refresh")
+        XCTAssertNotNil(vm.errorMessage)
+    }
+
+    func testDuplicateMoveToTrashBlocksUnchangedPeerWhenGroupMemberChanged() async throws {
+        let content = "shared bytes"
+        let url1 = dir.appendingPathComponent("dup1.txt")
+        let url2 = dir.appendingPathComponent("dup2.txt")
+        try content.write(to: url1, atomically: true, encoding: .utf8)
+        try content.write(to: url2, atomically: true, encoding: .utf8)
+        var trashCalls = 0
+        let vm = DuplicateFinderViewModel { _ in
+            trashCalls += 1
+            return FileOperationResult(succeeded: 1, errors: [], resultingURLs: [])
+        }
+
+        vm.startScan(at: dir)
+        try await waitForDone(vm)
+        try "changed bytes".write(to: url2, atomically: true, encoding: .utf8)
+        vm.moveToTrash(url1)
+
+        XCTAssertEqual(trashCalls, 0, "a changed peer must block deletion of the unchanged file")
+        try await waitForDone(vm)
+        XCTAssertTrue(vm.groups.isEmpty)
+        XCTAssertNotNil(vm.errorMessage)
+    }
+
+    func testDuplicateKeepFirstBlocksWhenAnyGroupMemberChanged() async throws {
+        let content = "shared bytes"
+        let url1 = dir.appendingPathComponent("dup1.txt")
+        let url2 = dir.appendingPathComponent("dup2.txt")
+        try content.write(to: url1, atomically: true, encoding: .utf8)
+        try content.write(to: url2, atomically: true, encoding: .utf8)
+        var trashCalls = 0
+        let vm = DuplicateFinderViewModel { _ in
+            trashCalls += 1
+            return FileOperationResult(succeeded: 1, errors: [], resultingURLs: [])
+        }
+
+        vm.startScan(at: dir)
+        try await waitForDone(vm)
+        try "changed bytes".write(to: url1, atomically: true, encoding: .utf8)
+        vm.keepFirst(in: 0)
+
+        XCTAssertEqual(trashCalls, 0, "Keep First must not partially delete a stale duplicate group")
+        try await waitForDone(vm)
+        XCTAssertTrue(vm.groups.isEmpty)
+        XCTAssertNotNil(vm.errorMessage)
+    }
+
+    func testDuplicateMoveToTrashBlocksChangedFirstFile() async throws {
+        let content = "shared bytes"
+        let url1 = dir.appendingPathComponent("dup1.txt")
+        let url2 = dir.appendingPathComponent("dup2.txt")
+        try content.write(to: url1, atomically: true, encoding: .utf8)
+        try content.write(to: url2, atomically: true, encoding: .utf8)
+        var trashCalls = 0
+        let vm = DuplicateFinderViewModel { _ in
+            trashCalls += 1
+            return FileOperationResult(succeeded: 1, errors: [], resultingURLs: [])
+        }
+
+        vm.startScan(at: dir)
+        try await waitForDone(vm)
+        try "changed bytes".write(to: url1, atomically: true, encoding: .utf8)
+        vm.moveToTrash(url1)
+
+        XCTAssertEqual(trashCalls, 0)
+        try await waitForDone(vm)
+        XCTAssertTrue(vm.groups.isEmpty)
+        XCTAssertNotNil(vm.errorMessage)
+    }
+
+    func testDuplicateMoveToTrashBlocksUnchangedSecondFileWhenFirstChanged() async throws {
+        let content = "shared bytes"
+        let url1 = dir.appendingPathComponent("dup1.txt")
+        let url2 = dir.appendingPathComponent("dup2.txt")
+        try content.write(to: url1, atomically: true, encoding: .utf8)
+        try content.write(to: url2, atomically: true, encoding: .utf8)
+        var trashCalls = 0
+        let vm = DuplicateFinderViewModel { _ in
+            trashCalls += 1
+            return FileOperationResult(succeeded: 1, errors: [], resultingURLs: [])
+        }
+
+        vm.startScan(at: dir)
+        try await waitForDone(vm)
+        try "changed bytes".write(to: url1, atomically: true, encoding: .utf8)
+        vm.moveToTrash(url2)
+
+        XCTAssertEqual(trashCalls, 0)
+        try await waitForDone(vm)
+        XCTAssertTrue(vm.groups.isEmpty)
+        XCTAssertNotNil(vm.errorMessage)
+    }
+
+    func testDuplicateKeepFirstBlocksWhenSecondFileChanged() async throws {
+        let content = "shared bytes"
+        let url1 = dir.appendingPathComponent("dup1.txt")
+        let url2 = dir.appendingPathComponent("dup2.txt")
+        try content.write(to: url1, atomically: true, encoding: .utf8)
+        try content.write(to: url2, atomically: true, encoding: .utf8)
+        var trashCalls = 0
+        let vm = DuplicateFinderViewModel { _ in
+            trashCalls += 1
+            return FileOperationResult(succeeded: 1, errors: [], resultingURLs: [])
+        }
+
+        vm.startScan(at: dir)
+        try await waitForDone(vm)
+        try "changed bytes".write(to: url2, atomically: true, encoding: .utf8)
+        vm.keepFirst(in: 0)
+
+        XCTAssertEqual(trashCalls, 0)
+        try await waitForDone(vm)
+        XCTAssertTrue(vm.groups.isEmpty)
+        XCTAssertNotNil(vm.errorMessage)
+    }
+
     func testDuplicateCancelResetsPhaseToIdle() async throws {
         // Write enough files so the scan won't finish instantly
         for i in 0..<20 {

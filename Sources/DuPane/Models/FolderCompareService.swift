@@ -83,6 +83,7 @@ struct FolderSyncPlanEntry: Equatable {
     let source: FileItem
     let destination: URL
     let action: FolderSyncAction
+    let expectedDestinationState: FileState
 }
 
 struct FolderSyncPlan: Equatable {
@@ -227,6 +228,10 @@ enum FolderCompareService {
             return .different
         }
 
+        if !left.isDirectory, let contentsMatch = contentsMatch(left.url, right.url), !contentsMatch {
+            return .different
+        }
+
         switch compareDates(left.modified, right.modified) {
         case .orderedSame:
             return .same
@@ -250,6 +255,27 @@ enum FolderCompareService {
         }
     }
 
+    private static func contentsMatch(_ left: URL, _ right: URL) -> Bool? {
+        let leftState = FileState.snapshot(at: left)
+        let rightState = FileState.snapshot(at: right)
+        guard leftState.exists, rightState.exists, !leftState.isDirectory, !rightState.isDirectory,
+              let leftHandle = try? FileHandle(forReadingFrom: left),
+              let rightHandle = try? FileHandle(forReadingFrom: right) else {
+            return nil
+        }
+        defer {
+            try? leftHandle.close()
+            try? rightHandle.close()
+        }
+
+        while true {
+            let leftChunk = leftHandle.readData(ofLength: 1024 * 1024)
+            let rightChunk = rightHandle.readData(ofLength: 1024 * 1024)
+            if leftChunk != rightChunk { return false }
+            if leftChunk.isEmpty { return true }
+        }
+    }
+
     private static func syncPlanEntry(
         for entry: FolderCompareEntry,
         direction: FolderSyncDirection,
@@ -262,14 +288,20 @@ enum FolderCompareService {
             return FolderSyncPlanEntry(
                 source: source,
                 destination: destinationFolder.appendingPathComponent(source.name),
-                action: .copyMissing
+                action: .copyMissing,
+                expectedDestinationState: FileState.snapshot(
+                    at: destinationFolder.appendingPathComponent(source.name)
+                )
             )
         case (.rightToLeft, .onlyRight):
             guard let source = entry.right else { return nil }
             return FolderSyncPlanEntry(
                 source: source,
                 destination: destinationFolder.appendingPathComponent(source.name),
-                action: .copyMissing
+                action: .copyMissing,
+                expectedDestinationState: FileState.snapshot(
+                    at: destinationFolder.appendingPathComponent(source.name)
+                )
             )
         case (.leftToRight, .newerLeft):
             return overwritingEntry(
@@ -315,6 +347,11 @@ enum FolderCompareService {
             skippedExistingFolderOverwrites += 1
             return nil
         }
-        return FolderSyncPlanEntry(source: source, destination: destination.url, action: action)
+        return FolderSyncPlanEntry(
+            source: source,
+            destination: destination.url,
+            action: action,
+            expectedDestinationState: FileState.snapshot(at: destination.url)
+        )
     }
 }

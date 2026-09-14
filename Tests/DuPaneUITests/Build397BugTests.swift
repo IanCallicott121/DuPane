@@ -3,20 +3,18 @@ import XCTest
 @testable import DuPane
 
 // Tests for bugs fixed in Build 397 — four design-decision fixes:
-//   1. Sync plan not atomic       → FileOperationService.transactionalCopy
+//   1. Sync plan partial failure  → FileOperationService.copyFilesBestEffort
 //   2. Partial trash unrecoverable → trash() reports TrashedItems + restoreFromTrash
 //   3. UserDefaults not atomic     → AppSettings.performBatchUpdate
 //   4. Metadata cache not Sendable → SmartMetadataService main-actor assertions
 // Each test class is named after the bug it covers.
 
-// MARK: - Medium: sync plan not atomic — 4 tests [must]
+// MARK: - Medium: sync plan partial failure — 4 tests [must]
 //
-// executeSyncPlan copied with per-item backups that were deleted the instant each item
-// succeeded, so a failure partway through left earlier files overwritten with no rollback.
-// transactionalCopy keeps every backup until the whole plan succeeds and rolls the batch
-// back on any single failure.
+// Folder Sync is best-effort: a failure on one item does not undo files that were copied
+// successfully before it. Each individual overwrite still protects its own destination.
 
-final class TransactionalSyncCopyTests: DuPaneTestCase {
+final class BestEffortSyncCopyTests: DuPaneTestCase {
     private var fixture: FilePaneFixture!
 
     override func setUpWithError() throws {
@@ -57,7 +55,7 @@ final class TransactionalSyncCopyTests: DuPaneTestCase {
             item(at: fixture.fileURL(named: "over.txt", in: .left))
         ]
 
-        let result = FileOperationService.transactionalCopy(files: files, to: fixture.rightPaneURL)
+        let result = FileOperationService.copyFilesBestEffort(files: files, to: fixture.rightPaneURL)
 
         XCTAssertEqual(result.succeeded, 2)
         XCTAssertTrue(result.errors.isEmpty)
@@ -69,9 +67,7 @@ final class TransactionalSyncCopyTests: DuPaneTestCase {
     }
 
     @MainActor
-    func testFailedPlanRestoresAnAlreadyOverwrittenFile() throws {
-        // THE data-loss case: the first file is overwritten, then a later file fails.
-        // The already-overwritten file must be rolled back to its original contents.
+    func testFailedPlanKeepsAnAlreadyOverwrittenFile() throws {
         try fixture.writeFile(named: "over.txt", contents: "over-src", in: .left)
         try fixture.writeFile(named: "over.txt", contents: "over-dst-ORIGINAL", in: .right)
 
@@ -81,18 +77,18 @@ final class TransactionalSyncCopyTests: DuPaneTestCase {
             item(at: ghost)          // copyItem throws → whole plan rolls back
         ]
 
-        let result = FileOperationService.transactionalCopy(files: files, to: fixture.rightPaneURL)
+        let result = FileOperationService.copyFilesBestEffort(files: files, to: fixture.rightPaneURL)
 
-        XCTAssertEqual(result.succeeded, 0, "an all-or-nothing plan must not report partial success")
+        XCTAssertEqual(result.succeeded, 1, "the successful item must remain successful")
         XCTAssertFalse(result.errors.isEmpty)
-        XCTAssertEqual(try contents(fixture.fileURL(named: "over.txt", in: .right)), "over-dst-ORIGINAL",
-                       "the overwritten destination file must be restored on rollback")
+        XCTAssertEqual(try contents(fixture.fileURL(named: "over.txt", in: .right)), "over-src",
+                       "a successful overwrite must remain in place when a later item fails")
         XCTAssertFalse(hasTempBackups(in: fixture.rightPaneURL),
-                       "rollback must leave no orphaned backup files behind")
+                       "per-item replacement must leave no orphaned backup files behind")
     }
 
     @MainActor
-    func testFailedPlanRemovesFilesItHadAlreadyCreated() throws {
+    func testFailedPlanKeepsFilesItHadAlreadyCreated() throws {
         try fixture.writeFile(named: "new.txt", contents: "new-src", in: .left)
 
         let ghost = fixture.leftPaneURL.appendingPathComponent("does-not-exist.txt")
@@ -101,16 +97,36 @@ final class TransactionalSyncCopyTests: DuPaneTestCase {
             item(at: ghost)
         ]
 
-        let result = FileOperationService.transactionalCopy(files: files, to: fixture.rightPaneURL)
+        let result = FileOperationService.copyFilesBestEffort(files: files, to: fixture.rightPaneURL)
+
+        XCTAssertEqual(result.succeeded, 1)
+        XCTAssertTrue(fixture.exists(fixture.fileURL(named: "new.txt", in: .right)),
+                      "a file created before the failure must remain in place")
+    }
+
+    @MainActor
+    func testPlanRejectsDestinationChangedAfterConfirmation() throws {
+        let source = try fixture.writeFile(named: "stale.txt", contents: "source", in: .left)
+        let destination = try fixture.writeFile(named: "stale.txt", contents: "original", in: .right)
+        let item = item(at: source)
+        let expected = [FileState.canonicalURL(destination).path: FileState.snapshot(at: destination)]
+        try "changed".write(to: destination, atomically: true, encoding: .utf8)
+
+        let result = FileOperationService.copyFilesBestEffort(
+            files: [item],
+            to: fixture.rightPaneURL,
+            expectedDestinationStates: expected
+        )
 
         XCTAssertEqual(result.succeeded, 0)
-        XCTAssertFalse(fixture.exists(fixture.fileURL(named: "new.txt", in: .right)),
-                       "a file created before the failure must be removed by the rollback")
+        XCTAssertFalse(result.errors.isEmpty)
+        XCTAssertEqual(try contents(destination), "changed")
+        XCTAssertTrue(fixture.exists(source))
     }
 
     @MainActor
     func testEmptyPlanSucceedsWithNothingToDo() throws {
-        let result = FileOperationService.transactionalCopy(files: [], to: fixture.rightPaneURL)
+        let result = FileOperationService.copyFilesBestEffort(files: [], to: fixture.rightPaneURL)
         XCTAssertEqual(result.succeeded, 0)
         XCTAssertTrue(result.errors.isEmpty)
     }

@@ -19,6 +19,42 @@ struct FileOperationResult {
     var lastError: String? { errors.last }
 }
 
+struct FileState: Equatable {
+    let exists: Bool
+    let isDirectory: Bool
+    let size: Int64?
+    let modified: Date?
+    let fileNumber: UInt64?
+
+    static let missing = FileState(
+        exists: false,
+        isDirectory: false,
+        size: nil,
+        modified: nil,
+        fileNumber: nil
+    )
+
+    static func canonicalURL(_ url: URL) -> URL {
+        let standardized = url.standardizedFileURL
+        let parent = standardized.deletingLastPathComponent().resolvingSymlinksInPath()
+        return parent.appendingPathComponent(standardized.lastPathComponent, isDirectory: standardized.hasDirectoryPath)
+    }
+
+    static func snapshot(at url: URL, fileManager: FileManager = .default) -> FileState {
+        guard let attributes = try? fileManager.attributesOfItem(atPath: url.path) else {
+            return .missing
+        }
+        let type = attributes[.type] as? FileAttributeType
+        return FileState(
+            exists: true,
+            isDirectory: type == .typeDirectory,
+            size: (attributes[.size] as? NSNumber)?.int64Value,
+            modified: attributes[.modificationDate] as? Date,
+            fileNumber: (attributes[.systemFileNumber] as? NSNumber)?.uint64Value
+        )
+    }
+}
+
 /// One item that was moved to the Trash: its original path and where it now lives inside
 /// the Trash, so `restoreFromTrash` can move it back.
 struct TrashedItem: Equatable {
@@ -80,11 +116,19 @@ enum FileOperationService {
         }
     }
 
+    static func destinationStates(files: [FileItem], in destinationFolder: URL) -> [String: FileState] {
+        Dictionary(uniqueKeysWithValues: files.map { file in
+            let destination = destinationFolder.appendingPathComponent(file.name)
+            return (FileState.canonicalURL(destination).path, FileState.snapshot(at: destination))
+        })
+    }
+
     static func moveOrCopy(
         files: [FileItem],
         to destinationFolder: URL,
         isMove: Bool,
         conflictResolution: ConflictResolution = .automatic,
+        expectedDestinationStates: [String: FileState]? = nil,
         onProgress: ((Int, Int) -> Void)? = nil
     ) -> FileOperationResult {
         let dstPath = destinationFolder.standardizedFileURL.resolvingSymlinksInPath().path
@@ -103,6 +147,12 @@ enum FileOperationService {
                 }
             }
             let proposed = destinationFolder.appendingPathComponent(file.name)
+            if let expectedDestinationStates,
+               let expectedState = expectedDestinationStates[FileState.canonicalURL(proposed).path],
+               FileState.snapshot(at: proposed) != expectedState {
+                errors.append("Couldn't \(isMove ? "move" : "copy") \(file.name): the destination changed after confirmation.")
+                continue
+            }
             let exists = FileManager.default.fileExists(atPath: proposed.path)
 
             let destination: URL
@@ -243,71 +293,37 @@ enum FileOperationService {
         return FileOperationResult(succeeded: succeeded, errors: errors, resultingURLs: resultingURLs)
     }
 
-    /// All-or-nothing overwrite copy used by folder sync. Every existing destination is
-    /// backed up before it is overwritten and every newly-created file is tracked; if any
-    /// single copy fails the whole batch is rolled back, so a crash-free failure never
-    /// leaves the destination partially synced. Backups are deleted only once the entire
-    /// plan has succeeded. Sync plans only ever contain files (directories are excluded
-    /// upstream), so no directory-merge handling is needed here.
-    static func transactionalCopy(
+    /// Best-effort overwrite copy used by folder sync. Each file is processed independently,
+    /// so successful copies remain in place when a later file fails. The per-file operation
+    /// still protects its own destination while it is being replaced.
+    static func copyFilesBestEffort(
         files: [FileItem],
         to destinationFolder: URL,
+        expectedDestinationStates: [String: FileState] = [:],
         onProgress: ((Int, Int) -> Void)? = nil
     ) -> FileOperationResult {
-        let fileManager = FileManager.default
-        var performed: [(destination: URL, backup: URL?)] = []
-
-        func rollback() {
-            for op in performed.reversed() {
-                try? fileManager.removeItem(at: op.destination)
-                if let backup = op.backup {
-                    try? fileManager.moveItem(at: backup, to: op.destination)
-                }
-            }
-        }
+        var succeeded = 0
+        var errors: [String] = []
+        var resultingURLs: [URL] = []
 
         for (index, file) in files.enumerated() {
-            let destination = destinationFolder.appendingPathComponent(file.name)
-
-            guard !sameFileLocation(file.url, destination) else {
-                rollback()
-                return FileOperationResult(
-                    succeeded: 0,
-                    errors: ["Cannot sync '\(file.name)': source and destination are the same."],
-                    resultingURLs: []
-                )
-            }
-
-            var backup: URL? = nil
-            do {
-                if fileManager.fileExists(atPath: destination.path) {
-                    let tmp = destinationFolder.appendingPathComponent(
-                        ".\(destination.lastPathComponent).\(UUID().uuidString).tmp"
-                    )
-                    try fileManager.moveItem(at: destination, to: tmp)
-                    backup = tmp
-                }
-                try fileManager.copyItem(at: file.url, to: destination)
-                performed.append((destination, backup))
-                onProgress?(index + 1, files.count)
-            } catch {
-                // Undo this item's half-finished step, then roll back the committed ones.
-                try? fileManager.removeItem(at: destination)
-                if let backup { try? fileManager.moveItem(at: backup, to: destination) }
-                rollback()
-                return FileOperationResult(
-                    succeeded: 0,
-                    errors: ["Couldn't sync '\(file.name)': \(error.localizedDescription)"],
-                    resultingURLs: []
-                )
-            }
+            let result = moveOrCopy(
+                files: [file],
+                to: destinationFolder,
+                isMove: false,
+                conflictResolution: .overwrite,
+                expectedDestinationStates: expectedDestinationStates
+            )
+            succeeded += result.succeeded
+            errors.append(contentsOf: result.errors)
+            resultingURLs.append(contentsOf: result.resultingURLs)
+            onProgress?(index + 1, files.count)
         }
 
-        for op in performed {
-            if let backup = op.backup { try? fileManager.removeItem(at: backup) }
-        }
         return FileOperationResult(
-            succeeded: performed.count, errors: [], resultingURLs: performed.map(\.destination)
+            succeeded: succeeded,
+            errors: errors,
+            resultingURLs: resultingURLs
         )
     }
 
@@ -337,14 +353,33 @@ enum FileOperationService {
         return values.isDirectory == true && values.isPackage != true
     }
 
-    /// Copies or moves every entry of `source` into `destination`, recursing into
-    /// subdirectories and overwriting colliding files. Never removes a destination entry
-    /// that has no counterpart in the source — that is the whole point of merging.
     private static func mergeDirectory(from source: URL, to destination: URL, isMove: Bool) throws {
-        let fileManager = FileManager.default
-        if !fileManager.fileExists(atPath: destination.path) {
-            try fileManager.createDirectory(at: destination, withIntermediateDirectories: true)
+        let transaction = try MergeTransaction(destinationRoot: destination)
+
+        do {
+            try mergeDirectory(from: source, to: destination, isMove: isMove, transaction: transaction)
+            transaction.commit()
+        } catch {
+            do {
+                try transaction.rollback()
+            } catch {
+                throw NSError(
+                    domain: "DuPane.FileOperationService",
+                    code: 1,
+                    userInfo: [NSLocalizedDescriptionKey: "The folder merge failed and the original destination could not be fully restored: \(error.localizedDescription)"]
+                )
+            }
+            throw error
         }
+    }
+
+    private static func mergeDirectory(
+        from source: URL,
+        to destination: URL,
+        isMove: Bool,
+        transaction: MergeTransaction
+    ) throws {
+        let fileManager = FileManager.default
 
         let entries = try fileManager.contentsOfDirectory(
             at: source,
@@ -355,25 +390,95 @@ enum FileOperationService {
         for entry in entries {
             let target = destination.appendingPathComponent(entry.lastPathComponent)
             if isMergeableDirectory(entry), isMergeableDirectory(target) {
-                try mergeDirectory(from: entry, to: target, isMove: isMove)
+                try mergeDirectory(from: entry, to: target, isMove: isMove, transaction: transaction)
             } else {
                 if fileManager.fileExists(atPath: target.path) {
-                    try fileManager.removeItem(at: target)
+                    try transaction.backup(target)
                 }
-                try transferItem(entry, to: target, isMove: isMove)
+                try transaction.install(source: entry, destination: target, isMove: isMove)
             }
         }
 
-        if isMove, (try? fileManager.contentsOfDirectory(atPath: source.path))?.isEmpty == true {
-            try? fileManager.removeItem(at: source)
+        if isMove {
+            transaction.sourceDirectoriesToRemove.append(source)
         }
     }
 
-    private static func transferItem(_ source: URL, to destination: URL, isMove: Bool) throws {
-        if isMove {
-            try FileManager.default.moveItem(at: source, to: destination)
-        } else {
-            try FileManager.default.copyItem(at: source, to: destination)
+    private final class MergeTransaction {
+        private struct Backup {
+            let original: URL
+            let temporary: URL
+        }
+
+        private struct Installation {
+            let source: URL
+            let destination: URL
+            let isMove: Bool
+        }
+
+        private let fileManager = FileManager.default
+        private let backupRoot: URL
+        private var backups: [Backup] = []
+        private var installations: [Installation] = []
+        var sourceDirectoriesToRemove: [URL] = []
+
+        init(destinationRoot: URL) throws {
+            backupRoot = destinationRoot.deletingLastPathComponent()
+                .appendingPathComponent(".\(destinationRoot.lastPathComponent).\(UUID().uuidString).merge-tmp")
+            try fileManager.createDirectory(at: backupRoot, withIntermediateDirectories: true)
+        }
+
+        func backup(_ original: URL) throws {
+            let temporary = backupRoot.appendingPathComponent(UUID().uuidString)
+            try fileManager.moveItem(at: original, to: temporary)
+            backups.append(Backup(original: original, temporary: temporary))
+        }
+
+        func install(source: URL, destination: URL, isMove: Bool) throws {
+            if isMove {
+                try fileManager.moveItem(at: source, to: destination)
+            } else {
+                try fileManager.copyItem(at: source, to: destination)
+            }
+            installations.append(Installation(source: source, destination: destination, isMove: isMove))
+        }
+
+        func commit() {
+            for backup in backups {
+                try? fileManager.removeItem(at: backup.temporary)
+            }
+            for source in sourceDirectoriesToRemove.reversed() {
+                if (try? fileManager.contentsOfDirectory(atPath: source.path))?.isEmpty == true {
+                    try? fileManager.removeItem(at: source)
+                }
+            }
+            try? fileManager.removeItem(at: backupRoot)
+        }
+
+        func rollback() throws {
+            var firstError: Error?
+            for installation in installations.reversed() {
+                do {
+                    if installation.isMove {
+                        try fileManager.moveItem(at: installation.destination, to: installation.source)
+                    } else {
+                        try fileManager.removeItem(at: installation.destination)
+                    }
+                } catch {
+                    firstError = firstError ?? error
+                }
+            }
+            for backup in backups.reversed() {
+                do {
+                    try fileManager.moveItem(at: backup.temporary, to: backup.original)
+                } catch {
+                    firstError = firstError ?? error
+                }
+            }
+            try? fileManager.removeItem(at: backupRoot)
+            if let firstError {
+                throw firstError
+            }
         }
     }
 

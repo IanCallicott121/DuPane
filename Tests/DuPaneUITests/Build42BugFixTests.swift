@@ -88,6 +88,27 @@ final class Build42BugFixTests: DuPaneTestCase {
         XCTAssertEqual(try String(contentsOf: destFile, encoding: .utf8), "original content")
     }
 
+    func testCopyRejectsDestinationCreatedAfterConfirmation() throws {
+        let source = try fixture.writeFile(named: "race.txt", contents: "source", in: .left)
+        let item = makeItem(name: "race.txt", in: .left, size: 6)
+        let expected = FileOperationService.destinationStates(files: [item], in: fixture.rightPaneURL)
+        let destination = fixture.fileURL(named: "race.txt", in: .right)
+        try "new destination".write(to: destination, atomically: true, encoding: .utf8)
+
+        let result = FileOperationService.moveOrCopy(
+            files: [item],
+            to: fixture.rightPaneURL,
+            isMove: false,
+            conflictResolution: .overwrite,
+            expectedDestinationStates: expected
+        )
+
+        XCTAssertEqual(result.succeeded, 0)
+        XCTAssertFalse(result.errors.isEmpty)
+        XCTAssertTrue(fixture.exists(source))
+        XCTAssertEqual(try String(contentsOf: destination, encoding: .utf8), "new destination")
+    }
+
     func testCopyFolderOverwriteRestoresDestinationAfterPartialCopyFailure() throws {
         let destination = try fixture.createFolder(named: "Shared", in: .right)
         let original = destination.appendingPathComponent("original.txt")
