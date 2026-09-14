@@ -27,6 +27,8 @@ project changes; content-only edits reload normally.
 - Keep responses concise and omit internal reasoning.
 - Number questions so the user can refer to them directly.
 - Use lettered choices only for true alternatives; use bullets for non-alternative lists.
+- Number every implemented item in implementation summaries so the user can refer to it
+  unambiguously.
 
 Use standard Codex file-editing and version-control practices; do not require a
 repository-wide checkout lock or block changes because unrelated files are modified.
@@ -85,12 +87,24 @@ via `Package.swift`. `project.yml` is the source of truth for the generated Xcod
 - Use the appropriate verification lane described in this file; documentation-only changes use `docs`.
 - Unit tests: `swift test --filter DuPaneUITests`.
 - E2E tests: `./Scripts/run-e2e.sh`.
+- Interim E2E runs may use `./Scripts/run-e2e.sh --priority high`; use `--priority medium`
+  to include medium-priority coverage. Final verification runs the full suite with no
+  priority filter.
+- `./Scripts/run-e2e.sh --negative-validation` intentionally fails otherwise-passing
+  tests and succeeds only when every emitted result is `FAIL`; missing, `PASS`, or
+  `SKIP` results fail the validation.
 - Report the actual test result when tests are run; do not preserve fixed expected test counts in guidance.
+- E2E result logging must fail closed: XCTest failures and unexpected exceptions must not
+  be emitted or accepted as `PASS`, and the wrapper must reject any emitted `FAIL` result.
 - Fix known build errors before reporting completion.
 - Bump the build number only for implementation or release work that needs a new visible number.
-- During iterative local builds, increment the temporary visible internal test marker and add it to the app menu so manual testers can identify the latest build. In every manual-test handoff, quote the exact marker and instruct the tester to confirm it in the menu.
+- Before every build used for manual testing, increment the temporary internal test build marker to a new unique value, include that value in the app menu and its verification test, and never reuse a marker from an earlier build.
+- After every such build, report the verification results first and then give the user the exact temporary internal test build marker. The marker must be visible in the app menu, and the handoff must instruct the user to confirm that menu value before testing.
+- A manual-test handoff is incomplete until the final verified app build contains the
+  visible menu marker and the exact marker has been reported to the user.
 - Keep the marker in place while manual testing and review are in progress. Remove it only after the user approves the completed change for commit; do not change `BuildNumber.txt` for this purpose.
-- A source change is not present in the running app until it is rebuilt. Before manual testing, rebuild the app, quit any running instance, relaunch `~/Applications/DuPane.app`, and confirm the quoted internal test marker.
+- A source change is not present in the running app until it is rebuilt. Use `./Scripts/prepare-manual-build.sh` for manual-test builds; do not use `ln -sfn` to refresh the app symlink because directory symlinks may remain stale. The script clean-builds into external DerivedData, safely replaces the symlink, and verifies the target and timestamps.
+- Before manual testing, quit any running instance, relaunch `~/Applications/DuPane.app`, and confirm the quoted internal test marker.
 
 ## Application builds
 
@@ -99,6 +113,7 @@ via `Package.swift`. `project.yml` is the source of truth for the generated Xcod
 - Run `xcodegen generate` first when `project.yml` changes.
 - Verification builds use external DerivedData at `~/Library/Developer/DuPane-build`.
 - The convenience symlink is `~/Applications/DuPane.app` to the latest Debug build.
+- The final pre-handoff test is `swift test --filter DuPaneFunctionTests/testInstalledAppSymlinkDateMatchesLatestDebugBuild`; it must pass after the manual build script and before reporting the marker.
 
 ## Post-build checklist
 

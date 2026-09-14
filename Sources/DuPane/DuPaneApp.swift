@@ -2,6 +2,10 @@ import SwiftUI
 import AppKit
 import UniformTypeIdentifiers
 
+enum InternalTestBuildMarker {
+    static let value = "421.4"
+}
+
 @main
 struct DuPaneApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
@@ -29,6 +33,9 @@ struct DuPaneApp: App {
                 Button("Open FAQs") {
                     openFAQs()
                 }
+
+                Button("Internal Test Build \(InternalTestBuildMarker.value)") {}
+                    .disabled(true)
             }
             CommandGroup(replacing: .windowArrangement) {}
             CommandGroup(replacing: .systemServices) {}
@@ -132,12 +139,41 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         keyEventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
             let responder = NSApp.keyWindow?.firstResponder
+            let modifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+            let navigationModifiers = modifiers.intersection([.command, .control, .option, .shift])
+            if event.keyCode == 53 {
+                NotificationCenter.default.post(name: .creationPromptEscapeRequested, object: nil)
+                return event
+            }
+            if event.charactersIgnoringModifiers?.lowercased() == "g",
+               navigationModifiers == [.command, .shift] {
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: .goToPathShortcutRequested, object: nil)
+                }
+                return nil
+            }
             if responder is NSTextView || responder is NSTextField {
+                if event.charactersIgnoringModifiers?.lowercased() == "v",
+                   navigationModifiers == [.command] {
+                    let editor: NSText?
+                    if let textView = responder as? NSTextView {
+                        editor = textView
+                    } else if let textField = responder as? NSTextField {
+                        editor = textField.currentEditor()
+                    } else {
+                        editor = nil
+                    }
+                    if let editor,
+                       let pastedText = NSPasteboard.general.string(forType: .string) {
+                        editor.replaceCharacters(in: editor.selectedRange, with: pastedText)
+                        return nil
+                    }
+                    NSApp.sendAction(#selector(NSText.paste(_:)), to: responder, from: nil)
+                    return nil
+                }
                 return event
             }
 
-            let modifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
-            let navigationModifiers = modifiers.intersection([.command, .control, .option, .shift])
             if navigationModifiers.isEmpty {
                 let navigationOffset: Int?
                 switch event.keyCode {

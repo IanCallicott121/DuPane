@@ -104,6 +104,12 @@ struct FileRowView: View {
                     .font(.system(size: fsMeta, design: .monospaced))
                     .foregroundStyle(.secondary)
             }
+        case "Date Added":
+            columnCell(name, alignment: .leading) {
+                Text(Self.formatDate(item.dateAdded, style: settings.dateFormatStyle, timeStyle: settings.timeFormatStyle))
+                    .font(.system(size: fsMeta, design: .monospaced))
+                    .foregroundStyle(.secondary)
+            }
         case "Info":
             columnCell(name, alignment: .trailing) {
                 Text(extraInfo ?? "")

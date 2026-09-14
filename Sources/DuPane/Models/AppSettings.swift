@@ -159,7 +159,7 @@ enum StartupFolderMode: String, CaseIterable {
 }
 
 enum FileColumnLayout {
-    static let defaultWidths: [String: CGFloat] = ["Size": 80, "Kind": 120, "Modified": 150, "Info": 80]
+    static let defaultWidths: [String: CGFloat] = ["Size": 80, "Kind": 120, "Modified": 150, "Date Added": 150, "Info": 80]
     static let minWidth: CGFloat = 50
     static let maxWidth: CGFloat = 400
     static let headerHeight: CGFloat = 28
@@ -345,11 +345,13 @@ final class AppSettings: ObservableObject {
         dateFormatStyle = DateFormatStyle(
             rawValue: UserDefaults.standard.string(forKey: "dateFormatStyle") ?? ""
         ) ?? .medium
-        // Default: hide Kind and Info so only Name, Size, Modified show
+        // Default: hide Kind, Date Added, and Info so only Name, Size, Modified show
         hiddenColumnsRaw = UserDefaults.standard.object(forKey: "hiddenColumns").map {
-            ($0 as? String) ?? "Info,Kind"
-        } ?? "Info,Kind"
-        columnOrder = UserDefaults.standard.stringArray(forKey: "columnOrder") ?? ["Size", "Kind", "Modified", "Info"]
+            ($0 as? String) ?? "Date Added,Info,Kind"
+        } ?? "Date Added,Info,Kind"
+        let defaultColumnOrder = ["Size", "Kind", "Modified", "Date Added", "Info"]
+        let savedColumnOrder = UserDefaults.standard.stringArray(forKey: "columnOrder") ?? []
+        columnOrder = savedColumnOrder + defaultColumnOrder.filter { !savedColumnOrder.contains($0) }
         let legacyColumnWidths = Self.loadColumnWidths(forKey: "columnWidths") ?? FileColumnLayout.defaultWidths
         leftColumnWidths = Self.loadColumnWidths(forKey: "leftColumnWidths") ?? legacyColumnWidths
         rightColumnWidths = Self.loadColumnWidths(forKey: "rightColumnWidths") ?? legacyColumnWidths

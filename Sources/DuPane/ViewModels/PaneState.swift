@@ -130,6 +130,11 @@ final class PaneState: ObservableObject {
                 let dateB = b.modified ?? .distantPast
                 if dateA != dateB { return ascending ? dateA < dateB : dateA > dateB }
                 return a.name.localizedStandardCompare(b.name) == (ascending ? .orderedAscending : .orderedDescending)
+            case .dateAdded:
+                let dateA = a.dateAdded ?? .distantPast
+                let dateB = b.dateAdded ?? .distantPast
+                if dateA != dateB { return ascending ? dateA < dateB : dateA > dateB }
+                return a.name.localizedStandardCompare(b.name) == (ascending ? .orderedAscending : .orderedDescending)
             case .info:
                 // Metadata loads asynchronously; PaneView re-sorts by loaded values.
                 // Fall back to name so displayedItems is always deterministic.
@@ -421,6 +426,7 @@ final class PaneState: ObservableObject {
             let name = mdItem.value(forAttribute: NSMetadataItemFSNameKey) as? String ?? url.lastPathComponent
             let size = (mdItem.value(forAttribute: NSMetadataItemFSSizeKey) as? NSNumber)?.int64Value
             let modified = mdItem.value(forAttribute: NSMetadataItemFSContentChangeDateKey) as? Date
+            let dateAdded = mdItem.value(forAttribute: NSMetadataItemFSCreationDateKey) as? Date
             var isDir: ObjCBool = false
             FileManager.default.fileExists(atPath: path, isDirectory: &isDir)
             let kind = isDir.boolValue
@@ -431,7 +437,8 @@ final class PaneState: ObservableObject {
                 isDirectory: isDir.boolValue, isVolume: false, isRemovable: false,
                 size: isDir.boolValue ? nil : size,
                 kind: kind, modified: modified, tags: [],
-                isRestricted: isDir.boolValue && !FileManager.default.isReadableFile(atPath: path)
+                isRestricted: isDir.boolValue && !FileManager.default.isReadableFile(atPath: path),
+                dateAdded: dateAdded
             ))
         }
         q.enableUpdates()
@@ -491,7 +498,7 @@ final class PaneState: ObservableObject {
     /// Thread-safe: reads only from FileManager, no actor-isolated state.
     nonisolated static func loadFolder(_ url: URL, showHidden: Bool = false, showHiddenFolders: Bool = false) throws -> [FileItem] {
         let keys: [URLResourceKey] = [
-            .isDirectoryKey, .fileSizeKey, .contentModificationDateKey,
+            .isDirectoryKey, .fileSizeKey, .contentModificationDateKey, .creationDateKey,
             .localizedTypeDescriptionKey, .tagNamesKey
         ]
         let needsAllItems = showHidden || showHiddenFolders
@@ -521,7 +528,8 @@ final class PaneState: ObservableObject {
                 kind: values?.localizedTypeDescription ?? (isDir ? "Folder" : itemURL.pathExtension.uppercased() + " File"),
                 modified: values?.contentModificationDate,
                 tags: values?.tagNames ?? [],
-                isRestricted: isDir && !fileManager.isReadableFile(atPath: itemURL.path)
+                isRestricted: isDir && !fileManager.isReadableFile(atPath: itemURL.path),
+                dateAdded: values?.creationDate
             ))
         }
         if showHiddenFolders && !showHidden {

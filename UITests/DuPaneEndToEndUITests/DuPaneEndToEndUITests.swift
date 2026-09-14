@@ -1,4 +1,5 @@
 import XCTest
+import AppKit
 
 final class DuPaneEndToEndUITests: DuPaneTestCase {
     private var fixture: EndToEndFixture!
@@ -61,6 +62,85 @@ final class DuPaneEndToEndUITests: DuPaneTestCase {
     }
 
     @MainActor
+    func testCriticalRepeatedEscapeDismissesCreationSheets() throws {
+        launchApp()
+
+        for identifier in ["toolbar-new-file-button", "toolbar-new-folder-button"] {
+            clickToolbarButton(identifier)
+            let field = app.textFields["text-prompt-name-field"]
+            XCTAssertTrue(field.waitForExistence(timeout: 5))
+            for _ in 0..<20 {
+                app.typeKey(.escape, modifierFlags: [])
+            }
+            waitForCreationPromptToDismiss()
+        }
+
+        clickRow(waitForRow(named: "alpha.txt", in: "left"))
+        app.typeKey("g", modifierFlags: [.command, .shift])
+        let pathField = app.textFields["go-to-path-field"]
+        XCTAssertTrue(pathField.waitForExistence(timeout: 5), "Go To Folder field did not appear")
+        for _ in 0..<20 {
+            app.typeKey(.escape, modifierFlags: [])
+        }
+        let dismissed = expectation(for: NSPredicate(format: "exists == false"), evaluatedWith: pathField)
+        wait(for: [dismissed], timeout: 5)
+
+        XCTAssertTrue(app.descendants(matching: .any)["left-pane"].exists)
+    }
+
+    @MainActor
+    func testCriticalCommandVPastesIntoCreationAndGoToFolderFields() throws {
+        launchApp()
+        let pasteboard = NSPasteboard.general
+
+        pasteboard.clearContents()
+        pasteboard.setString("pasted-name.txt", forType: .string)
+        clickToolbarButton("toolbar-new-file-button")
+
+        let nameField = app.textFields["text-prompt-name-field"]
+        XCTAssertTrue(nameField.waitForExistence(timeout: 5))
+        nameField.click()
+        nameField.typeKey(.rightArrow, modifierFlags: .command)
+        nameField.typeKey(.leftArrow, modifierFlags: [.command, .shift])
+        app.typeKey("v", modifierFlags: .command)
+        XCTAssertEqual(nameField.value as? String, "pasted-name.txt")
+        app.typeKey(.escape, modifierFlags: [])
+
+        let promptDismissed = expectation(for: NSPredicate(format: "exists == false"), evaluatedWith: nameField)
+        wait(for: [promptDismissed], timeout: 5)
+
+        let path = fixture.leftPaneURL.path
+        pasteboard.clearContents()
+        pasteboard.setString(path, forType: .string)
+        app.typeKey("g", modifierFlags: [.command, .shift])
+
+        let pathField = app.textFields["go-to-path-field"]
+        XCTAssertTrue(pathField.waitForExistence(timeout: 5))
+        pathField.click()
+        pathField.typeKey(.rightArrow, modifierFlags: .command)
+        pathField.typeKey(.leftArrow, modifierFlags: [.command, .shift])
+        app.typeKey("v", modifierFlags: .command)
+        XCTAssertEqual(pathField.value as? String, path)
+        app.typeKey(.escape, modifierFlags: [])
+    }
+
+    @MainActor
+    func testCriticalDateAddedColumnCanBeShown() throws {
+        launchApp(additionalArguments: ["-hiddenColumns", "NONE"])
+
+        XCTAssertTrue(
+            app.staticTexts["Date Added"].waitForExistence(timeout: 5)
+        )
+    }
+
+    @MainActor
+    func testCriticalMenuShowsInternalTestBuildMarker() throws {
+        launchApp()
+
+        XCTAssertTrue(app.menuItems["Internal Test Build 421.4"].waitForExistence(timeout: 5))
+    }
+
+    @MainActor
     func testCriticalCopySelectedFileBetweenPanes() throws {
         let sourceURL = try fixture.writeFile(named: "copy-me.txt", contents: "copy source", in: fixture.leftPaneURL)
         launchApp()
@@ -89,6 +169,203 @@ final class DuPaneEndToEndUITests: DuPaneTestCase {
         waitForMissingRow(named: "move-me.txt", in: "left")
         XCTAssertFalse(fixture.exists(sourceURL))
         XCTAssertEqual(try fixture.fileContents(named: "move-me.txt", in: fixture.rightPaneURL), "move source")
+    }
+
+    @MainActor
+    func testCriticalCommandVMovesSelectedFileBetweenPanes() throws {
+        let sourceURL = try fixture.writeFile(named: "shortcut-move-me.txt", contents: "shortcut move source", in: fixture.leftPaneURL)
+        launchApp()
+
+        let sourceRow = waitForRow(named: "shortcut-move-me.txt", in: "left")
+        clickRow(sourceRow)
+        waitForSelection(sourceRow)
+        app.typeKey("v", modifierFlags: .command)
+
+        XCTAssertTrue(row(named: "shortcut-move-me.txt", in: "right").waitForExistence(timeout: 5))
+        waitForMissingRow(named: "shortcut-move-me.txt", in: "left")
+        XCTAssertFalse(fixture.exists(sourceURL))
+        XCTAssertEqual(
+            try fixture.fileContents(named: "shortcut-move-me.txt", in: fixture.rightPaneURL),
+            "shortcut move source"
+        )
+    }
+
+    @MainActor
+    func testCriticalCreatesFileAndFolderThroughToolbarSheets() throws {
+        launchApp()
+
+        clickToolbarButton("toolbar-new-folder-button")
+        let folderField = app.textFields["text-prompt-name-field"]
+        XCTAssertTrue(folderField.waitForExistence(timeout: 5))
+        folderField.click()
+        folderField.typeKey(.rightArrow, modifierFlags: .command)
+        folderField.typeKey(.leftArrow, modifierFlags: [.command, .shift])
+        folderField.typeText("created-folder")
+        clickToolbarButton("text-prompt-confirm-button")
+        XCTAssertTrue(row(named: "created-folder", in: "left").waitForExistence(timeout: 5))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: fixture.fileURL(named: "created-folder", in: fixture.leftPaneURL).path))
+
+        clickToolbarButton("toolbar-new-file-button")
+        let fileField = app.textFields["text-prompt-name-field"]
+        XCTAssertTrue(fileField.waitForExistence(timeout: 5))
+        fileField.click()
+        fileField.typeKey(.rightArrow, modifierFlags: .command)
+        fileField.typeKey(.leftArrow, modifierFlags: [.command, .shift])
+        fileField.typeText("created-file.txt")
+        clickToolbarButton("text-prompt-confirm-button")
+        XCTAssertTrue(row(named: "created-file.txt", in: "left").waitForExistence(timeout: 5))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: fixture.fileURL(named: "created-file.txt", in: fixture.leftPaneURL).path))
+    }
+
+    @MainActor
+    func testCriticalRepeatedCreationAndGoToFolderCyclesRemainResponsive() throws {
+        launchApp()
+
+        for index in 1...20 {
+            clickToolbarButton("toolbar-new-folder-button")
+            let folderField = app.textFields["text-prompt-name-field"]
+            XCTAssertTrue(folderField.waitForExistence(timeout: 5))
+            replaceText(in: folderField, with: "stress-folder-\(index)")
+            clickToolbarButton("text-prompt-confirm-button")
+            XCTAssertTrue(row(named: "stress-folder-\(index)", in: "left").waitForExistence(timeout: 5), "Folder row did not appear for index \(index)")
+            waitForCreationPromptToDismiss()
+        }
+
+        for index in 1...20 {
+            clickToolbarButton("toolbar-new-file-button")
+            let fileField = app.textFields["text-prompt-name-field"]
+            XCTAssertTrue(fileField.waitForExistence(timeout: 5))
+            replaceText(in: fileField, with: "stress-file-\(index).txt")
+            clickToolbarButton("text-prompt-confirm-button")
+            XCTAssertTrue(row(named: "stress-file-\(index).txt", in: "left").waitForExistence(timeout: 5), "File row did not appear for index \(index)")
+            waitForCreationPromptToDismiss()
+        }
+
+        for cycle in 1...20 {
+            clickRow(waitForRow(named: "alpha.txt", in: "left"))
+            app.typeKey("g", modifierFlags: [.command, .shift])
+            let pathField = app.textFields["go-to-path-field"]
+            XCTAssertTrue(pathField.waitForExistence(timeout: 5), "Go To Folder field did not appear on cycle \(cycle)")
+            replaceText(in: pathField, with: fixture.leftPaneURL.path)
+            XCTAssertTrue(app.buttons["go-to-path-confirm-button"].waitForExistence(timeout: 5), "Go To Folder confirm did not appear on cycle \(cycle)")
+            app.buttons["go-to-path-confirm-button"].click()
+            waitForSheetToDismiss(pathField)
+            XCTAssertTrue(row(named: "alpha.txt", in: "left").waitForExistence(timeout: 5), "Alpha row did not return on cycle \(cycle)")
+        }
+    }
+
+    @MainActor
+    func testCriticalFolderBurstThenNewFileDoesNotQueueBehindGoToFolder() throws {
+        launchApp()
+
+        for index in 1...20 {
+            clickToolbarButton("toolbar-new-folder-button")
+            let folderField = app.textFields["text-prompt-name-field"]
+            XCTAssertTrue(folderField.waitForExistence(timeout: 5), "New Folder field did not appear for index \(index)")
+            replaceText(in: folderField, with: "burst-folder-\(index)")
+            clickToolbarButton("text-prompt-confirm-button")
+            XCTAssertTrue(row(named: "burst-folder-\(index)", in: "left").waitForExistence(timeout: 5), "Burst folder row did not appear for index \(index)")
+        }
+
+        clickToolbarButton("toolbar-new-file-button")
+        let fileField = app.textFields["text-prompt-name-field"]
+        XCTAssertTrue(fileField.waitForExistence(timeout: 5), "New File field did not appear after the folder burst")
+        replaceText(in: fileField, with: "burst-file.txt")
+        clickToolbarButton("text-prompt-confirm-button")
+        XCTAssertTrue(row(named: "burst-file.txt", in: "left").waitForExistence(timeout: 5), "Burst file row did not appear after the folder burst")
+        let promptOverlay = app.otherElements["creation-prompt-overlay"]
+        let promptDismissed = expectation(for: NSPredicate(format: "exists == false"), evaluatedWith: promptOverlay)
+        wait(for: [promptDismissed], timeout: 5)
+
+        clickRow(waitForRow(named: "alpha.txt", in: "left"))
+        app.typeKey("g", modifierFlags: [.command, .shift])
+        let pathField = app.textFields["go-to-path-field"]
+        XCTAssertTrue(pathField.waitForExistence(timeout: 5), "Go To Folder field did not appear after the folder burst and file creation")
+        app.typeKey(.escape, modifierFlags: [])
+        waitForSheetToDismiss(pathField)
+        XCTAssertFalse(app.textFields["text-prompt-name-field"].exists)
+    }
+
+    @MainActor
+    func testCriticalArchiveRoundTripThroughContextMenu() throws {
+        let sourceURL = try fixture.writeFile(named: "archive-me.txt", contents: "archive contents", in: fixture.leftPaneURL)
+        launchApp()
+
+        rightClickRow(waitForRow(named: "archive-me.txt", in: "left"))
+        XCTAssertTrue(app.menuItems["Compress"].waitForExistence(timeout: 2))
+        app.menuItems["Compress"].click()
+
+        _ = waitForRow(named: "archive-me.zip", in: "left")
+        try FileManager.default.removeItem(at: sourceURL)
+        app.typeKey("r", modifierFlags: .command)
+        waitForMissingRow(named: "archive-me.txt", in: "left")
+
+        rightClickRow(waitForRow(named: "archive-me.zip", in: "left"))
+        XCTAssertTrue(app.menuItems["Uncompress"].waitForExistence(timeout: 2))
+        app.menuItems["Uncompress"].click()
+
+        XCTAssertTrue(row(named: "archive-me.txt", in: "left").waitForExistence(timeout: 5))
+        XCTAssertEqual(
+            try fixture.fileContents(named: "archive-me.txt", in: fixture.leftPaneURL),
+            "archive contents"
+        )
+    }
+
+    @MainActor
+    func testCriticalDuplicateFinderScansAndShowsDuplicateGroup() throws {
+        try fixture.writeFile(named: "duplicate-a.txt", contents: "same contents", in: fixture.leftPaneURL)
+        try fixture.writeFile(named: "duplicate-b.txt", contents: "same contents", in: fixture.leftPaneURL)
+        launchApp()
+
+        clickToolbarButton("toolbar-duplicates-button")
+        XCTAssertTrue(app.sheets.firstMatch.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Keep First"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["2 copies"].exists)
+        app.buttons["Done"].click()
+        XCTAssertFalse(app.sheets.firstMatch.exists)
+    }
+
+    @MainActor
+    func testMediumCommandRunnerPanelCanBeOpenedAndClosed() throws {
+        launchApp()
+
+        clickToolbarButton("toolbar-terminal-button")
+        let commandField = app.textFields["Command…"]
+        XCTAssertTrue(commandField.waitForExistence(timeout: 5))
+        clickToolbarButton("toolbar-terminal-button")
+        XCTAssertFalse(commandField.exists)
+    }
+
+    @MainActor
+    func testMediumFilterNarrowsVisibleRows() throws {
+        launchApp()
+
+        let filter = app.textFields["left-pane"]
+        XCTAssertTrue(filter.waitForExistence(timeout: 5))
+        filter.click()
+        filter.typeText("alpha")
+
+        XCTAssertTrue(row(named: "alpha.txt", in: "left").waitForExistence(timeout: 5))
+        waitForMissingRow(named: "beta.txt", in: "left")
+    }
+
+    @MainActor
+    func testMediumPropertiesAndFolderSizePanelsOpen() throws {
+        let folderURL = try fixture.createFolder(named: "sized-folder", in: fixture.leftPaneURL)
+        try fixture.writeFile(named: "inside.txt", contents: "inside", in: folderURL)
+        launchApp()
+
+        rightClickRow(waitForRow(named: "sized-folder", in: "left"))
+        XCTAssertTrue(app.menuItems["Show Folder / File Sizes"].waitForExistence(timeout: 2))
+        app.menuItems["Show Folder / File Sizes"].click()
+        XCTAssertTrue(app.staticTexts["Folder Sizes"].waitForExistence(timeout: 5))
+        app.buttons["Done"].click()
+
+        rightClickRow(waitForRow(named: "alpha.txt", in: "left"))
+        XCTAssertTrue(app.menuItems["Get Info…"].waitForExistence(timeout: 2))
+        app.menuItems["Get Info…"].click()
+        XCTAssertTrue(app.staticTexts["Path"].waitForExistence(timeout: 5))
+        app.buttons["Done"].click()
     }
 
     @MainActor
@@ -326,7 +603,7 @@ final class DuPaneEndToEndUITests: DuPaneTestCase {
     }
 
     @MainActor
-    private func launchApp() {
+    private func launchApp(additionalArguments: [String] = []) {
         app.launchArguments = [
             "-ApplePersistenceIgnoreState",
             "YES",
@@ -336,7 +613,7 @@ final class DuPaneEndToEndUITests: DuPaneTestCase {
             "YES",
             "--left-pane-url", fixture.leftPaneURL.path,
             "--right-pane-url", fixture.rightPaneURL.path
-        ]
+        ] + additionalArguments
         app.launch()
         app.activate()
         XCTAssertTrue(
@@ -364,6 +641,27 @@ final class DuPaneEndToEndUITests: DuPaneTestCase {
         let predicate = NSPredicate(format: "exists == false")
         expectation(for: predicate, evaluatedWith: element)
         waitForExpectations(timeout: 5)
+    }
+
+    @MainActor
+    private func replaceText(in field: XCUIElement, with value: String) {
+        field.click()
+        field.typeKey(.rightArrow, modifierFlags: .command)
+        field.typeKey(.leftArrow, modifierFlags: [.command, .shift])
+        field.typeText(value)
+    }
+
+    @MainActor
+    private func waitForSheetToDismiss(_ sheet: XCUIElement) {
+        let dismissed = expectation(for: NSPredicate(format: "exists == false"), evaluatedWith: sheet)
+        wait(for: [dismissed], timeout: 5)
+    }
+
+    @MainActor
+    private func waitForCreationPromptToDismiss() {
+        let overlay = app.otherElements["creation-prompt-overlay"]
+        let dismissed = expectation(for: NSPredicate(format: "exists == false"), evaluatedWith: overlay)
+        wait(for: [dismissed], timeout: 5)
     }
 
     @MainActor

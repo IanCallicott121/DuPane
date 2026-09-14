@@ -18,6 +18,7 @@ struct GlobalToolbar: View {
     let canSyncRightToLeft: Bool
     let onToggleSidebar: () -> Void
     let onBookmarkCurrent: () -> Void
+    let canCreateItems: Bool
     let onNewFolder: () -> Void
     let onNewFile: () -> Void
     let onMove: () -> Void
@@ -49,12 +50,16 @@ struct GlobalToolbar: View {
             Button(action: onNewFolder) {
                 toolbarLabel("New Folder", icon: "folder.badge.plus")
             }
+            .disabled(!canCreateItems)
             .keyboardShortcut("n", modifiers: .command)
+            .accessibilityIdentifier("toolbar-new-folder-button")
 
             Button(action: onNewFile) {
                 toolbarLabel("New File", icon: "doc.badge.plus")
             }
+            .disabled(!canCreateItems)
             .keyboardShortcut("n", modifiers: [.command, .option])
+            .accessibilityIdentifier("toolbar-new-file-button")
 
             Button(action: onMove) {
                 toolbarLabel("Move", icon: moveIcon)
@@ -112,6 +117,7 @@ struct GlobalToolbar: View {
                 toolbarLabel("Dupes", icon: "doc.on.doc")
             }
             .disabled(!canFindDuplicates)
+            .accessibilityIdentifier("toolbar-duplicates-button")
             .help("Find duplicate files in the current folder tree")
 
             Divider().frame(height: 20)
@@ -121,6 +127,7 @@ struct GlobalToolbar: View {
                     .foregroundStyle(isBookmarked ? Color.accentColor : Color.secondary)
             }
             .disabled(!bookmarkEnabled)
+            .accessibilityIdentifier("toolbar-bookmark-button")
             .help(isBookmarked ? "Remove Bookmark" : "Add to Sidebar")
 
             Button(action: onToggleTerminal) {
@@ -134,6 +141,7 @@ struct GlobalToolbar: View {
                 toolbarLabel("Follow", icon: "link")
                     .foregroundStyle(isFollowMode ? Color.accentColor : Color.secondary)
             }
+            .accessibilityIdentifier("toolbar-follow-button")
             .help(isFollowMode ? "Follow Mode on — navigation mirrors between panes" : "Follow Mode — navigation in one pane mirrors to the other")
 
             if isCompareMode, let compareSummary {

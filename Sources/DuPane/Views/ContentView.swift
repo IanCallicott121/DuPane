@@ -3,6 +3,21 @@ import Foundation
 import AppKit
 
 struct ContentView: View {
+    private struct CreationSheet: Identifiable {
+        enum Kind {
+            case newFolder
+            case newFile
+        }
+
+        let id = UUID()
+        let kind: Kind
+    }
+
+    private enum PendingCreation {
+        case folder(baseURL: URL, name: String)
+        case file(baseURL: URL, name: String)
+    }
+
     private enum Layout {
         static let outerMargin: CGFloat = 6
         static let paneSpacing: CGFloat = 6
@@ -23,11 +38,15 @@ struct ContentView: View {
     @State private var activeTagFilters: Set<String> = []
     @State private var toastMessage: String?
     @State private var toastUndo: (() -> Void)?
+    @State private var toastDismissTask: Task<Void, Never>?
     @State private var showDeleteConfirm = false
-    @State private var showNewFolderSheet = false
     @State private var newFolderName = "New Folder"
-    @State private var showNewFileSheet = false
     @State private var newFileName = "untitled"
+    @State private var goToPathText = ""
+    @State private var showGoToPath = false
+    @State private var creationSheet: CreationSheet?
+    @State private var pendingCreation: PendingCreation?
+    @State private var isCreationSheetTransitioning = false
     @State private var pendingConflictFiles: [FileItem] = []
     @State private var pendingConflictDest: URL? = nil
     @State private var pendingConflictIsMove: Bool = false
@@ -75,23 +94,52 @@ struct ContentView: View {
         // Delegate the heavy layout + observer chain to a separate function so
         // the Swift type-checker can handle each expression tree independently.
         coreView(snapshot: snapshot, leftToRightPlan: leftToRightPlan, rightToLeftPlan: rightToLeftPlan)
-            .sheet(isPresented: $showNewFolderSheet) {
-                TextPromptSheet(
-                    title: "New Folder",
-                    text: $newFolderName,
-                    confirmLabel: "Create",
-                    onConfirm: performCreateFolder,
-                    onCancel: { showNewFolderSheet = false }
-                )
+            .overlay {
+                if let creationSheet {
+                    ZStack {
+                        Color.black.opacity(0.18)
+                            .ignoresSafeArea()
+                        Group {
+                            switch creationSheet.kind {
+                            case .newFolder:
+                                TextPromptSheet(
+                                    title: "New Folder",
+                                    text: $newFolderName,
+                                    confirmLabel: "Create",
+                                    onConfirm: performCreateFolder,
+                                    onCancel: dismissCreationSheet
+                                )
+                            case .newFile:
+                                TextPromptSheet(
+                                    title: "New File",
+                                    text: $newFileName,
+                                    confirmLabel: "Create",
+                                    onConfirm: performCreateFile,
+                                    onCancel: dismissCreationSheet
+                                )
+                            }
+                        }
+                        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+                        .shadow(radius: 16)
+                        .accessibilityElement(children: .contain)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .accessibilityIdentifier("creation-prompt-overlay")
+                }
             }
-            .sheet(isPresented: $showNewFileSheet) {
-                TextPromptSheet(
-                    title: "New File",
-                    text: $newFileName,
-                    confirmLabel: "Create",
-                    onConfirm: performCreateFile,
-                    onCancel: { showNewFileSheet = false }
-                )
+            .overlay {
+                if showGoToPath {
+                    ZStack {
+                        Color.black.opacity(0.18)
+                            .ignoresSafeArea()
+                        goToPathSheet
+                            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+                            .shadow(radius: 16)
+                            .accessibilityElement(children: .contain)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .accessibilityIdentifier("go-to-path-overlay")
+                }
             }
             .sheet(isPresented: $showDuplicateFinder, onDismiss: { duplicateFinderViewModel.cancel() }) {
                 if let rootURL = duplicateScanURL {
@@ -196,6 +244,17 @@ struct ContentView: View {
             case "newFolder": requestNewFolder()
             case "delete": requestDelete()
             default: break
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .goToPathShortcutRequested)) { _ in
+            requestGoToPath()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .creationPromptEscapeRequested)) { _ in
+            if creationSheet != nil {
+                dismissCreationSheet()
+            } else if showGoToPath {
+                showGoToPath = false
+                resignCreationPromptFocus()
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .paneContentsChanged)) { notif in
@@ -341,7 +400,7 @@ struct ContentView: View {
                 .keyboardShortcut("r", modifiers: .command)
             Button("Select All") { active.selectAll() }
                 .keyboardShortcut("a", modifiers: .command)
-            Button("Go to Path") { active.requestGoToPath = true }
+            Button("Go to Path") { requestGoToPath() }
                 .keyboardShortcut("l", modifiers: .command)
             Button("Switch Active Pane") {
                 activePane = activePane == .left ? .right : .left
@@ -349,7 +408,7 @@ struct ContentView: View {
             .keyboardShortcut(.tab, modifiers: [])
         }
         Group {
-            Button("Go to Path") { active.requestGoToPath = true }
+            Button("Go to Path") { requestGoToPath() }
                 .keyboardShortcut("g", modifiers: [.command, .shift])
             Button("Go Home") { active.navigate(to: FileManager.default.homeDirectoryForCurrentUser) }
                 .keyboardShortcut("h", modifiers: [.command, .shift])
@@ -401,6 +460,7 @@ struct ContentView: View {
             canSyncRightToLeft: rightToLeftPlan?.isEmpty == false,
             onToggleSidebar: toggleSidebar,
             onBookmarkCurrent: { [self] in if let url = bookmarkTarget { sidebarModel.toggleBookmark(url) } },
+            canCreateItems: !isCreationSheetTransitioning && creationSheet == nil,
             onNewFolder: requestNewFolder,
             onNewFile: requestNewFile,
             onMove: { self.moveOrCopy(isMove: true) },
@@ -646,16 +706,18 @@ struct ContentView: View {
     // MARK: - Toast
 
     private func showToast(_ message: String, undo: (() -> Void)? = nil) {
+        toastDismissTask?.cancel()
         withAnimation {
             toastMessage = message
             toastUndo = undo
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + (undo == nil ? 3 : 6)) {
-            if toastMessage == message {
-                withAnimation {
-                    toastMessage = nil
-                    toastUndo = nil
-                }
+        let delay: UInt64 = undo == nil ? 3_000_000_000 : 6_000_000_000
+        toastDismissTask = Task { @MainActor in
+            try? await Task.sleep(nanoseconds: delay)
+            guard !Task.isCancelled, toastMessage == message else { return }
+            withAnimation {
+                toastMessage = nil
+                toastUndo = nil
             }
         }
     }
@@ -683,54 +745,165 @@ struct ContentView: View {
         target.navigate(to: url)
     }
 
+    private func requestGoToPath() {
+        guard creationSheet == nil else { return }
+        let path = active.currentURL?.path ?? ""
+        showGoToPath = false
+        Task { @MainActor in
+            await Task.yield()
+            guard creationSheet == nil else { return }
+            goToPathText = path
+            showGoToPath = true
+        }
+    }
+
+    @ViewBuilder
+    private var goToPathSheet: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Go to Folder").font(.headline)
+            TextField("/", text: $goToPathText)
+                .textFieldStyle(.roundedBorder)
+                .font(.system(size: 12, design: .monospaced))
+                .onSubmit(commitGoToPath)
+                .onExitCommand { showGoToPath = false }
+                .onPasteCommand(of: [.text]) { providers in
+                    guard let provider = providers.first else { return }
+                    provider.loadObject(ofClass: NSString.self) { value, _ in
+                        guard let value = value as? NSString else { return }
+                        DispatchQueue.main.async { goToPathText = value as String }
+                    }
+                }
+                .accessibilityIdentifier("go-to-path-field")
+            HStack {
+                Spacer()
+                Button("Cancel") { showGoToPath = false }
+                    .accessibilityIdentifier("go-to-path-cancel-button")
+                Button("Go", action: commitGoToPath)
+                    .keyboardShortcut(.defaultAction)
+                    .accessibilityIdentifier("go-to-path-confirm-button")
+                    .disabled(goToPathText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            }
+        }
+        .padding(20)
+        .frame(width: 440)
+        .onExitCommand { showGoToPath = false }
+    }
+
+    private func commitGoToPath() {
+        let raw = goToPathText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let expanded = (raw as NSString).expandingTildeInPath
+        let url = URL(fileURLWithPath: expanded)
+        var isDirectory: ObjCBool = false
+        guard FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory), isDirectory.boolValue else {
+            showGoToPath = false
+            active.errorMessage = "\"\(expanded)\" is not a folder."
+            return
+        }
+        showGoToPath = false
+        active.navigate(to: url)
+    }
+
     // MARK: - New Folder
 
     private func requestNewFolder() {
+        guard !isCreationSheetTransitioning else { return }
         guard active.currentURL != nil else { showToast("Navigate into a folder first."); return }
         newFolderName = "New Folder"
-        showNewFolderSheet = true
+        creationSheet = CreationSheet(kind: .newFolder)
     }
 
     private func performCreateFolder() {
         guard let baseURL = active.currentURL else { return }
         let name = newFolderName.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !name.isEmpty else { return }
-        showNewFolderSheet = false
-        do {
-            try FileOperationService.createFolder(named: name, in: baseURL)
-            active.load()
-            reloadPeerIfSameFolder(changedURL: baseURL)
-            showToast("Created folder '\(name)'.")
-        } catch {
-            active.errorMessage = error.localizedDescription
-        }
+        pendingCreation = .folder(baseURL: baseURL, name: name)
+        isCreationSheetTransitioning = true
+        resignCreationPromptFocus()
+        creationSheet = nil
+        schedulePendingCreationFinish()
     }
 
     // MARK: - New File
 
     private func requestNewFile() {
+        guard !isCreationSheetTransitioning else { return }
         guard active.currentURL != nil else { showToast("Navigate into a folder first."); return }
         newFileName = "untitled"
-        showNewFileSheet = true
+        creationSheet = CreationSheet(kind: .newFile)
     }
 
     private func performCreateFile() {
         guard let baseURL = active.currentURL else { return }
         let name = newFileName.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !name.isEmpty else { return }
-        showNewFileSheet = false
+        pendingCreation = .file(baseURL: baseURL, name: name)
+        isCreationSheetTransitioning = true
+        resignCreationPromptFocus()
+        creationSheet = nil
+        schedulePendingCreationFinish()
+    }
+
+    private func dismissCreationSheet() {
+        pendingCreation = nil
+        resignCreationPromptFocus()
+        creationSheet = nil
+        isCreationSheetTransitioning = false
+    }
+
+    private func resignCreationPromptFocus() {
+        guard let window = NSApp.keyWindow else { return }
+        window.endEditing(for: nil)
+        window.makeFirstResponder(window.contentView)
+    }
+
+    private func schedulePendingCreationFinish() {
+        Task { @MainActor in
+            await Task.yield()
+            finishCreationSheetDismissal()
+        }
+    }
+
+    private func finishCreationSheetDismissal() {
+        guard let pendingCreation else {
+            isCreationSheetTransitioning = false
+            return
+        }
+        resignCreationPromptFocus()
+        self.pendingCreation = nil
+        let pane = active
+
         do {
-            let fileURL = try FileOperationService.createFile(named: name, in: baseURL)
-            active.load()
-            reloadPeerIfSameFolder(changedURL: baseURL)
-            let pane = active
-            Task { @MainActor in
-                await pane.loadingTask?.value
-                pane.selection = [fileURL]
+            let createdFileURL: URL?
+            let message: String
+            let baseURL: URL
+            switch pendingCreation {
+            case let .folder(folderURL, name):
+                baseURL = folderURL
+                try FileOperationService.createFolder(named: name, in: folderURL)
+                createdFileURL = nil
+                message = "Created folder '\(name)'."
+            case let .file(folderURL, name):
+                baseURL = folderURL
+                createdFileURL = try FileOperationService.createFile(named: name, in: folderURL)
+                message = "Created file '\(name)'."
             }
-            showToast("Created file '\(name)'.")
+
+            reloadPeerIfSameFolder(changedURL: baseURL)
+            let refreshTask = pane.loadingTask
+            Task { @MainActor in
+                await refreshTask?.value
+                while pane.isLoading {
+                    await Task.yield()
+                }
+                if let createdFileURL {
+                    pane.selection = [createdFileURL]
+                }
+                isCreationSheetTransitioning = false
+                showToast(message)
+            }
         } catch {
-            active.errorMessage = error.localizedDescription
+            pane.errorMessage = error.localizedDescription
+            isCreationSheetTransitioning = false
         }
     }
 

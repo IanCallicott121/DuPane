@@ -36,6 +36,51 @@ final class DuPaneFunctionTests: DuPaneTestCase {
         XCTAssertEqual(configuration.rightPaneURL, fixture.rightPaneURL)
     }
 
+    func testInstalledAppSymlinkTargetsExternalDebugBuild() throws {
+        let fileManager = FileManager.default
+        let linkURL = fileManager.homeDirectoryForCurrentUser
+            .appendingPathComponent("Applications/DuPane.app")
+        let expectedURL = fileManager.homeDirectoryForCurrentUser
+            .appendingPathComponent("Library/Developer/DuPane-build/Build/Products/Debug/DuPane.app")
+
+        let targetPath = try fileManager.destinationOfSymbolicLink(atPath: linkURL.path)
+        let targetURL = targetPath.hasPrefix("/")
+            ? URL(fileURLWithPath: targetPath).standardizedFileURL
+            : linkURL.deletingLastPathComponent().appendingPathComponent(targetPath).standardizedFileURL
+        let binaryURL = targetURL.appendingPathComponent("Contents/MacOS/DuPane")
+
+        XCTAssertEqual(targetURL, expectedURL.standardizedFileURL)
+        XCTAssertTrue(fileManager.fileExists(atPath: binaryURL.path))
+    }
+
+    func testInstalledAppSymlinkDateMatchesLatestDebugBuild() throws {
+        let fileManager = FileManager.default
+        let linkURL = fileManager.homeDirectoryForCurrentUser
+            .appendingPathComponent("Applications/DuPane.app")
+        let targetPath = try fileManager.destinationOfSymbolicLink(atPath: linkURL.path)
+        let targetURL = targetPath.hasPrefix("/")
+            ? URL(fileURLWithPath: targetPath).standardizedFileURL
+            : linkURL.deletingLastPathComponent().appendingPathComponent(targetPath).standardizedFileURL
+        let repositoryURL = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let sourceURL = repositoryURL.appendingPathComponent("Sources/DuPane/DuPaneApp.swift")
+        let binaryURL = targetURL.appendingPathComponent("Contents/MacOS/DuPane")
+        let sourceDate = try XCTUnwrap(
+            fileManager.attributesOfItem(atPath: sourceURL.path)[.modificationDate] as? Date
+        )
+        let binaryDate = try XCTUnwrap(
+            fileManager.attributesOfItem(atPath: binaryURL.path)[.modificationDate] as? Date
+        )
+        let linkDate = try XCTUnwrap(
+            fileManager.attributesOfItem(atPath: linkURL.path)[.modificationDate] as? Date
+        )
+
+        XCTAssertGreaterThan(binaryDate, sourceDate)
+        XCTAssertGreaterThanOrEqual(linkDate, binaryDate)
+    }
+
     @MainActor
     func testLoadFolderReadsFilesAndFolders() throws {
         try fixture.createFolder(named: "Nested", in: .left)
@@ -43,6 +88,15 @@ final class DuPaneFunctionTests: DuPaneTestCase {
         let names = try fixture.itemNames(in: .left)
 
         XCTAssertEqual(names, ["Nested", "alpha.txt", "beta.txt", "gamma.txt"])
+    }
+
+    @MainActor
+    func testLoadFolderPopulatesDateAdded() throws {
+        let item = try PaneState.loadFolder(fixture.leftPaneURL).first { $0.name == "alpha.txt" }
+        let resourceValues = try item?.url.resourceValues(forKeys: [.creationDateKey])
+
+        XCTAssertNotNil(item?.dateAdded)
+        XCTAssertEqual(item?.dateAdded, resourceValues?.creationDate)
     }
 
     @MainActor
@@ -249,6 +303,19 @@ final class DuPaneFunctionTests: DuPaneTestCase {
     }
 
     @MainActor
+    func testDisplayedItemsSortsByDateAdded() {
+        let pane = PaneState(initialURL: fixture.leftPaneURL)
+        pane.items = [
+            makeItem(name: "older.txt", dateAdded: Date(timeIntervalSince1970: 10)),
+            makeItem(name: "newer.txt", dateAdded: Date(timeIntervalSince1970: 30)),
+            makeItem(name: "middle.txt", dateAdded: Date(timeIntervalSince1970: 20))
+        ]
+        pane.setSort(.dateAdded)
+
+        XCTAssertEqual(pane.displayedItems.map(\.name), ["older.txt", "middle.txt", "newer.txt"])
+    }
+
+    @MainActor
     func testSelectedFileItemsReturnsSelectedFilesOnly() {
         let selectedFile = makeItem(name: "alpha.txt", isDirectory: false)
         let selectedFolder = makeItem(name: "Folder", isDirectory: true)
@@ -301,6 +368,37 @@ final class DuPaneFunctionTests: DuPaneTestCase {
         _ = try FileOperationService.createFile(named: "dup.txt", in: fixture.leftPaneURL)
 
         XCTAssertThrowsError(try FileOperationService.createFile(named: "dup.txt", in: fixture.leftPaneURL))
+    }
+
+    @MainActor
+    func testRepeatedCreateAndReloadCyclesKeepPaneResponsive() async throws {
+        let pane = PaneState(initialURL: fixture.leftPaneURL)
+        pane.start()
+        await pane.loadingTask?.value
+
+        for index in 1...20 {
+            _ = try FileOperationService.createFolder(
+                named: "stress-folder-\(index)",
+                in: fixture.leftPaneURL
+            )
+            _ = try FileOperationService.createFile(
+                named: "stress-file-\(index).txt",
+                in: fixture.leftPaneURL
+            )
+            pane.load()
+            pane.load()
+            await pane.loadingTask?.value
+
+            XCTAssertFalse(pane.isLoading, "pane remained loading after cycle \(index)")
+            XCTAssertTrue(
+                pane.items.contains { $0.name == "stress-file-\(index).txt" },
+                "latest file was missing after cycle \(index)"
+            )
+            XCTAssertTrue(
+                pane.items.contains { $0.name == "stress-folder-\(index)" },
+                "latest folder was missing after cycle \(index)"
+            )
+        }
     }
 
     func testDeletePermanentlyRemovesFileWithNoTrash() throws {
@@ -742,6 +840,7 @@ final class DuPaneFunctionTests: DuPaneTestCase {
         size: Int64? = nil,
         kind: String = "Text",
         modified: Date? = nil,
+        dateAdded: Date? = nil,
         tags: [String] = []
     ) -> FileItem {
         let url = fixture.leftPaneURL.appendingPathComponent(name, isDirectory: isDirectory)
@@ -755,7 +854,8 @@ final class DuPaneFunctionTests: DuPaneTestCase {
             size: isDirectory ? nil : size,
             kind: isDirectory ? "Folder" : kind,
             modified: modified,
-            tags: tags
+            tags: tags,
+            dateAdded: dateAdded
         )
     }
 }
@@ -1329,6 +1429,8 @@ final class FolderSizeViewModelTests: DuPaneTestCase {
     func testSortKeyInfoCaseExists() {
         XCTAssertTrue(SortKey.allCases.contains(.info))
         XCTAssertEqual(SortKey.info.rawValue, "Info")
+        XCTAssertTrue(SortKey.allCases.contains(.dateAdded))
+        XCTAssertEqual(SortKey.dateAdded.rawValue, "Date Added")
     }
 
     // [optional] — trivial default; struct initialiser ensures this unless explicitly set
@@ -1368,7 +1470,7 @@ final class FolderSizeViewModelTests: DuPaneTestCase {
     func testAppSettingsColumnOrderDefaultContainsAllColumns() {
         UserDefaults.standard.removeObject(forKey: "columnOrder")
         let settings = AppSettings()
-        XCTAssertEqual(settings.columnOrder, ["Size", "Kind", "Modified", "Info"])
+        XCTAssertEqual(settings.columnOrder, ["Size", "Kind", "Modified", "Date Added", "Info"])
         UserDefaults.standard.removeObject(forKey: "columnOrder")
     }
 
@@ -1377,7 +1479,7 @@ final class FolderSizeViewModelTests: DuPaneTestCase {
         let settings = AppSettings()
         settings.columnOrder = ["Info", "Modified", "Kind", "Size"]
         let settings2 = AppSettings()
-        XCTAssertEqual(settings2.columnOrder, ["Info", "Modified", "Kind", "Size"])
+        XCTAssertEqual(settings2.columnOrder, ["Info", "Modified", "Kind", "Size", "Date Added"])
         UserDefaults.standard.removeObject(forKey: "columnOrder")
     }
 
@@ -1387,6 +1489,7 @@ final class FolderSizeViewModelTests: DuPaneTestCase {
         XCTAssertEqual(settings.columnWidths(for: .left)["Size"], 80)
         XCTAssertEqual(settings.columnWidths(for: .left)["Kind"], 120)
         XCTAssertEqual(settings.columnWidths(for: .left)["Modified"], 150)
+        XCTAssertEqual(settings.columnWidths(for: .left)["Date Added"], 150)
         XCTAssertEqual(settings.columnWidths(for: .left)["Info"], 80)
         UserDefaults.standard.removeObject(forKey: "leftColumnWidths")
     }

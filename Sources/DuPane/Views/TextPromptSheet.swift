@@ -14,10 +14,16 @@ struct TextPromptSheet: View {
                 .textFieldStyle(.roundedBorder)
                 .accessibilityIdentifier("text-prompt-name-field")
                 .onSubmit(onConfirm)
+                .onPasteCommand(of: [.text]) { providers in
+                    guard let provider = providers.first else { return }
+                    provider.loadObject(ofClass: NSString.self) { value, _ in
+                        guard let value = value as? NSString else { return }
+                        DispatchQueue.main.async { text = value as String }
+                    }
+                }
             HStack {
                 Spacer()
                 Button("Cancel", action: onCancel)
-                    .keyboardShortcut(.escape, modifiers: [])
                     .accessibilityIdentifier("text-prompt-cancel-button")
                 Button(confirmLabel, action: onConfirm)
                     .keyboardShortcut(.defaultAction)
@@ -27,5 +33,6 @@ struct TextPromptSheet: View {
         }
         .padding(20)
         .frame(width: 300)
+        .onExitCommand(perform: onCancel)
     }
 }

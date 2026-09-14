@@ -20,8 +20,6 @@ struct PaneView: View {
 
     @State private var renamingItem: FileItem?
     @State private var renameText: String = ""
-    @State private var showGoToPath: Bool = false
-    @State private var goToPathText: String = ""
     @StateObject private var typeAhead = TypeAheadController()
     @State private var typeBuffer: String = ""
     @State private var typeBufferTimer: Timer? = nil
@@ -85,27 +83,6 @@ struct PaneView: View {
                 onCancel: { renamingItem = nil }
             )
         }
-        .sheet(isPresented: $showGoToPath) {
-            VStack(alignment: .leading, spacing: 14) {
-                Text("Go to Folder").font(.headline)
-                TextField("/", text: $goToPathText)
-                    .textFieldStyle(.roundedBorder)
-                    .font(.system(size: 12, design: .monospaced))
-                    .onSubmit { commitGoToPath() }
-                    .accessibilityIdentifier("go-to-path-field")
-                HStack {
-                    Spacer()
-                    Button("Cancel") { showGoToPath = false }
-                        .accessibilityIdentifier("go-to-path-cancel-button")
-                    Button("Go") { commitGoToPath() }
-                        .keyboardShortcut(.defaultAction)
-                        .accessibilityIdentifier("go-to-path-confirm-button")
-                        .disabled(goToPathText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                }
-            }
-            .padding(20)
-            .frame(width: 440)
-        }
         .sheet(item: $folderSizeItem) { item in
             FolderSizeView(folderURL: item.url, onDismiss: { folderSizeItem = nil })
         }
@@ -164,12 +141,6 @@ struct PaneView: View {
             pane.requestRename = false
             guard let item = pane.selectedItems.first else { return }
             beginRename(item)
-        })
-        .onChange(of: pane.requestGoToPath, perform: { should in
-            guard should else { return }
-            pane.requestGoToPath = false
-            goToPathText = pane.currentURL?.path ?? ""
-            showGoToPath = true
         })
         .onAppear {
             typeAhead.isActive = isActive
@@ -288,6 +259,7 @@ struct PaneView: View {
                     .padding(.horizontal, 5)
                     .padding(.vertical, 3)
                     .focused($filterFocused)
+                    .accessibilityIdentifier("\(side.accessibilityIDPrefix)-filter-field")
                     .frame(width: 92)
                     .font(.system(size: 11))
                     .background(Color(nsColor: .textBackgroundColor))
@@ -325,6 +297,7 @@ struct PaneView: View {
                             .foregroundStyle(pane.isInSearchMode ? Color.accentColor : Color.secondary.opacity(0.7))
                     }
                     .buttonStyle(.plain)
+                    .accessibilityIdentifier("\(side.accessibilityIDPrefix)-deep-search-button")
                     .help(pane.isInSearchMode ? "Exit subfolder search" : "Search subfolders (Spotlight)")
                 }
             }
@@ -358,9 +331,10 @@ struct PaneView: View {
             Divider()
             columnToggleButton("Icon")
             columnToggleButton("Size")
-            columnToggleButton("Kind")
-            columnToggleButton("Modified")
-            columnToggleButton("Info")
+                columnToggleButton("Kind")
+                columnToggleButton("Modified")
+                columnToggleButton("Date Added")
+                columnToggleButton("Info")
             Divider()
             Button("Reset Column Widths") { settings.resetColumnWidths(for: side) }
             Divider()
@@ -439,6 +413,7 @@ struct PaneView: View {
         case "Size": return .size
         case "Kind": return .kind
         case "Modified": return .modified
+        case "Date Added": return .dateAdded
         case "Info": return .info
         default: return .name
         }
@@ -605,6 +580,7 @@ struct PaneView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: alignment)
+        .accessibilityIdentifier("\(side.accessibilityIDPrefix)-column-\(title)")
     }
 
     private func setSort(_ key: SortKey) {
@@ -1048,21 +1024,6 @@ struct PaneView: View {
         onActivate()
         guard let item = pane.moveSelection(by: offset, in: visibleItems) else { return }
         typeAheadScrollURL = item.url
-    }
-
-    private func commitGoToPath() {
-        let raw = goToPathText.trimmingCharacters(in: .whitespacesAndNewlines)
-        let expanded = (raw as NSString).expandingTildeInPath
-        let url = URL(fileURLWithPath: expanded)
-        var isDir: ObjCBool = false
-        guard FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir), isDir.boolValue else {
-            showGoToPath = false
-            pane.errorMessage = "\u{201C}\(expanded)\u{201D} is not a folder."
-            return
-        }
-        showGoToPath = false
-        onActivate()
-        pane.navigate(to: url)
     }
 
     // MARK: - Tag management

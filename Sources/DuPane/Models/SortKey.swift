@@ -3,5 +3,6 @@ enum SortKey: String, CaseIterable {
     case size = "Size"
     case kind = "Kind"
     case modified = "Modified"
+    case dateAdded = "Date Added"
     case info = "Info"
 }

@@ -30,21 +30,36 @@ enum TestResultLog {
 class DuPaneTestCase: XCTestCase {
     private var recordedFailures: [String] = []
 
+    private var negativeValidationEnabled: Bool {
+        ProcessInfo.processInfo.environment["DUPANE_E2E_NEGATIVE_VALIDATION"] == "1"
+            || FileManager.default.fileExists(atPath: "/tmp/DuPane-e2e-negative-validation")
+    }
+
     override func record(_ issue: XCTIssue) {
-        recordedFailures.append(issue.compactDescription)
+        if issue.severity.rawValue >= XCTIssue.Severity.error.rawValue {
+            recordedFailures.append(issue.compactDescription)
+        }
         super.record(issue)
     }
 
     override func setUpWithError() throws {
         recordedFailures = []
         try super.setUpWithError()
+        if negativeValidationEnabled {
+            XCTFail("Negative E2E validation: intentional failure for an otherwise-passing test")
+        }
     }
 
     override func tearDownWithError() throws {
+        let testWasSkipped = (testRun?.skipCount ?? 0) > 0
+        let finalTestRunHasFailures = (testRun?.failureCount ?? 0) > 0
+            || (testRun?.unexpectedExceptionCount ?? 0) > 0
         TestResultLog.append(
             name: name,
-            failures: recordedFailures,
-            skipped: (testRun?.skipCount ?? 0) > 0
+            failures: finalTestRunHasFailures && recordedFailures.isEmpty
+                ? ["XCTest reported a failure that was not intercepted by record(_:)" ]
+                : recordedFailures,
+            skipped: testWasSkipped
         )
         try super.tearDownWithError()
     }

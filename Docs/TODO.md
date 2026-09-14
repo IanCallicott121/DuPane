@@ -2,29 +2,40 @@
 
 ## Current state
 
-**Last verified working local build: Build 420.** The archive compression and extraction
-rewrite has been implemented and manually verified.
+**Last verified working local build: Build 421.4.** Cmd-V routing and repeated Escape
+dismissal for New File, New Folder, and Go to Folder have been manually verified.
 
 ## Action Items
 
-### Other data-integrity findings
-
-## Pending items
-- Discuss whether DuPane can be submitted to the Mac App Store.** Feasibility and
-  any necessary changes are still to be discussed. No distribution approach has been
-  chosen, and no code changes are authorized by this item.
-- additional feature - add 'Date Added' as a new attribute which the user can can to the pane
-- bug : click new file button, press escape repeat 8 times and they the UI becomes locked - it does clear if you click New Folder, then the File File panel appears. Same for New Folder, repeatingly pressing New folder button and escape eventually locks up the UI
-- bug : after adding the paste keybaord shortcut CMD-V, now not able to paste file paths from the clipbaord into the new file panel, same issue when trying to paste into the go to folder pannel
+- 2. Fix Cmd-V paste in text fields and retain an E2E assertion that verifies the field
+  value, not merely that the key event was sent. Also retain the pane-level Cmd-V move
+  regression test so text-field paste and pane move both remain available.
+- 3. Harden E2E result reporting so an XCTest failure cannot produce a PASS marker.
+- 4. Expand E2E coverage for visible UI workflows, classify tests as high, medium, or
+  low priority, and support high-priority-only interim runs plus full final runs.
+  Add a negative-validation mode that intentionally fails otherwise-passing tests;
+  the runner must confirm every test fails and must reject missing or PASS results.
+  Current coverage additions: high-priority creation, archive round-trip, Duplicate
+  Finder, and core transfer paths; medium-priority command runner, filtering, and
+  Properties/Folder Sizes. Lower-risk navigation, selection, and context-menu smoke
+  tests remain separately classified; final release runs must execute the full suite.
+- Other data-integrity findings
+- Rework the column picker, when right-click on column heading show list of all column, when hovering over each, allow different options : show, hide, left, right, min, max. Show and hide should be intelligent as inspect if col is currently shown/hidden
+- Discuss whether DuPane can be submitted to the Mac App Store.** Feasibility and   any necessary changes are still to be discussed. No distribution approach has been  chosen, and no code changes are authorized by this item.
 
 
 ## Verification reference
 
 - Unit tests: `swift test --filter DuPaneUITests`.
 - E2E tests: `./Scripts/run-e2e.sh`.
-- Repository workflow: `Docs/AGENT-WORKFLOW.md`.
+- Repository workflow: `AGENTS.md`.
 
 ## Done
+
+### Date Added — 2026-09-14 (Build 420 unchanged)
+
+- Added creation-date metadata, Date Added sorting, column display, column sizing, and
+  migration for existing saved column orders.
 
 ### Data-integrity safeguards — 2026-09-14 (Build 420 unchanged)
 
