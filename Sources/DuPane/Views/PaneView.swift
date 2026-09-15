@@ -262,6 +262,9 @@ struct PaneView: View {
                     .accessibilityIdentifier("\(side.accessibilityIDPrefix)-filter-field")
                     .frame(width: 92)
                     .font(.system(size: 11))
+                    .onChange(of: filterFocused) { focused in
+                        if focused { TextFieldFocusSupport.selectAllCurrentEditor() }
+                    }
                     .background(Color(nsColor: .textBackgroundColor))
                     .clipShape(RoundedRectangle(cornerRadius: 5))
                     .overlay(
@@ -326,34 +329,67 @@ struct PaneView: View {
         .font(.system(size: 10, weight: .semibold, design: .rounded))
         .foregroundStyle(.primary)
         .background(panelBgColor)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("\(side.accessibilityIDPrefix)-column-header")
         .contextMenu {
             Text("Columns").font(.caption)
             Divider()
-            columnToggleButton("Icon")
-            columnToggleButton("Size")
-                columnToggleButton("Kind")
-                columnToggleButton("Modified")
-                columnToggleButton("Date Added")
-                columnToggleButton("Info")
+            ForEach(columnPickerColumns, id: \.self) { column in
+                columnPickerMenu(for: column)
+            }
             Divider()
             Button("Reset Column Widths") { settings.resetColumnWidths(for: side) }
-            Divider()
-            ForEach(settings.columnOrder.indices, id: \.self) { idx in
-                let col = settings.columnOrder[idx]
-                Menu("\(col) column") {
-                    if idx > 0 {
-                        Button("Move Left") {
-                            withAnimation { settings.columnOrder.swapAt(idx, idx - 1) }
-                        }
-                    }
-                    if idx < settings.columnOrder.count - 1 {
-                        Button("Move Right") {
-                            withAnimation { settings.columnOrder.swapAt(idx, idx + 1) }
-                        }
+        }
+    }
+
+    private var columnPickerColumns: [String] {
+        ["Name", "Icon"] + settings.columnOrder
+    }
+
+    @ViewBuilder
+    private func columnPickerMenu(for column: String) -> some View {
+        Menu(column) {
+            if column == "Name" {
+                Button("Hide Name") {}
+                    .disabled(true)
+                Text("Always visible")
+            } else {
+                columnToggleButton(column)
+            }
+
+            let isVisible = !settings.hiddenColumns.contains(column)
+            let navigationOrder = columnPickerNavigationOrder(for: column)
+            if let index = navigationOrder.firstIndex(of: column) {
+                Divider()
+                Button("Move Left") {
+                    guard isVisible else { return }
+                    withAnimation {
+                        settings.moveColumn(column, by: -1, within: columnPickerNavigationOrder(for: column))
                     }
                 }
+                .disabled(!isVisible || index == 0)
+                Button("Move Right") {
+                    guard isVisible else { return }
+                    withAnimation {
+                        settings.moveColumn(column, by: 1, within: columnPickerNavigationOrder(for: column))
+                    }
+                }
+                .disabled(!isVisible || index == navigationOrder.count - 1)
+                Divider()
+                Button("Minimum Width") {
+                    settings.setColumnWidth(column, to: FileColumnLayout.minWidth, for: side)
+                }
+                Button("Maximum Width") {
+                    settings.setColumnWidth(column, to: FileColumnLayout.maxWidth, for: side)
+                }
+            } else if column == "Icon" {
+                Text("Position and width are fixed")
             }
         }
+    }
+
+    private func columnPickerNavigationOrder(for column: String) -> [String] {
+        settings.hiddenColumns.contains(column) ? settings.columnOrder : visibleColumns
     }
 
     private func metadataHeaderColumns(

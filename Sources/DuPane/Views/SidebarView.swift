@@ -20,6 +20,7 @@ struct SidebarView: View {
     @State private var isFolderDropTargeted = false
     @State private var showConnectToServer = false
     @State private var connectAddress = "smb://"
+    @FocusState private var connectAddressFocused: Bool
     @State private var connectError: String? = nil
     @State private var renamingPinnedURL: String? = nil
     @State private var renamingPinnedText = ""
@@ -208,7 +209,12 @@ struct SidebarView: View {
                 TextField("smb://server/share", text: $connectAddress)
                     .textFieldStyle(.roundedBorder)
                     .font(.system(size: 12, design: .monospaced))
+                    .focused($connectAddressFocused)
+                    .onChange(of: connectAddressFocused) { focused in
+                        if focused { TextFieldFocusSupport.selectAllCurrentEditor() }
+                    }
                     .onSubmit { connectToServer() }
+                    .onAppear { connectAddressFocused = true }
             }
             if let err = connectError {
                 Text(err).font(.system(size: 11)).foregroundStyle(.red)

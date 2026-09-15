@@ -1483,6 +1483,57 @@ final class FolderSizeViewModelTests: DuPaneTestCase {
         UserDefaults.standard.removeObject(forKey: "columnOrder")
     }
 
+    func testAppSettingsMoveColumnPreservesOrderAndStopsAtBoundaries() {
+        UserDefaults.standard.removeObject(forKey: "columnOrder")
+        let settings = AppSettings()
+
+        settings.moveColumn("Kind", by: -1)
+        XCTAssertEqual(settings.columnOrder, ["Kind", "Size", "Modified", "Date Added", "Info"])
+        settings.moveColumn("Kind", by: -1)
+        XCTAssertEqual(settings.columnOrder, ["Kind", "Size", "Modified", "Date Added", "Info"])
+        settings.moveColumn("Kind", by: 4)
+        XCTAssertEqual(settings.columnOrder, ["Size", "Modified", "Date Added", "Info", "Kind"])
+        settings.moveColumn("Kind", by: 1)
+        XCTAssertEqual(settings.columnOrder, ["Size", "Modified", "Date Added", "Info", "Kind"])
+
+        UserDefaults.standard.removeObject(forKey: "columnOrder")
+    }
+
+    func testAppSettingsMoveColumnUsesVisibleOrderForBoundaryMoves() {
+        UserDefaults.standard.removeObject(forKey: "columnOrder")
+        UserDefaults.standard.removeObject(forKey: "hiddenColumns")
+        let settings = AppSettings()
+        settings.hiddenColumns = ["Kind", "Date Added", "Info"]
+        let visibleColumns = ["Size", "Modified"]
+
+        settings.moveColumn("Size", by: 1, within: visibleColumns)
+        XCTAssertEqual(settings.columnOrder, ["Kind", "Modified", "Size", "Date Added", "Info"])
+        settings.moveColumn("Size", by: 1, within: ["Modified", "Size"])
+        XCTAssertEqual(settings.columnOrder, ["Kind", "Modified", "Size", "Date Added", "Info"])
+        settings.moveColumn("Size", by: -1, within: ["Modified", "Size"])
+        XCTAssertEqual(settings.columnOrder, ["Kind", "Size", "Modified", "Date Added", "Info"])
+        settings.moveColumn("Size", by: -1, within: ["Size", "Modified"])
+        XCTAssertEqual(settings.columnOrder, ["Kind", "Size", "Modified", "Date Added", "Info"])
+
+        UserDefaults.standard.removeObject(forKey: "columnOrder")
+        UserDefaults.standard.removeObject(forKey: "hiddenColumns")
+    }
+
+    func testAppSettingsColumnWidthPresetsAreClampedAndPersistedPerPane() {
+        UserDefaults.standard.removeObject(forKey: "leftColumnWidths")
+        UserDefaults.standard.removeObject(forKey: "rightColumnWidths")
+        let settings = AppSettings()
+
+        settings.setColumnWidth("Kind", to: FileColumnLayout.minWidth, for: .left)
+        settings.setColumnWidth("Kind", to: FileColumnLayout.maxWidth, for: .right)
+
+        XCTAssertEqual(settings.columnWidth(for: "Kind", in: .left), FileColumnLayout.minWidth)
+        XCTAssertEqual(settings.columnWidth(for: "Kind", in: .right), FileColumnLayout.maxWidth)
+
+        UserDefaults.standard.removeObject(forKey: "leftColumnWidths")
+        UserDefaults.standard.removeObject(forKey: "rightColumnWidths")
+    }
+
     func testAppSettingsColumnWidthsDefaults() {
         UserDefaults.standard.removeObject(forKey: "leftColumnWidths")
         let settings = AppSettings()

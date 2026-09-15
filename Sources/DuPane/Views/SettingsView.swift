@@ -3,6 +3,7 @@ import AppKit
 
 struct SettingsView: View {
     @ObservedObject var settings: AppSettings
+    @FocusState private var focusedStartupPath: String?
 
     var body: some View {
         Form {
@@ -86,6 +87,9 @@ struct SettingsView: View {
         .formStyle(.grouped)
         .frame(width: 460)
         .padding()
+        .onChange(of: focusedStartupPath) { focusedPane in
+            if focusedPane != nil { TextFieldFocusSupport.selectAllCurrentEditor() }
+        }
         .background(
             Button("") { NSApp.sendAction(#selector(NSWindow.performClose(_:)), to: nil, from: nil) }
                 .keyboardShortcut(.escape, modifiers: [])
@@ -130,6 +134,7 @@ struct SettingsView: View {
                     TextField("Path…", text: fixedPath)
                         .textFieldStyle(.roundedBorder)
                         .font(.system(size: 11, design: .monospaced))
+                        .focused($focusedStartupPath, equals: pane)
                     Button("Browse…") {
                         let panel = NSOpenPanel()
                         panel.canChooseFiles = false

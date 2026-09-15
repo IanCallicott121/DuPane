@@ -31,6 +31,9 @@ struct CommandRunnerView: View {
                     .textFieldStyle(.plain)
                     .font(.system(size: 12, design: .monospaced))
                     .focused($fieldFocused)
+                    .onChange(of: fieldFocused) { focused in
+                        if focused { TextFieldFocusSupport.selectAllCurrentEditor() }
+                    }
                     .padding(.vertical, 6)
                     .accessibilityIdentifier("command-runner-field")
                 if isRunning {

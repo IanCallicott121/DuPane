@@ -44,6 +44,7 @@ struct ContentView: View {
     @State private var newFileName = "untitled"
     @State private var goToPathText = ""
     @State private var showGoToPath = false
+    @FocusState private var goToPathFocused: Bool
     @State private var creationSheet: CreationSheet?
     @State private var pendingCreation: PendingCreation?
     @State private var isCreationSheetTransitioning = false
@@ -764,6 +765,10 @@ struct ContentView: View {
             TextField("/", text: $goToPathText)
                 .textFieldStyle(.roundedBorder)
                 .font(.system(size: 12, design: .monospaced))
+                .focused($goToPathFocused)
+                .onChange(of: goToPathFocused) { focused in
+                    if focused { TextFieldFocusSupport.selectAllCurrentEditor() }
+                }
                 .onSubmit(commitGoToPath)
                 .onExitCommand { showGoToPath = false }
                 .onPasteCommand(of: [.text]) { providers in
@@ -787,6 +792,9 @@ struct ContentView: View {
         .padding(20)
         .frame(width: 440)
         .onExitCommand { showGoToPath = false }
+        .onAppear {
+            goToPathFocused = true
+        }
     }
 
     private func commitGoToPath() {

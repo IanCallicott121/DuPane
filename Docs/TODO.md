@@ -2,26 +2,12 @@
 
 ## Current state
 
-**Last verified working local build: Build 421.4.** Cmd-V routing and repeated Escape
+**Last verified working local build: Build 421.7.** Cmd-V routing, repeated Escape
 dismissal for New File, New Folder, and Go to Folder have been manually verified.
 
 ## Action Items
 
-- 2. Fix Cmd-V paste in text fields and retain an E2E assertion that verifies the field
-  value, not merely that the key event was sent. Also retain the pane-level Cmd-V move
-  regression test so text-field paste and pane move both remain available.
-- 3. Harden E2E result reporting so an XCTest failure cannot produce a PASS marker.
-- 4. Expand E2E coverage for visible UI workflows, classify tests as high, medium, or
-  low priority, and support high-priority-only interim runs plus full final runs.
-  Add a negative-validation mode that intentionally fails otherwise-passing tests;
-  the runner must confirm every test fails and must reject missing or PASS results.
-  Current coverage additions: high-priority creation, archive round-trip, Duplicate
-  Finder, and core transfer paths; medium-priority command runner, filtering, and
-  Properties/Folder Sizes. Lower-risk navigation, selection, and context-menu smoke
-  tests remain separately classified; final release runs must execute the full suite.
-- Other data-integrity findings
-- Rework the column picker, when right-click on column heading show list of all column, when hovering over each, allow different options : show, hide, left, right, min, max. Show and hide should be intelligent as inspect if col is currently shown/hidden
-- Discuss whether DuPane can be submitted to the Mac App Store.** Feasibility and   any necessary changes are still to be discussed. No distribution approach has been  chosen, and no code changes are authorized by this item.
+6.D iscuss whether DuPane can be submitted to the Mac App Store.** Feasibility and   any necessary changes are still to be discussed. No distribution approach has been  chosen, and no code changes are authorized by this item.
 
 
 ## Verification reference
@@ -31,6 +17,31 @@ dismissal for New File, New Folder, and Go to Folder have been manually verified
 - Repository workflow: `AGENTS.md`.
 
 ## Done
+
+### E2E coverage expansion (2026-09-14)
+
+- Expanded visible UI workflow coverage with high, medium, and low priorities, including
+  high-priority-only interim runs and full final runs.
+- Added negative validation that requires every emitted result to be `FAIL` and rejects
+  missing or `PASS` results.
+- Hardened result reporting so XCTest failures and unexpected exceptions emit `FAIL`,
+  never `PASS`; the runner also rejects missing machine-readable results.
+- Classified the active E2E coverage into high, medium, and low priority lanes; retired
+  the Command Runner panel test from the suite.
+
+### Column picker — 2026-09-15 (Build 421.7)
+
+- Right-clicking a column heading lists every column with state-aware show/hide controls,
+  visible-column movement, and minimum/maximum width actions.
+- Hidden columns cannot be moved, and visible-column movement stops at the actual visible
+  left and right boundaries.
+
+### Build 421.4 — UI input routing and Escape dismissal (2026-09-14)
+
+- Cmd-V pastes into New File and Go to Folder text fields while moving selected pane
+  items between panes elsewhere; regression coverage verifies both behaviors.
+- Repeated Escape dismisses New File, New Folder, and Go to Folder without locking the UI.
+- Manual verification completed for all three dialogs, including Go to Folder.
 
 ### Date Added — 2026-09-14 (Build 420 unchanged)
 

@@ -27,6 +27,7 @@
 		620A1F3DFC688184020B03CB /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B6670DC7F86CE59A77BDCB /* AppSettings.swift */; };
 		6793005AD5224B8FB82BED1B /* ArchiveExtractionSafety.swift in Sources */ = {isa = PBXBuildFile; fileRef = 359D76E90A07D857C14708EF /* ArchiveExtractionSafety.swift */; };
 		6FF1393932F591E1A41891B6 /* PaneStatusFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2AB1720EBFDD942932DA08 /* PaneStatusFormatter.swift */; };
+		7305FF231A5A107B6531B925 /* TextFieldFocusSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD9B2C5788144F8810F1CDA /* TextFieldFocusSupport.swift */; };
 		7AF00C431BF2D2F4DE9EB78C /* FileItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111CD0B2A6FF020EEE44C249 /* FileItem.swift */; };
 		84A17B6D94A1C3E64BF185C9 /* DuPaneApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D64A3C378B4FF4EF43433C4 /* DuPaneApp.swift */; };
 		9C8D125999C057C45C615F31 /* DuplicateFinderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E9AC9BE723532F7A720C8C9 /* DuplicateFinderView.swift */; };
@@ -77,6 +78,7 @@
 		3E9AC9BE723532F7A720C8C9 /* DuplicateFinderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuplicateFinderView.swift; sourceTree = "<group>"; };
 		42F3DE126E6ED9AE8C058440 /* DuPaneEndToEndUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuPaneEndToEndUITests.swift; sourceTree = "<group>"; };
 		4A82E5C9F38FB38C70591C46 /* PaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaneView.swift; sourceTree = "<group>"; };
+		4BD9B2C5788144F8810F1CDA /* TextFieldFocusSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldFocusSupport.swift; sourceTree = "<group>"; };
 		4C95D005626882E2D2F3EAEF /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
 		4D23189709AA33FA3A8D8BFE /* AppNotifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNotifications.swift; sourceTree = "<group>"; };
 		579C8620AB7283EDC8CA3867 /* SidebarModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarModel.swift; sourceTree = "<group>"; };
@@ -236,6 +238,7 @@
 				A45BCD3F60603830DD11FE1B /* SettingsView.swift */,
 				4C95D005626882E2D2F3EAEF /* SidebarView.swift */,
 				39E987ED4C8E3B99EF9428BC /* TabbedPaneView.swift */,
+				4BD9B2C5788144F8810F1CDA /* TextFieldFocusSupport.swift */,
 				EC30511A9FD0582A9C4E614C /* TextPromptSheet.swift */,
 			);
 			path = Views;
@@ -398,6 +401,7 @@
 				B75805B6A1D822F28E6DF0CC /* SortKey.swift in Sources */,
 				F542C58721FA4AFFC1DD0410 /* TabbedPaneState.swift in Sources */,
 				34280C2DB977BC615581F0B0 /* TabbedPaneView.swift in Sources */,
+				7305FF231A5A107B6531B925 /* TextFieldFocusSupport.swift in Sources */,
 				D7965EC94339DF627FAB83DC /* TextPromptSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

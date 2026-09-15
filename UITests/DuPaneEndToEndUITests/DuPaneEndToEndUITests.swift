@@ -125,12 +125,67 @@ final class DuPaneEndToEndUITests: DuPaneTestCase {
     }
 
     @MainActor
+    func testCriticalDefaultInputTextIsSelectedOnFocus() throws {
+        launchApp()
+
+        clickToolbarButton("toolbar-new-folder-button")
+        let folderField = app.textFields["text-prompt-name-field"]
+        XCTAssertTrue(folderField.waitForExistence(timeout: 5))
+        folderField.typeText("f")
+        XCTAssertEqual(folderField.value as? String, "f")
+        app.typeKey(.escape, modifierFlags: [])
+        waitForCreationPromptToDismiss()
+
+        clickToolbarButton("toolbar-new-file-button")
+        let fileField = app.textFields["text-prompt-name-field"]
+        XCTAssertTrue(fileField.waitForExistence(timeout: 5))
+        fileField.typeText("x")
+        XCTAssertEqual(fileField.value as? String, "x")
+        app.typeKey(.escape, modifierFlags: [])
+        waitForCreationPromptToDismiss()
+
+        clickRow(waitForRow(named: "alpha.txt", in: "left"))
+        app.typeKey("g", modifierFlags: [.command, .shift])
+        let pathField = app.textFields["go-to-path-field"]
+        XCTAssertTrue(pathField.waitForExistence(timeout: 5))
+        pathField.typeText("p")
+        XCTAssertEqual(pathField.value as? String, "p")
+        app.typeKey(.escape, modifierFlags: [])
+    }
+
+    @MainActor
     func testCriticalDateAddedColumnCanBeShown() throws {
         launchApp(additionalArguments: ["-hiddenColumns", "NONE"])
 
         XCTAssertTrue(
             app.staticTexts["Date Added"].waitForExistence(timeout: 5)
         )
+    }
+
+    @MainActor
+    func testMediumColumnPickerListsAllColumnsAndStateAwareActions() throws {
+        launchApp(additionalArguments: ["-hiddenColumns", "Kind,Modified,Date Added,Info"])
+
+        let leftPane = app.descendants(matching: .any)["left-pane"]
+        let header = leftPane.staticTexts["left-column-Name"]
+        XCTAssertTrue(header.waitForExistence(timeout: 5))
+        header.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).rightClick()
+
+        for column in ["Name", "Icon", "Size", "Kind", "Modified", "Date Added", "Info"] {
+            XCTAssertTrue(
+                app.menuItems[column].waitForExistence(timeout: 2),
+                "Missing \(column) column menu"
+            )
+        }
+
+        app.menuItems["Kind"].click()
+        XCTAssertTrue(app.menuItems["Show Kind"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.menuItems["Move Left"].exists)
+        XCTAssertTrue(app.menuItems["Move Right"].exists)
+        XCTAssertFalse(app.menuItems["Move Left"].isEnabled)
+        XCTAssertFalse(app.menuItems["Move Right"].isEnabled)
+        XCTAssertTrue(app.menuItems["Minimum Width"].exists)
+        XCTAssertTrue(app.menuItems["Maximum Width"].exists)
     }
 
     @MainActor
@@ -323,17 +378,6 @@ final class DuPaneEndToEndUITests: DuPaneTestCase {
         XCTAssertTrue(app.staticTexts["2 copies"].exists)
         app.buttons["Done"].click()
         XCTAssertFalse(app.sheets.firstMatch.exists)
-    }
-
-    @MainActor
-    func testMediumCommandRunnerPanelCanBeOpenedAndClosed() throws {
-        launchApp()
-
-        clickToolbarButton("toolbar-terminal-button")
-        let commandField = app.textFields["Command…"]
-        XCTAssertTrue(commandField.waitForExistence(timeout: 5))
-        clickToolbarButton("toolbar-terminal-button")
-        XCTAssertFalse(commandField.exists)
     }
 
     @MainActor

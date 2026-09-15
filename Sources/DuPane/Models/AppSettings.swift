@@ -400,6 +400,21 @@ final class AppSettings: ObservableObject {
         hiddenColumns = cols
     }
 
+    func moveColumn(_ name: String, by offset: Int, within navigationOrder: [String]? = nil) {
+        guard offset != 0 else { return }
+        let navigationOrder = navigationOrder ?? columnOrder
+        guard let index = navigationOrder.firstIndex(of: name) else { return }
+        let destination = index + offset
+        guard navigationOrder.indices.contains(destination),
+              let sourceIndex = columnOrder.firstIndex(of: name),
+              let targetIndex = columnOrder.firstIndex(of: navigationOrder[destination]) else { return }
+
+        var order = columnOrder
+        let column = order.remove(at: sourceIndex)
+        order.insert(column, at: targetIndex)
+        columnOrder = order
+    }
+
     func columnWidth(for name: String, in side: PaneSide) -> CGFloat {
         columnWidths(for: side)[name, default: FileColumnLayout.defaultWidth(for: name)]
     }
@@ -412,6 +427,10 @@ final class AppSettings: ObservableObject {
         case .right:
             rightColumnWidths = rightColumnWidths.merging(clampedWidths) { _, new in new }
         }
+    }
+
+    func setColumnWidth(_ name: String, to width: CGFloat, for side: PaneSide) {
+        setColumnWidths([name: width], for: side)
     }
 
     func columnWidths(for side: PaneSide) -> [String: CGFloat] {

@@ -87,6 +87,8 @@ via `Package.swift`. `project.yml` is the source of truth for the generated Xcod
 - Use the appropriate verification lane described in this file; documentation-only changes use `docs`.
 - Unit tests: `swift test --filter DuPaneUITests`.
 - E2E tests: `./Scripts/run-e2e.sh`.
+- Before running E2E tests, ask the user which priority lanes to run: H, M, L, or a
+  combination such as HM or HML. Run exactly the lanes selected by the user.
 - Interim E2E runs may use `./Scripts/run-e2e.sh --priority high`; use `--priority medium`
   to include medium-priority coverage. Final verification runs the full suite with no
   priority filter.
