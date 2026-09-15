@@ -115,7 +115,7 @@ via `Package.swift`. `project.yml` is the source of truth for the generated Xcod
 - Run `xcodegen generate` first when `project.yml` changes.
 - Verification builds use external DerivedData at `~/Library/Developer/DuPane-build`.
 - The convenience symlink is `~/Applications/DuPane.app` to the latest Debug build.
-- The final pre-handoff test is `swift test --filter DuPaneFunctionTests/testInstalledAppSymlinkDateMatchesLatestDebugBuild`; it must pass after the manual build script and before reporting the marker.
+- The final pre-handoff test is `swift test --filter DuPaneFunctionTests/testInstalledAppSymlinkTargetsBuildNewerThanSource`; it must pass after the manual build script and before reporting the marker.
 
 ## Post-build checklist
 

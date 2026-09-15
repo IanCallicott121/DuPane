@@ -41,8 +41,6 @@ low_priority_tests=(
   testCriticalTypeAheadStillWorksAfterClosingTheActiveTab
   testCriticalProgressOverlayIsNotLeftOnScreenAfterACopy
   testCriticalUndoAfterDeleteRestoresTheFile
-  testCriticalRepeatedCreationAndGoToFolderCyclesRemainResponsive
-  testCriticalFolderBurstThenNewFileDoesNotQueueBehindGoToFolder
   testMediumColumnPickerListsAllColumnsAndStateAwareActions
 )
 

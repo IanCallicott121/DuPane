@@ -80,6 +80,19 @@ swift test --filter DuPaneUITests
 Run `./Scripts/run-e2e.sh`, or open `DuPane.xcodeproj` and test the `DuPane` scheme.
 The `DuPaneEndToEndUITests` test target launches the app against temporary fixtures.
 
+## Releases
+
+Pushing a semantic version tag such as `v1.0.0` starts the GitHub Actions Release
+workflow. It builds the Release app and publishes both a `.zip` and a `.dmg` to a
+GitHub Release, along with SHA-256 checksums. GitHub records download counts for each
+asset; these counts measure downloads, not active app usage. Release builds are currently
+unsigned and not notarized.
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
 **Test run policy**
 
 Follow the verification lanes in `Docs/AGENT-WORKFLOW.md` (relative to the repository

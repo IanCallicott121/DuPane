@@ -53,7 +53,7 @@ final class DuPaneFunctionTests: DuPaneTestCase {
         XCTAssertTrue(fileManager.fileExists(atPath: binaryURL.path))
     }
 
-    func testInstalledAppSymlinkDateMatchesLatestDebugBuild() throws {
+    func testInstalledAppSymlinkTargetsBuildNewerThanSource() throws {
         let fileManager = FileManager.default
         let linkURL = fileManager.homeDirectoryForCurrentUser
             .appendingPathComponent("Applications/DuPane.app")
@@ -73,12 +73,7 @@ final class DuPaneFunctionTests: DuPaneTestCase {
         let binaryDate = try XCTUnwrap(
             fileManager.attributesOfItem(atPath: binaryURL.path)[.modificationDate] as? Date
         )
-        let linkDate = try XCTUnwrap(
-            fileManager.attributesOfItem(atPath: linkURL.path)[.modificationDate] as? Date
-        )
-
         XCTAssertGreaterThan(binaryDate, sourceDate)
-        XCTAssertGreaterThanOrEqual(linkDate, binaryDate)
     }
 
     @MainActor

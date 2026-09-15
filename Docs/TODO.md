@@ -7,7 +7,13 @@ dismissal for New File, New Folder, and Go to Folder have been manually verified
 
 ## Action Items
 
-6.D iscuss whether DuPane can be submitted to the Mac App Store.** Feasibility and   any necessary changes are still to be discussed. No distribution approach has been  chosen, and no code changes are authorized by this item.
+None.
+
+## Pending items
+
+- Mac App Store submission is on hold due to the friction involved for this type of app.
+  Revisit only when explicitly requested; no distribution work or code changes are
+  currently authorized.
 
 
 ## Verification reference
@@ -18,10 +24,18 @@ dismissal for New File, New Folder, and Go to Folder have been manually verified
 
 ## Done
 
+### GitHub Releases — 2026-09-15
+
+- Added a tag-triggered GitHub Actions workflow that builds the Release app and publishes
+  ZIP and DMG assets plus SHA-256 checksums to a GitHub Release. GitHub records download
+  counts per asset; no launch telemetry is collected.
+
 ### E2E coverage expansion (2026-09-14)
 
 - Expanded visible UI workflow coverage with high, medium, and low priorities, including
   high-priority-only interim runs and full final runs.
+- Removed the excessively long multi-create and repeated Go To Folder stress workflows;
+  the underlying edge case remains covered by focused unit and regular UI tests.
 - Added negative validation that requires every emitted result to be `FAIL` and rejects
   missing or `PASS` results.
 - Hardened result reporting so XCTest failures and unexpected exceptions emit `FAIL`,

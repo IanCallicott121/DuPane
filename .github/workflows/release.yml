@@ -1,0 +1,88 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing version tag to build and publish
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-15
+    env:
+      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+
+    steps:
+      - name: Check out release tag
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
+          fetch-depth: 0
+
+      - name: Validate release tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          git show-ref --verify --quiet "refs/tags/$RELEASE_TAG"
+
+      - name: Build Release app
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${RELEASE_TAG#v}"
+          xcodebuild \
+            -project DuPane.xcodeproj \
+            -scheme DuPane \
+            -configuration Release \
+            -destination 'platform=macOS' \
+            -derivedDataPath "$RUNNER_TEMP/DuPane-release-dd" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            MARKETING_VERSION="$version" \
+            build
+
+      - name: Package release assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${RELEASE_TAG#v}"
+          app="$RUNNER_TEMP/DuPane-release-dd/Build/Products/Release/DuPane.app"
+          artifacts="$RUNNER_TEMP/DuPane-release-assets"
+          dmg_stage="$RUNNER_TEMP/DuPane-dmg-stage"
+
+          test -d "$app"
+          mkdir -p "$artifacts" "$dmg_stage"
+          ditto -c -k --sequesterRsrc --keepParent \
+            "$app" "$artifacts/DuPane-${version}.zip"
+          ditto "$app" "$dmg_stage/DuPane.app"
+          ln -s /Applications "$dmg_stage/Applications"
+          hdiutil create \
+            -volname "DuPane ${version}" \
+            -srcfolder "$dmg_stage" \
+            -ov \
+            -format UDZO \
+            "$artifacts/DuPane-${version}.dmg"
+          shasum -a 256 "$artifacts"/* > "$artifacts/SHA256SUMS"
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${RELEASE_TAG#v}"
+          gh release create "$RELEASE_TAG" \
+            "$RUNNER_TEMP/DuPane-release-assets"/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "DuPane ${version}" \
+            --generate-notes \
+            --verify-tag

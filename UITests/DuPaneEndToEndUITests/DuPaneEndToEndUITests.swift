@@ -180,12 +180,13 @@ final class DuPaneEndToEndUITests: DuPaneTestCase {
 
         app.menuItems["Kind"].click()
         XCTAssertTrue(app.menuItems["Show Kind"].waitForExistence(timeout: 2))
-        XCTAssertTrue(app.menuItems["Move Left"].exists)
-        XCTAssertTrue(app.menuItems["Move Right"].exists)
-        XCTAssertFalse(app.menuItems["Move Left"].isEnabled)
-        XCTAssertFalse(app.menuItems["Move Right"].isEnabled)
-        XCTAssertTrue(app.menuItems["Minimum Width"].exists)
-        XCTAssertTrue(app.menuItems["Maximum Width"].exists)
+        let kindSubmenu = app.menuItems["Kind"].menus.element(boundBy: 0)
+        XCTAssertTrue(kindSubmenu.menuItems["Move Left"].exists)
+        XCTAssertTrue(kindSubmenu.menuItems["Move Right"].exists)
+        XCTAssertFalse(kindSubmenu.menuItems["Move Left"].isEnabled)
+        XCTAssertFalse(kindSubmenu.menuItems["Move Right"].isEnabled)
+        XCTAssertTrue(kindSubmenu.menuItems["Minimum Width"].exists)
+        XCTAssertTrue(kindSubmenu.menuItems["Maximum Width"].exists)
     }
 
     @MainActor
@@ -270,75 +271,6 @@ final class DuPaneEndToEndUITests: DuPaneTestCase {
         clickToolbarButton("text-prompt-confirm-button")
         XCTAssertTrue(row(named: "created-file.txt", in: "left").waitForExistence(timeout: 5))
         XCTAssertTrue(FileManager.default.fileExists(atPath: fixture.fileURL(named: "created-file.txt", in: fixture.leftPaneURL).path))
-    }
-
-    @MainActor
-    func testCriticalRepeatedCreationAndGoToFolderCyclesRemainResponsive() throws {
-        launchApp()
-
-        for index in 1...20 {
-            clickToolbarButton("toolbar-new-folder-button")
-            let folderField = app.textFields["text-prompt-name-field"]
-            XCTAssertTrue(folderField.waitForExistence(timeout: 5))
-            replaceText(in: folderField, with: "stress-folder-\(index)")
-            clickToolbarButton("text-prompt-confirm-button")
-            XCTAssertTrue(row(named: "stress-folder-\(index)", in: "left").waitForExistence(timeout: 5), "Folder row did not appear for index \(index)")
-            waitForCreationPromptToDismiss()
-        }
-
-        for index in 1...20 {
-            clickToolbarButton("toolbar-new-file-button")
-            let fileField = app.textFields["text-prompt-name-field"]
-            XCTAssertTrue(fileField.waitForExistence(timeout: 5))
-            replaceText(in: fileField, with: "stress-file-\(index).txt")
-            clickToolbarButton("text-prompt-confirm-button")
-            XCTAssertTrue(row(named: "stress-file-\(index).txt", in: "left").waitForExistence(timeout: 5), "File row did not appear for index \(index)")
-            waitForCreationPromptToDismiss()
-        }
-
-        for cycle in 1...20 {
-            clickRow(waitForRow(named: "alpha.txt", in: "left"))
-            app.typeKey("g", modifierFlags: [.command, .shift])
-            let pathField = app.textFields["go-to-path-field"]
-            XCTAssertTrue(pathField.waitForExistence(timeout: 5), "Go To Folder field did not appear on cycle \(cycle)")
-            replaceText(in: pathField, with: fixture.leftPaneURL.path)
-            XCTAssertTrue(app.buttons["go-to-path-confirm-button"].waitForExistence(timeout: 5), "Go To Folder confirm did not appear on cycle \(cycle)")
-            app.buttons["go-to-path-confirm-button"].click()
-            waitForSheetToDismiss(pathField)
-            XCTAssertTrue(row(named: "alpha.txt", in: "left").waitForExistence(timeout: 5), "Alpha row did not return on cycle \(cycle)")
-        }
-    }
-
-    @MainActor
-    func testCriticalFolderBurstThenNewFileDoesNotQueueBehindGoToFolder() throws {
-        launchApp()
-
-        for index in 1...20 {
-            clickToolbarButton("toolbar-new-folder-button")
-            let folderField = app.textFields["text-prompt-name-field"]
-            XCTAssertTrue(folderField.waitForExistence(timeout: 5), "New Folder field did not appear for index \(index)")
-            replaceText(in: folderField, with: "burst-folder-\(index)")
-            clickToolbarButton("text-prompt-confirm-button")
-            XCTAssertTrue(row(named: "burst-folder-\(index)", in: "left").waitForExistence(timeout: 5), "Burst folder row did not appear for index \(index)")
-        }
-
-        clickToolbarButton("toolbar-new-file-button")
-        let fileField = app.textFields["text-prompt-name-field"]
-        XCTAssertTrue(fileField.waitForExistence(timeout: 5), "New File field did not appear after the folder burst")
-        replaceText(in: fileField, with: "burst-file.txt")
-        clickToolbarButton("text-prompt-confirm-button")
-        XCTAssertTrue(row(named: "burst-file.txt", in: "left").waitForExistence(timeout: 5), "Burst file row did not appear after the folder burst")
-        let promptOverlay = app.otherElements["creation-prompt-overlay"]
-        let promptDismissed = expectation(for: NSPredicate(format: "exists == false"), evaluatedWith: promptOverlay)
-        wait(for: [promptDismissed], timeout: 5)
-
-        clickRow(waitForRow(named: "alpha.txt", in: "left"))
-        app.typeKey("g", modifierFlags: [.command, .shift])
-        let pathField = app.textFields["go-to-path-field"]
-        XCTAssertTrue(pathField.waitForExistence(timeout: 5), "Go To Folder field did not appear after the folder burst and file creation")
-        app.typeKey(.escape, modifierFlags: [])
-        waitForSheetToDismiss(pathField)
-        XCTAssertFalse(app.textFields["text-prompt-name-field"].exists)
     }
 
     @MainActor
@@ -545,6 +477,7 @@ final class DuPaneEndToEndUITests: DuPaneTestCase {
 
         // Close the first tab. activeTabIndex stays 0 while now referring to the second.
         app.buttons["left-tab-0"].click()
+        XCTAssertTrue(app.buttons["left-close-tab-0"].waitForExistence(timeout: 5))
         app.buttons["left-close-tab-0"].click()
         let survivor = waitForRow(named: "gamma.txt", in: "left")
 
