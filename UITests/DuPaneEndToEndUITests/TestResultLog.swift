@@ -36,9 +36,7 @@ class DuPaneTestCase: XCTestCase {
     }
 
     override func record(_ issue: XCTIssue) {
-        if issue.severity.rawValue >= XCTIssue.Severity.error.rawValue {
-            recordedFailures.append(issue.compactDescription)
-        }
+        recordedFailures.append(issue.compactDescription)
         super.record(issue)
     }
 
@@ -54,11 +52,14 @@ class DuPaneTestCase: XCTestCase {
         let testWasSkipped = (testRun?.skipCount ?? 0) > 0
         let finalTestRunHasFailures = (testRun?.failureCount ?? 0) > 0
             || (testRun?.unexpectedExceptionCount ?? 0) > 0
+        let failures = finalTestRunHasFailures
+            ? (recordedFailures.isEmpty
+                ? ["XCTest reported a failure that was not intercepted by record(_:)" ]
+                : recordedFailures)
+            : []
         TestResultLog.append(
             name: name,
-            failures: finalTestRunHasFailures && recordedFailures.isEmpty
-                ? ["XCTest reported a failure that was not intercepted by record(_:)" ]
-                : recordedFailures,
+            failures: failures,
             skipped: testWasSkipped
         )
         try super.tearDownWithError()

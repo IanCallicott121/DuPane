@@ -40,7 +40,10 @@ struct TextPromptSheet: View {
         .frame(width: 300)
         .onExitCommand(perform: onCancel)
         .onAppear {
-            nameFieldFocused = true
+            Task { @MainActor in
+                await Task.yield()
+                nameFieldFocused = true
+            }
         }
     }
 }

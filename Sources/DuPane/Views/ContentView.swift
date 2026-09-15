@@ -793,7 +793,10 @@ struct ContentView: View {
         .frame(width: 440)
         .onExitCommand { showGoToPath = false }
         .onAppear {
-            goToPathFocused = true
+            Task { @MainActor in
+                await Task.yield()
+                goToPathFocused = true
+            }
         }
     }
 
