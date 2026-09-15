@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import WebKit
 import UniformTypeIdentifiers
 
 enum InternalTestBuildMarker {
@@ -64,7 +65,12 @@ struct DuPaneApp: App {
                 .appendingPathComponent(filename)
         ].compactMap { $0 }
         for url in candidates where FileManager.default.fileExists(atPath: url.path) {
-            NSWorkspace.shared.open(url)
+            let title = filename == "FAQs.html" ? "DuPane — FAQs" : "DuPane — User Guide"
+            if let appDelegate = NSApp.delegate as? AppDelegate {
+                appDelegate.openDocumentation(url: url, title: title)
+            } else {
+                NSWorkspace.shared.open(url)
+            }
             return
         }
     }
@@ -111,6 +117,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private var keyEventMonitor: Any?
+    private var documentationWindows: [String: DocumentationWindowController] = [:]
+
+    func openDocumentation(url: URL, title: String) {
+        if let existing = documentationWindows[url.lastPathComponent] {
+            existing.showFullWidth()
+            return
+        }
+
+        let controller = DocumentationWindowController(url: url, title: title)
+        documentationWindows[url.lastPathComponent] = controller
+        controller.showFullWidth()
+    }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.regular)
@@ -247,5 +265,39 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         return nil
+    }
+}
+
+final class DocumentationWindowController: NSWindowController {
+    private let webView: WKWebView
+
+    init(url: URL, title: String) {
+        webView = WKWebView(frame: .zero)
+        let window = NSWindow(
+            contentRect: .zero,
+            styleMask: [.titled, .closable, .resizable, .miniaturizable],
+            backing: .buffered,
+            defer: false
+        )
+        window.title = title
+        window.minSize = NSSize(width: 900, height: 600)
+        window.contentView = webView
+        super.init(window: window)
+        webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    func showFullWidth() {
+        if let screen = NSScreen.main {
+            window?.setFrame(screen.visibleFrame, display: true)
+        } else {
+            window?.setContentSize(NSSize(width: 1200, height: 800))
+            window?.center()
+        }
+        window?.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
     }
 }

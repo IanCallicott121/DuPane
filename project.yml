@@ -22,6 +22,10 @@ targets:
     platform: macOS
     sources:
       - path: Sources/DuPane
+      - path: Docs/UserGuide.html
+        buildPhase: resources
+      - path: Docs/FAQs.html
+        buildPhase: resources
     dependencies:
       - package: ZIPFoundation
     postBuildScripts:

@@ -24,6 +24,12 @@ None.
 
 ## Done
 
+### Documentation audit — 2026-09-15
+
+- Audited the User Guide and FAQs against current settings, shortcuts, and operation
+  behavior; corrected stale build, theme, path-navigation, and duplicate-scan details.
+- Help documents are bundled into the app and open in a full-width in-app window.
+
 ### GitHub Releases — 2026-09-15
 
 - Added a tag-triggered GitHub Actions workflow that builds the Release app and publishes
