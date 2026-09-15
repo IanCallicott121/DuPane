@@ -82,16 +82,13 @@ The `DuPaneEndToEndUITests` test target launches the app against temporary fixtu
 
 ## Releases
 
-Pushing a semantic version tag such as `v1.0.0` starts the GitHub Actions Release
-workflow. It builds the Release app and publishes both a `.zip` and a `.dmg` to a
-GitHub Release, along with SHA-256 checksums. GitHub records download counts for each
-asset; these counts measure downloads, not active app usage. Release builds are currently
-unsigned and not notarized.
+Download DuPane from the [GitHub Releases page](https://github.com/IanCallicott121/DuPane/releases).
+The DMG is recommended for installation; the ZIP is also available. GitHub records
+download counts for each asset, but these counts measure downloads, not active app usage.
+Release builds are currently unsigned and not notarized.
 
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
+Maintainers can find the publishing procedure in the
+[release guide](RELEASING.md). Contributors do not need to create releases.
 
 **Test run policy**
 

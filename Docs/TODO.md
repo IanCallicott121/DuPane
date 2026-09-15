@@ -28,7 +28,9 @@ None.
 
 - Added a tag-triggered GitHub Actions workflow that builds the Release app and publishes
   ZIP and DMG assets plus SHA-256 checksums to a GitHub Release. GitHub records download
-  counts per asset; no launch telemetry is collected.
+  counts per asset; no launch telemetry is collected. Moved maintainer publishing steps
+  into `Docs/RELEASING.md` so contributor guidance does not imply that contributors make
+  releases.
 
 ### E2E coverage expansion (2026-09-14)
 

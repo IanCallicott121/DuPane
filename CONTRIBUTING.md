@@ -32,18 +32,8 @@ Set your signing team in Xcode (project target → Signing & Capabilities → Te
    - `Docs/UserGuide.html`
    - `Docs/FAQs.html`
 
-## Publishing a release
-
-Push a semantic version tag such as `v1.0.0` to build and publish the Release app:
-
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
-
-The Release workflow publishes a ZIP, DMG, and SHA-256 checksums to GitHub Releases.
-GitHub tracks downloads for each asset. The current workflow produces unsigned,
-non-notarized builds.
+Contributors do not need to create or publish releases. Maintainers should use the
+[separate release guide](Docs/RELEASING.md).
 
 ## Code conventions
 
