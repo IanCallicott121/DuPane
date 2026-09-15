@@ -6,8 +6,59 @@
 dismissal for New File, New Folder, and Go to Folder have been manually verified.
 
 ## Action Items
+Manual update and app feedback:
 
-None.
+ther is a lot of material here to work through - it should be approach in 2 ways
+1) 1) manual fixes easy
+ the mechanical ones (broken callout class, TOC regeneration, print stylesheet, responsive breakpoint, aria attributes, contrast, build-number token) - these require no app changes
+2) 2) manual changes which are more complex
+Permissions, Troubleshooting, Toolbar reference) and the ⌘C/⌘V question - need a discussion and indded these may need an app change or a new feature
+I read the source copy at Docs/UserGuide.html (1,633 lines — the same file that gets bundled into the app) and cross-checked a number of its claims against the Swift source.
+
+The Verdict !
+
+It's a genuinely good guide — better than most indie app docs. Structure is sensible, the Finder comparison table is persuasive, and the CSS mockups do real work. The problems are mostly accuracy drift between doc and code, a few things the doc contradicts itself on, and some missing reference material.
+
+Must-fix (wrong or self-contradictory)
+
+1. Duplicate Finder contradicts itself, and one version is false. Line 1391 says the scan compares "file content byte-for-byte"; line 1401 says files are "hashed with FNV-1a 64-bit. Two files whose hashes match are identical." The code (DuplicateFinderViewModel.fnv1a64) does the hash and no byte comparison, so the first claim is wrong and the second is technically untrue — FNV-1a is non-cryptographic and collides. This matters because the next paragraph tells users to trash files. Either add a final memcmp pass in the app (cheap — only runs on same-size, same-hash candidates), or reword to "extremely unlikely to be different; verify before deleting large batches."
+
+2. ⌘C / ⌘V are documented but never flagged as non-standard. The code confirms ⌘C = copy to other pane and ⌘V = move to other pane. Meanwhile the File Operations section documents right-click → Copy as "places files on the macOS clipboard." So ⌘C and the menu item labelled Copy do different things, and ⌘V does a move — which will eventually cost someone data they didn't mean to relocate. At minimum add a callout in the shortcuts section. I'd argue for changing the app: ⌘C/⌘V for clipboard, F5/F6 (already wired) plus maybe ⌥⌘→/← for pane transfers.
+
+3. The TOC is missing Duplicate Finder. The sidebar nav has it (line 612), the TOC list (lines 641–661) jumps straight from Folder Size View to Settings. Two hand-maintained nav lists will keep drifting — generate the TOC from the <section id> elements in the existing script instead.
+
+4. Broken callout styling. Line 1405 uses <div class="tip"> where every other callout uses class="callout tip". There's no bare .tip rule, so that Duplicate Finder note renders as unstyled text with no icon.
+
+5. Version and build are hardcoded in two places (lines 586 and 1611) and BuildNumber.txt already says 421. A build-phase sed on a {{BUILD}} token would stop these going stale.
+
+Content gaps
+No Installation / first-run permissions section. The Downloads/Documents prompts are mentioned in passing in Quick Start step 1, but there's nothing about Full Disk Access, what happens if a user clicks Deny, or how to fix it in System Settings. This is the #1 support question for any Mac file manager.
+No Troubleshooting section. Candidates you already have material for: Spotlight search returning nothing on external drives, sync skipping folder differences, network shares not auto-reconnecting without Keychain credentials, red lock badges.
+No feedback/support/changelog link anywhere, including the footer.
+Network settings aren't in the Settings section. The Sidebar section keeps pointing at "Settings → Network → …", but the Settings → Sidebar table only documents Places and Recents. Someone reading Settings top-to-bottom never learns those toggles exist.
+Settings menu-path naming is inconsistent: "Settings → Sidebar Places" (Places section) vs "Settings → Sidebar" (elsewhere). Pick one and use it everywhere.
+Toolbar buttons with no keyboard equivalent (Dupes, Compare, Follow, Folder Sizes) are scattered through the prose. A short "Toolbar reference" table — button, what it does, when it's disabled — would be the most-used page in the guide.
+Consistency and naming
+The terminal feature has four names: "Integrated Terminal" (feature card, line 697), "Command Runner" (section heading), the Terminal toolbar button, and "retractable shell panel". Pick one — I'd use Command Runner everywhere and label the button that too.
+Similarly "Folder Size View" (nav/TOC) vs "Show Folder Sizes" (the actual menu item).
+The Developer Tools shortcut group (line 1595) contains Settings and Open User Guide, which aren't developer tools. Rename to "Application" or move those into a General group.
+The overview callout ("DuPane is a native macOS file manager built with SwiftUI, with dual panes and keyboard shortcuts…") just restates the lead paragraph two inches above it. Cut it or replace it with something actionable.
+Section comment numbering has drifted (two 7.s, then 13, 15, 16, 17) — harmless, but a sign the file is being edited piecemeal.
+HTML / CSS / accessibility
+body { min-width: 760px } forces horizontal scrolling in a narrow help window. Add a breakpoint that collapses the fixed sidebar to a top bar below ~900px; the guide is otherwise fully fluid.
+No print stylesheet. Users will print or PDF the shortcuts section; right now they'd get the 240px sidebar gutter on every page and no page breaks. @media print with .sidebar{display:none}, .main{margin:0}, .section{break-inside:avoid} is about six lines.
+No in-page search. For a 17-section reference, a filter box that hides non-matching sections pays for itself; ~15 lines of JS.
+Emoji used as meaningful icons (🍎 ⚡ 📑 💡 ⚠️ ℹ️) are read aloud verbosely by VoiceOver. Add aria-hidden="true" to decorative ones and give callouts a visible or sr-only text label ("Tip:", "Warning:").
+<kbd>⌘[</kbd> reads as gibberish to VoiceOver. <kbd aria-label="Command bracket left"> on the common ones would help.
+The scroll-spy IntersectionObserver uses rootMargin: '-30% 0px -60% 0px', a 10% band — in long sections nothing is highlighted, and clicking a nav link doesn't highlight until the scroll settles. Track the last-intersecting section instead of clearing on every entry.
+Missing <meta name="description">; lang="en" could be en-GB given the consistent British spelling.
+.callout.tip sets the paragraph text to var(--accent) — blue text on a pale blue background is roughly 3.5:1 in light mode, under the 4.5:1 threshold. Use var(--text) for the body and keep the accent for the icon/label.
+Two smaller content notes
+The Permission Indicator paragraph says you can't navigate into a locked folder "but you can still copy or move files to them if you have write access" — true but confusing as written; worth a sentence explaining the read-vs-write distinction.
+"Show hidden files" and "Show hidden folders (dot-folders)" (line 1444) are documented independently, but their interaction isn't. Which wins if both are on? One extra sentence.
+
+
+
 
 ## Pending items
 

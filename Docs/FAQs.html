@@ -28,7 +28,7 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
-  body { font-family: var(--font); font-size: 15px; line-height: 1.6; color: var(--text); background: var(--bg); display: flex; width: 100%; min-height: 100vh; }
+  body { font-family: var(--font); font-size: 15px; line-height: 1.6; color: var(--text); background: var(--bg); display: block; width: 100%; min-width: 760px; min-height: 100vh; }
 
   .sidebar {
     position: fixed; top: 0; left: 0; width: var(--sidebar-w);
@@ -44,7 +44,7 @@
   .nav-item { display: block; padding: 6px 20px; font-size: 13px; color: var(--text2); text-decoration: none; border-radius: 0; transition: all 0.1s; }
   .nav-item:hover { background: var(--surface2); color: var(--text); }
 
-  .main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; }
+  .main { margin-left: var(--sidebar-w); width: calc(100% - var(--sidebar-w)); min-height: 100vh; }
   .hero { background: linear-gradient(135deg, #0071e3 0%, #5e5ce6 50%, #af52de 100%); padding: 60px 60px 48px; color: white; }
   .hero-badge { display: inline-block; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 4px 14px; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; margin-bottom: 16px; }
   .hero h1 { font-size: 42px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 12px; }

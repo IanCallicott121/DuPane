@@ -107,6 +107,7 @@ via `Package.swift`. `project.yml` is the source of truth for the generated Xcod
 - Keep the marker in place while manual testing and review are in progress. Remove it only after the user approves the completed change for commit; do not change `BuildNumber.txt` for this purpose.
 - A source change is not present in the running app until it is rebuilt. Use `./Scripts/prepare-manual-build.sh` for manual-test builds; do not use `ln -sfn` to refresh the app symlink because directory symlinks may remain stale. The script clean-builds into external DerivedData, safely replaces the symlink, and verifies the target and timestamps.
 - Before manual testing, quit any running instance, relaunch `~/Applications/DuPane.app`, and confirm the quoted internal test marker.
+- Mandatory manual-testing sequence: increment the unique temporary marker, run `./Scripts/prepare-manual-build.sh`, verify the rebuilt app and symlink timestamps, quit and relaunch `~/Applications/DuPane.app`, then confirm the exact Help-menu marker before testing.
 
 ## Application builds
 

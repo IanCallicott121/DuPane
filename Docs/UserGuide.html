@@ -51,7 +51,7 @@
     line-height: 1.6;
     color: var(--text);
     background: var(--bg);
-    display: flex;
+    display: block;
     width: 100%;
     min-width: 760px;
     min-height: 100vh;
@@ -114,8 +114,7 @@
   /* ── Main ── */
   .main {
     margin-left: var(--sidebar-w);
-    flex: 1;
-    min-width: 0;
+    width: calc(100% - var(--sidebar-w));
   }
   .hero {
     background: linear-gradient(135deg, #0071e3 0%, #5e5ce6 50%, #af52de 100%);

@@ -193,7 +193,7 @@ final class DuPaneEndToEndUITests: DuPaneTestCase {
     func testCriticalMenuShowsInternalTestBuildMarker() throws {
         launchApp()
 
-        XCTAssertTrue(app.menuItems["Internal Test Build 421.4"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.menuItems["Internal Test Build 421.6"].waitForExistence(timeout: 5))
     }
 
     @MainActor
