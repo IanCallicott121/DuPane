@@ -20,6 +20,12 @@ jobs:
         shell: bash
         run: swift build 2>&1 | tail -5
 
+      # The installed-app tests verify the same external Debug build and
+      # symlink used for manual testing, so prepare them before running SPM tests.
+      - name: Prepare installed app for tests
+        shell: bash
+        run: ./Scripts/prepare-manual-build.sh
+
       - name: Run unit tests (SPM)
         shell: bash
         run: swift test --filter DuPaneUITests 2>&1
