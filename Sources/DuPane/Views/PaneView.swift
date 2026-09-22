@@ -748,6 +748,12 @@ struct PaneView: View {
             let urls = pane.selectedItems.isEmpty ? [item.url] : pane.selectedItems.map { $0.url }
             QuickLookCoordinator.shared.toggle(urls: urls)
         }
+        if item.isRestricted {
+            Divider()
+            Button("Open Privacy & Security Settings…") {
+                openPrivacySettings()
+            }
+        }
         if item.isDirectory {
             Button("Show Folder / File Sizes") { folderSizeItem = item }
         }
@@ -807,6 +813,11 @@ struct PaneView: View {
         Divider()
         // Destructive — kept last so it's never accidentally triggered
         Button("Delete", role: .destructive) { onDeleteRequested() }
+    }
+
+    private func openPrivacySettings() {
+        guard let url = URL(string: "x-apple.systempreferences:com.apple.preference.security") else { return }
+        NSWorkspace.shared.open(url)
     }
 
     @ViewBuilder

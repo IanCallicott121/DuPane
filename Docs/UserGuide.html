@@ -424,7 +424,7 @@
   .callout-icon { flex-shrink: 0; font-size: 16px; margin-top: 1px; }
   .callout p { margin: 0; }
   .callout.tip { background: var(--accent-light); color: var(--accent); }
-  .callout.tip p { color: var(--accent); }
+  .callout.tip p { color: var(--text); }
   .callout.warning { background: #fff8e1; color: #f57f17; }
   .callout.warning p { color: #7f5a00; }
   @media (prefers-color-scheme: dark) {
@@ -550,6 +550,35 @@
     margin: 0 0 56px;
   }
   .toc h3 { font-size: 14px; margin: 0 0 14px; color: var(--text); }
+  .toc-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .toc-search label { font-size: 13px; color: var(--text2); white-space: nowrap; }
+  .toc-search input {
+    flex: 1;
+    min-width: 0;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface2);
+    color: var(--text);
+    font: inherit;
+  }
+  .toc-search input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .toc-clear {
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface2);
+    color: var(--text2);
+    font: inherit;
+    cursor: pointer;
+  }
+  .toc-clear:hover { color: var(--text); border-color: var(--accent); }
+  .toc-status { margin: 0 0 14px; font-size: 12px; color: var(--text2); }
   .toc ol { counter-reset: toc; list-style: none; }
   .toc ol li { counter-increment: toc; margin-bottom: 6px; }
   .toc ol li a {
@@ -573,6 +602,86 @@
     justify-content: space-between;
     align-items: center;
   }
+  .footer-link { color: var(--text2); }
+  .footer-link:hover { color: var(--accent); }
+
+  @media (max-width: 899px) {
+    body { min-width: 0; }
+    .sidebar {
+      position: relative;
+      width: 100%;
+      height: auto;
+      max-height: none;
+      overflow-x: auto;
+      overflow-y: hidden;
+      display: flex;
+      align-items: flex-start;
+      border-right: 0;
+      border-bottom: 1px solid var(--border);
+      padding: 12px 0;
+    }
+    .sidebar-logo {
+      flex: 0 0 auto;
+      padding: 0 20px;
+      margin-bottom: 0;
+      border-bottom: 0;
+      border-right: 1px solid var(--border);
+    }
+    .nav-section { flex: 0 0 auto; }
+    .nav-heading { padding: 4px 12px; }
+    .nav-item {
+      white-space: nowrap;
+      padding: 6px 12px;
+      margin: 0 4px;
+    }
+    .main {
+      margin-left: 0;
+      width: 100%;
+    }
+    .hero { padding: 44px 24px; }
+    .content { padding: 40px 24px; }
+    footer {
+      margin-left: 0;
+      padding: 28px 24px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+  }
+
+  @media print {
+    @page { margin: 16mm; }
+    body {
+      min-width: 0;
+      background: white;
+      color: black;
+      font-size: 11pt;
+    }
+    .sidebar { display: none; }
+    .main,
+    footer {
+      margin-left: 0;
+      width: auto;
+    }
+    .hero {
+      background: none;
+      color: black;
+      padding: 0 0 24px;
+    }
+    .content { padding: 0; }
+    .toc-search { display: none; }
+    .toc { break-after: page; }
+    .section,
+    .callout,
+    .shortcut-table { break-inside: avoid; }
+    .section { margin-bottom: 28px; }
+    .divider { display: none; }
+    footer {
+      padding: 24px 0 0;
+      color: black;
+    }
+    a { color: inherit; text-decoration: none; }
+  }
 </style>
 </head>
 <body>
@@ -583,15 +692,16 @@
     <div class="logo-icon">DP</div>
     <div>
       <div class="sidebar-logo-text">DuPane</div>
-      <div class="sidebar-logo-sub">User Guide v1.0 Build 421</div>
+      <div class="sidebar-logo-sub">User Guide v{{VERSION}} Build {{BUILD}}</div>
     </div>
   </div>
 
-  <div class="nav-section">
-    <div class="nav-heading">Getting Started</div>
-    <a href="#overview" class="nav-item">Overview</a>
-    <a href="#why-dupane" class="nav-item">Why DuPane?</a>
-    <a href="#quickstart" class="nav-item">Quick Start</a>
+    <div class="nav-section">
+      <div class="nav-heading">Getting Started</div>
+      <a href="#overview" class="nav-item">Overview</a>
+      <a href="#why-dupane" class="nav-item">Why DuPane?</a>
+      <a href="#quickstart" class="nav-item">Quick Start</a>
+      <a href="#installation" class="nav-item">Installation &amp; Permissions</a>
   </div>
   <div class="nav-section">
     <div class="nav-heading">Core Features</div>
@@ -608,13 +718,15 @@
     <div class="nav-heading">Smart Features</div>
     <a href="#smart-metadata" class="nav-item">Smart Metadata</a>
     <a href="#command-runner" class="nav-item">Command Runner</a>
-    <a href="#folder-size" class="nav-item">Folder Size View</a>
+    <a href="#folder-size" class="nav-item">Show Folder Sizes</a>
     <a href="#duplicate-finder" class="nav-item">Duplicate Finder</a>
   </div>
-  <div class="nav-section">
-    <div class="nav-heading">Reference</div>
-    <a href="#settings" class="nav-item">Settings</a>
-    <a href="#shortcuts" class="nav-item">Keyboard Shortcuts</a>
+    <div class="nav-section">
+      <div class="nav-heading">Reference</div>
+      <a href="#toolbar-reference" class="nav-item">Toolbar Reference</a>
+      <a href="#settings" class="nav-item">Settings</a>
+      <a href="#troubleshooting" class="nav-item">Troubleshooting</a>
+      <a href="#shortcuts" class="nav-item">Keyboard Shortcuts</a>
   </div>
 </nav>
 
@@ -638,33 +750,22 @@
     <!-- TOC -->
     <div class="toc">
       <h3>Table of Contents</h3>
-      <ol>
-        <li><a href="#overview">Overview</a></li>
-        <li><a href="#why-dupane">Why DuPane?</a></li>
-        <li><a href="#quickstart">Quick Start</a></li>
-        <li><a href="#navigation">Dual-Pane Navigation</a></li>
-        <li><a href="#tabs">Tabs</a></li>
-        <li><a href="#sidebar">Sidebar &amp; Bookmarks</a></li>
-        <li><a href="#file-ops">File Operations</a></li>
-        <li><a href="#compare-sync">Folder Compare &amp; Sync</a></li>
-        <li><a href="#sorting">Sorting &amp; Filtering</a></li>
-        <li><a href="#quicklook">Quick Look</a></li>
-        <li><a href="#tags">Colour Tags</a></li>
-        <li><a href="#smart-metadata">Smart Metadata Columns</a></li>
-        <li><a href="#command-runner">Command Runner</a></li>
-        <li><a href="#folder-size">Folder Size View</a></li>
-        <li><a href="#settings">Settings</a></li>
-        <li><a href="#shortcuts">Keyboard Shortcuts</a></li>
-      </ol>
+      <div class="toc-search">
+        <label for="guide-search">Search this guide</label>
+        <input id="guide-search" type="search" placeholder="Search sections and topics" autocomplete="off" aria-controls="toc-list">
+        <button class="toc-clear" id="guide-search-clear" type="button" hidden>Clear</button>
+      </div>
+      <p class="toc-status" id="guide-search-status" role="status" aria-live="polite"></p>
+      <ol id="toc-list"></ol>
     </div>
 
-    <!-- ─── 1. Overview ─── -->
+    <!-- Section: Overview -->
     <section class="section" id="overview">
       <div class="section-label">Introduction</div>
       <h2>What is DuPane?</h2>
       <p class="lead">DuPane is a full-featured file manager for macOS power users — a native dual-pane workspace where copy, move, compare, script, and inspect operations are always within reach. Both keyboard and mouse are fully supported throughout.</p>
 
-      <p>Where Finder is built for casual browsing, DuPane is built for <em>work</em>. Every feature is designed to eliminate friction: no window juggling, no switching to Terminal, no hunting for Get Info. The two-pane layout means your source and destination are always visible. The integrated terminal means your shell commands run in-context. Bookmarked folders in the sidebar mean your frequently-used locations are one click away.</p>
+      <p>Where Finder is built for casual browsing, DuPane is built for <em>work</em>. Every feature is designed to eliminate friction: no window juggling, no switching to Terminal, no hunting for Get Info. The two-pane layout means your source and destination are always visible. The Command Runner means your shell commands run in-context. Bookmarked folders in the sidebar mean your frequently-used locations are one click away.</p>
 
       <div class="feature-grid">
         <div class="feature-card">
@@ -690,12 +791,12 @@
         <div class="feature-card">
           <div class="feature-card-icon ic-blue">⇄</div>
           <h4>Compare &amp; Sync</h4>
-          <p>Compare the two active folders side-by-side, with per-row difference highlights (newer, older, different, only here), then sync in one click.</p>
+          <p>Compare the two active folders at the current folder level, with per-row difference highlights (newer, older, different, only here), then sync in one click.</p>
         </div>
         <div class="feature-card">
           <div class="feature-card-icon ic-green">$_</div>
-          <h4>Integrated Terminal</h4>
-          <p>A retractable shell panel lives at the bottom of each pane. Commands run in the current directory — stay in context, never switch windows.</p>
+          <h4>Command Runner</h4>
+          <p>A retractable command panel lives at the bottom of each pane. Commands run in the current directory — stay in context, never switch windows.</p>
         </div>
         <div class="feature-card">
           <div class="feature-card-icon ic-orange">⊟</div>
@@ -715,7 +816,7 @@
 
     <hr class="divider">
 
-    <!-- ─── Why DuPane? ─── -->
+    <!-- Section: Why DuPane? -->
     <section class="section" id="why-dupane">
       <div class="section-label">Getting Started</div>
       <h2>Why DuPane? Can't I just use Finder?</h2>
@@ -752,15 +853,11 @@
         <li><strong>Running git commands?</strong> Command Runner is already in the pane — type <code>git status</code> without opening a separate terminal.</li>
       </ul>
 
-      <div class="callout tip">
-        <div class="callout-icon">💡</div>
-        <p><strong>DuPane doesn't replace Finder</strong> — it complements it. Right-click any file → <strong>Reveal in Finder</strong> when you need Finder-specific features (AirDrop, Tags from colour wheel, iCloud status). For day-to-day file work, you'll rarely need to switch.</p>
-      </div>
     </section>
 
     <hr class="divider">
 
-    <!-- ─── 2. Quick Start ─── -->
+    <!-- Section: Quick Start -->
     <section class="section" id="quickstart">
       <div class="section-label">Getting Started</div>
       <h2>Quick Start</h2>
@@ -782,7 +879,33 @@
 
     <hr class="divider">
 
-    <!-- ─── 3. Navigation ─── -->
+    <!-- Section: Installation and Permissions -->
+    <section class="section" id="installation">
+      <div class="section-label">Getting Started</div>
+      <h2>Installation &amp; Permissions</h2>
+      <p class="lead">macOS protects personal folders and mounted volumes. DuPane asks for access when it first needs to show or manage them.</p>
+
+      <h3>First launch</h3>
+      <p>On first launch, macOS may ask DuPane to access your <strong>Downloads</strong> and <strong>Documents</strong> folders. Choose <strong>Allow</strong> if you want those locations to appear and remain usable in the panes. The choice is remembered by macOS.</p>
+
+      <h3>If access was denied</h3>
+      <p>A denied location may appear empty, inaccessible, or show a red lock badge. The badge means DuPane lacks read access, so it cannot list or open the folder's existing contents. macOS can grant write access separately, so copying or moving items into the folder may still succeed even when browsing it does not. The badge describes read access, not every possible operation. Right-click a red-lock folder and choose <strong>Open Privacy &amp; Security Settings…</strong> to open the relevant macOS settings area.</p>
+      <ol>
+        <li>Open <strong>System Settings → Privacy &amp; Security → Files and Folders</strong>.</li>
+        <li>Select <strong>DuPane</strong> and enable access for the affected location, if it is listed.</li>
+        <li>Return to DuPane and refresh the pane, or quit and relaunch DuPane if the location remains locked.</li>
+      </ol>
+
+      <h3>Full Disk Access</h3>
+      <p>Some protected locations, including parts of another user's home folder or system-managed folders, require broader approval. In <strong>System Settings → Privacy &amp; Security → Full Disk Access</strong>, add DuPane and enable it, then relaunch DuPane. Grant this only when you need to manage those protected locations.</p>
+
+      <h3>External and network volumes</h3>
+      <p>External drives must be mounted before DuPane can browse them. Network shares may require authentication each time unless their credentials are saved in the macOS Keychain. A volume that is unavailable or disconnected can remain visible as a pinned location, but it must be mounted again before its contents can be opened.</p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- Section: Navigation -->
     <section class="section" id="navigation">
       <div class="section-label">Core Features</div>
       <h2>Dual-Pane Navigation</h2>
@@ -895,7 +1018,7 @@
       </table>
 
       <h3>Permission Indicator</h3>
-      <p>Folders you don't have read access to show a small <strong>red lock badge</strong> on their icon. Attempting to navigate into them will show an error — but you can still copy or move files to them if you have write access at the filesystem level.</p>
+      <p>Folders you don't have read access to show a small <strong>red lock badge</strong> on their icon. Read access is required to list or open the folder's existing contents, so attempting to navigate into it will show an error. Write access is separate: you may still be able to copy or move items into the folder even while the red lock remains.</p>
 
       <h3>Switching Between Panes</h3>
       <p>Simply click anywhere inside the desired pane. The coloured border shows which pane is active. All toolbar actions (Move, Copy, Delete, New Folder) operate on the <strong>active pane</strong>.</p>
@@ -910,7 +1033,7 @@
 
     <hr class="divider">
 
-    <!-- ─── 4. Tabs ─── -->
+    <!-- Section: Tabs -->
     <section class="section" id="tabs">
       <div class="section-label">Core Features</div>
       <h2>Tabs</h2>
@@ -939,7 +1062,7 @@
 
       <div class="callout info">
         <div class="callout-icon">ℹ️</div>
-        <p><strong>Tab persistence:</strong> Pinned tabs restore their captured folder on launch even when the pane uses Default or Fixed Folder startup mode. When startup mode is set to <strong>Remember last folder</strong> (Settings → Startup Folders), all open tabs — not just pinned ones — are saved across restarts, including their custom names, pinned state, and tab order.</p>
+        <p><strong>Tab persistence:</strong> Pinned tabs restore their captured folder on launch even when the pane uses Default or Fixed Folder startup mode. When startup mode is set to <strong>Remember last folder</strong> (Settings → Startup folders), all open tabs — not just pinned ones — are saved across restarts, including their custom names, pinned state, and tab order.</p>
       </div>
 
       <h3>Native macOS Window Tabs</h3>
@@ -948,7 +1071,7 @@
 
     <hr class="divider">
 
-    <!-- ─── 5. Sidebar ─── -->
+    <!-- Section: Sidebar -->
     <section class="section" id="sidebar">
       <div class="section-label">Core Features</div>
       <h2>Sidebar &amp; Bookmarks</h2>
@@ -958,7 +1081,7 @@
       <p>To resize the sidebar, drag the divider between the sidebar and the file panes left or right. The width is saved and restored across restarts. Minimum width is 120 pt, maximum 320 pt.</p>
 
       <h3>Places</h3>
-      <p>The <strong>Places</strong> section shows fixed system locations for instant one-click access: Home, Applications, Desktop, Documents, and Downloads. If <strong>iCloud Drive</strong> or <strong>OneDrive</strong> is configured on your Mac, those folders also appear here automatically. You can choose which locations appear in <strong>Settings → Sidebar Places</strong> — each can be toggled on or off independently.</p>
+      <p>The <strong>Places</strong> section shows fixed system locations for instant one-click access: Home, Applications, Desktop, Documents, and Downloads. If <strong>iCloud Drive</strong> or <strong>OneDrive</strong> is configured on your Mac, those folders also appear here automatically. You can choose which locations appear in <strong>Settings → Sidebar places</strong> — each can be toggled on or off independently.</p>
 
       <h3>Recents</h3>
       <p>The <strong>Recents</strong> section automatically tracks the last 12 folders you navigated to in either pane — no configuration needed. The most recently visited folder appears at the top. Right-click any recent item to remove it, or click <strong>Clear Recents</strong> to reset the entire list.</p>
@@ -1020,7 +1143,7 @@
 
     <hr class="divider">
 
-    <!-- ─── 6. File Ops ─── -->
+    <!-- Section: File Operations -->
     <section class="section" id="file-ops">
       <div class="section-label">Core Features</div>
       <h2>File Operations</h2>
@@ -1089,11 +1212,11 @@
 
     <hr class="divider">
 
-    <!-- ─── 7. Compare Sync ─── -->
+    <!-- Section: Compare and Sync -->
     <section class="section" id="compare-sync">
       <div class="section-label">Core Features</div>
       <h2>Folder Compare &amp; Sync</h2>
-      <p class="lead">Compare mode checks the active folders in the left and right panes, highlights differences, and lets you sync eligible changes in either direction after a confirmation preview.</p>
+      <p class="lead">Compare mode checks the immediate items in the active folders, highlights differences, and lets you sync eligible changes in either direction after a confirmation preview.</p>
 
       <h3>Starting a Compare</h3>
       <ol class="steps">
@@ -1115,13 +1238,13 @@
 
       <div class="callout warning">
         <div class="callout-icon">⚠️</div>
-        <p>Sync never deletes destination-only items. Missing folders can be copied, but existing folder differences are skipped in this version because Compare does not yet scan inside folders.</p>
+        <p>Compare and Sync operate at the current-folder level only; they do not scan inside existing folders. Sync never deletes destination-only items. Missing folders can be copied, but existing folder differences are skipped in this version. When Sync overwrites existing files, the confirmation warns that those files cannot be recovered through DuPane.</p>
       </div>
     </section>
 
     <hr class="divider">
 
-    <!-- ─── 7. Sorting ─── -->
+    <!-- Section: Sorting -->
     <section class="section" id="sorting">
       <div class="section-label">Core Features</div>
       <h2>Sorting &amp; Filtering</h2>
@@ -1167,7 +1290,7 @@
 
     <hr class="divider">
 
-    <!-- ─── 8. Quick Look ─── -->
+    <!-- Section: Quick Look -->
     <section class="section" id="quicklook">
       <div class="section-label">Core Features</div>
       <h2>Quick Look</h2>
@@ -1189,7 +1312,7 @@
 
     <hr class="divider">
 
-    <!-- ─── 9. Tags ─── -->
+    <!-- Section: Tags -->
     <section class="section" id="tags">
       <div class="section-label">Core Features</div>
       <h2>Colour Tags</h2>
@@ -1219,7 +1342,7 @@
 
     <hr class="divider">
 
-    <!-- ─── 10. Smart Metadata ─── -->
+    <!-- Section: Smart Metadata -->
     <section class="section" id="smart-metadata">
       <div class="section-label">Smart Features</div>
       <h2>Smart Metadata Columns</h2>
@@ -1273,11 +1396,11 @@
 
     <hr class="divider">
 
-    <!-- ─── 11. Command Runner ─── -->
+    <!-- Section: Command Runner -->
     <section class="section" id="command-runner">
       <div class="section-label">Smart Features</div>
       <h2>Command Runner</h2>
-      <p class="lead">A retractable terminal bar at the bottom of each pane lets you run shell commands in the current directory without leaving DuPane.</p>
+      <p class="lead">A retractable Command Runner at the bottom of each pane lets you run shell commands in the current directory without leaving DuPane.</p>
 
       <div class="terminal-mockup">
         <div class="terminal-bar">
@@ -1299,7 +1422,7 @@
         <li>Output (stdout + stderr) appears in a scrollable area below the input. You can select and copy it.</li>
       </ol>
 
-      <p>Commands run in a <strong>login shell</strong> (your default shell from <code>$SHELL</code>) with the pane's current directory as the working directory, so aliases, path settings, and shell functions all work.</p>
+      <p>Commands run in a <strong>login shell</strong> (your default shell from <code>$SHELL</code>) with the pane's current directory as the working directory. A login shell normally reads <code>.zprofile</code>, not the interactive <code>.zshrc</code>, so aliases and functions defined only in <code>.zshrc</code> may not be available. The runner is non-interactive: standard input is closed, output appears after the command finishes, and commands time out after five minutes. Use a full Terminal window for editors, REPLs, password prompts, and other interactive commands.</p>
 
       <table class="shortcut-table">
         <tr><td class="shortcut-desc">Toggle command runner</td><td class="shortcut-keys"><kbd>⌥`</kbd></td></tr>
@@ -1315,10 +1438,10 @@
 
     <hr class="divider">
 
-    <!-- ─── 13. Folder Size ─── -->
+    <!-- Section: Show Folder Sizes -->
     <section class="section" id="folder-size">
       <div class="section-label">Smart Features</div>
-      <h2>Folder Size View</h2>
+      <h2>Show Folder Sizes</h2>
       <p class="lead">Wondering what's eating your disk space? Right-click any folder and choose <strong>Show Folder Sizes</strong> to see a live bar chart of its contents, sorted largest first.</p>
 
       <!-- Folder size mockup -->
@@ -1378,7 +1501,7 @@
 
     <hr class="divider">
 
-    <!-- ─── 15. Duplicate Finder ─── -->
+    <!-- Section: Duplicate Finder -->
     <section class="section" id="duplicate-finder">
       <div class="section-label">Smart Features</div>
       <h2>Duplicate Finder</h2>
@@ -1395,21 +1518,23 @@
       </ol>
 
       <h3>How detection works</h3>
-      <p>Duplicate detection uses a two-pass algorithm that is both fast and accurate:</p>
+      <p>Duplicate detection uses three stages:</p>
       <ol>
-        <li><strong>Size grouping</strong> — files are first bucketed by byte size. Only files that share the same size proceed to the next pass, eliminating most non-duplicates with zero I/O overhead.</li>
-        <li><strong>Content hashing</strong> — same-size files are hashed with FNV-1a 64-bit. Two files whose hashes match are identical regardless of name, location, or modification date.</li>
+        <li><strong>Size grouping</strong> — files are first bucketed by byte size. Only files that share the same size proceed to hashing, avoiding content reads for files with unique sizes.</li>
+        <li><strong>Content hashing</strong> — same-size files are hashed with FNV-1a 64-bit. Matching hashes identify candidates for comparison; they do not by themselves prove that files are identical.</li>
+        <li><strong>Byte-for-byte verification</strong> — candidates are compared byte-for-byte before being grouped as duplicates, regardless of name, location, or modification date.</li>
       </ol>
       <p>Hidden files are skipped. The scan runs entirely off the main thread so the app stays responsive.</p>
 
-      <div class="tip">
+      <div class="callout tip">
+        <div class="callout-icon">💡</div>
         <p><strong>Note:</strong> The Dupes button is disabled when the active pane is showing the Computer (all volumes) root. Navigate into a real folder first.</p>
       </div>
     </section>
 
     <hr class="divider">
 
-    <!-- ─── 16. Settings ─── -->
+    <!-- Section: Settings -->
     <section class="section" id="settings">
       <div class="section-label">Reference</div>
       <h2>Settings</h2>
@@ -1469,6 +1594,7 @@
           <td>When on, folders always appear at the top of the file list regardless of the current sort column. When off, folders and files are sorted together.</td>
         </tr>
       </table>
+      <p><strong>Hidden-item settings work independently in both panes:</strong> with both options off, hidden files and folders stay hidden. Turning on <strong>Show hidden folders</strong> reveals hidden folders while keeping hidden files hidden. Turning on <strong>Show hidden files</strong> reveals all hidden items, including hidden folders, so enabling both options does not reveal anything extra.</p>
 
       <h3>Appearance</h3>
       <p>Choose a theme from the <strong>Theme</strong> picker in Settings → Appearance. Changes apply instantly across the whole app.</p>
@@ -1494,8 +1620,38 @@
           <td>Show Recents section</td><td>On</td>
           <td>Shows the Recents section in the sidebar, listing the last 12 folders you visited. Turn off if you prefer a minimal sidebar.</td>
         </tr>
+        <tr>
+          <td>Show Network section</td><td>On</td>
+          <td>Shows the Network section for mounted network volumes, pinned servers, and server discovery. Turning it off also hides the Network settings subsection.</td>
+        </tr>
       </table>
       <p>Within the Places section, each individual location can be toggled on or off independently. Available locations: <strong>Home</strong>, <strong>Applications</strong>, <strong>Desktop</strong>, <strong>Documents</strong>, <strong>Downloads</strong>. <strong>iCloud Drive</strong> and <strong>OneDrive</strong> appear as additional options when those services are configured on your Mac — both are enabled by default if present.</p>
+
+      <h3>Network</h3>
+      <p>The Network settings subsection appears when <strong>Show Network section</strong> is enabled. These options control which network information appears in the sidebar and whether DuPane reconnects pinned servers at launch.</p>
+      <table class="shortcut-table">
+        <thead><tr><th>Setting</th><th>Default</th><th>Description</th></tr></thead>
+        <tr>
+          <td>Show mounted network volumes</td><td>On</td>
+          <td>Lists currently-mounted network shares such as SMB, AFP, NFS, WebDAV, and FTP volumes.</td>
+        </tr>
+        <tr>
+          <td>Show status indicator</td><td>On</td>
+          <td>Shows a coloured status dot for each network entry: green when mounted and grey when a pinned server is not mounted.</td>
+        </tr>
+        <tr>
+          <td>Show pinned servers</td><td>On</td>
+          <td>Shows saved network server URLs in the Network section, including servers that are currently disconnected.</td>
+        </tr>
+        <tr>
+          <td>Bonjour discovery (Connect sheet and sidebar)</td><td>On</td>
+          <td>Discovers compatible local-network services in the Connect to Server sheet and Network sidebar using Bonjour.</td>
+        </tr>
+        <tr>
+          <td>Auto-reconnect pinned servers on launch</td><td>Off</td>
+          <td>Attempts to mount each pinned server when DuPane starts. The server's credentials must already be available in the macOS Keychain for a silent reconnect.</td>
+        </tr>
+      </table>
 
       <h3>Export &amp; Import Settings</h3>
       <p>Open the <strong>DuPane</strong> menu → <strong>Export Settings…</strong> to save all your preferences to a <code>.json</code> file. Use <strong>Import Settings…</strong> to restore them — for example when setting up DuPane on a second Mac. All settings apply immediately without a restart.</p>
@@ -1521,7 +1677,58 @@
 
     <hr class="divider">
 
-    <!-- ─── 17. Shortcuts ─── -->
+    <!-- Section: Troubleshooting -->
+    <section class="section" id="troubleshooting">
+      <div class="section-label">Reference</div>
+      <h2>Troubleshooting</h2>
+      <p class="lead">Most problems come from macOS privacy permissions, unavailable volumes, or services that index files in the background.</p>
+
+      <h3>Subfolder search returns no results</h3>
+      <p>Subfolder search uses macOS Spotlight. External drives, network shares, and folders excluded from Spotlight may return no results even when matching files exist. Check that the volume is mounted and not listed under <strong>System Settings → Siri &amp; Spotlight → Spotlight Privacy</strong>. For a search limited to the current folder, use the normal <strong>Filter…</strong> field instead; it does not depend on Spotlight.</p>
+
+      <h3>Compare or Sync does not show nested differences</h3>
+      <p>Compare examines the items in the two current folders. It can copy missing folders, but it does not recursively compare the contents of existing folders in this version. Open the matching subfolders and compare them separately when you need to inspect nested differences. Sync never deletes destination-only items.</p>
+
+      <h3>A network share is missing after relaunch</h3>
+      <p>A pinned server can remain in the Network sidebar even when it is not mounted. Click it to connect again, or use <strong>Connect Now</strong> from its context menu. To reconnect automatically at launch, enable <strong>Settings → Network → Auto-reconnect pinned servers on launch</strong> and allow macOS to save the share's credentials in Keychain when prompted.</p>
+
+      <h3>A folder shows a red lock badge</h3>
+      <p>The badge means macOS has not granted DuPane the access required to read that location. Right-click the folder and choose <strong>Open Privacy &amp; Security Settings…</strong>, follow the steps in <a href="#installation">Installation &amp; Permissions</a>, then return to DuPane; the pane refreshes when the app becomes active again. A folder may still accept a write operation when macOS grants write access but denies read access, so the badge does not always mean every operation is unavailable.</p>
+
+      <h3>The Command Runner cannot find an alias</h3>
+      <p>DuPane runs commands in a shell rooted at the current pane directory. Commands and aliases that depend on a separate Terminal session may not be available. Use the full command path, place required executable paths in your login-shell configuration, or open a full Terminal window for interactive commands and editors.</p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- Section: Toolbar Reference -->
+    <section class="section" id="toolbar-reference">
+      <div class="section-label">Reference</div>
+      <h2>Toolbar Reference</h2>
+      <p class="lead">The toolbar acts on the active pane. Buttons become unavailable when the current selection or destination cannot support the operation.</p>
+
+      <table class="shortcut-table">
+        <thead><tr><th>Button</th><th>What it does</th><th>Disabled when</th></tr></thead>
+        <tr><td><strong>Sidebar</strong></td><td>Shows or hides the sidebar.</td><td>Never.</td></tr>
+        <tr><td><strong>New Folder</strong></td><td>Creates a folder in the active pane's current directory.</td><td>The active pane is at Computer, or its directory cannot be written.</td></tr>
+        <tr><td><strong>New File</strong></td><td>Creates a blank file in the active pane's current directory.</td><td>The active pane is at Computer, or its directory cannot be written.</td></tr>
+        <tr><td><strong>Move</strong></td><td>Moves the selected items to the other pane's current directory.</td><td>Nothing is selected, or the destination is not a real writable folder.</td></tr>
+        <tr><td><strong>Copy</strong></td><td>Copies the selected items to the other pane's current directory.</td><td>Nothing is selected, or the destination is not a real writable folder.</td></tr>
+        <tr><td><strong>Compare</strong></td><td>Compares the immediate items in the current folders; nested contents are not scanned.</td><td>Either pane is at Computer rather than inside a folder.</td></tr>
+        <tr><td><strong>Sync L→R / R→L</strong></td><td>Copies eligible differences in the selected direction after confirmation.</td><td>Compare mode is off or there are no eligible differences in that direction.</td></tr>
+        <tr><td><strong>Delete</strong></td><td>Moves the selected items to the macOS Trash.</td><td>Nothing is selected.</td></tr>
+        <tr><td><strong>Rename</strong></td><td>Renames the selected item.</td><td>The selection is not a single renameable item.</td></tr>
+        <tr><td><strong>Dupes</strong></td><td>Scans the active folder tree for duplicate files.</td><td>The active pane is showing Computer rather than a real folder.</td></tr>
+        <tr><td><strong>Bookmark</strong></td><td>Adds or removes the selected file or folder from the sidebar.</td><td>There is no single bookmarkable selection.</td></tr>
+        <tr><td><strong>Terminal</strong></td><td>Shows or hides the Command Runner for the active pane.</td><td>Never.</td></tr>
+        <tr><td><strong>Follow</strong></td><td>Makes navigation in one pane mirror the other pane.</td><td>Never; click it again to turn Follow Mode off.</td></tr>
+        <tr><td><strong>Show Folder Sizes</strong></td><td>Opens the folder-size chart for a selected folder.</td><td>It is available from the folder's context menu only, and only for folders.</td></tr>
+      </table>
+    </section>
+
+    <hr class="divider">
+
+    <!-- Section: Keyboard Shortcuts -->
     <section class="section" id="shortcuts">
       <div class="section-label">Reference</div>
       <h2>Keyboard Shortcuts</h2>
@@ -1552,9 +1759,10 @@
       </table>
 
       <h3>File Operations</h3>
+      <p><strong>Standard macOS copy/paste:</strong> <kbd>⌘C</kbd> and <kbd>⌘V</kbd> retain their normal macOS meanings. Use <kbd>Fn+F5</kbd> and <kbd>Fn+F6</kbd> when you want to copy or move a selection between DuPane's panes.</p>
       <table class="shortcut-table">
-        <tr><td class="shortcut-desc">Copy selection to other pane</td><td class="shortcut-keys"><kbd>Fn+F5</kbd> or <kbd>⌘C</kbd></td></tr>
-        <tr><td class="shortcut-desc">Move selection to other pane</td><td class="shortcut-keys"><kbd>Fn+F6</kbd> or <kbd>⌘V</kbd></td></tr>
+        <tr><td class="shortcut-desc">Copy selection to other pane</td><td class="shortcut-keys"><kbd>Fn+F5</kbd></td></tr>
+        <tr><td class="shortcut-desc">Move selection to other pane</td><td class="shortcut-keys"><kbd>Fn+F6</kbd></td></tr>
         <tr><td class="shortcut-desc">New Folder</td><td class="shortcut-keys"><kbd>Fn+F7</kbd> or <kbd>⌘N</kbd></td></tr>
         <tr><td class="shortcut-desc">New File</td><td class="shortcut-keys"><kbd>⌥⌘N</kbd></td></tr>
         <tr><td class="shortcut-desc">Rename selected item</td><td class="shortcut-keys">Pencil button in toolbar (visible when 1 item selected)</td></tr>
@@ -1592,7 +1800,7 @@
         <tr><td class="shortcut-desc">Rename / reset tab name</td><td class="shortcut-keys">Right-click tab → Rename Tab… / Reset Tab Name</td></tr>
       </table>
 
-      <h3>Developer Tools</h3>
+      <h3>Application</h3>
       <table class="shortcut-table">
         <tr><td class="shortcut-desc">Toggle command runner</td><td class="shortcut-keys"><kbd>⌥`</kbd></td></tr>
         <tr><td class="shortcut-desc">Open Settings</td><td class="shortcut-keys"><kbd>⌘,</kbd></td></tr>
@@ -1608,26 +1816,106 @@
     <strong>DuPane</strong> · Dual-Pane File Manager for macOS
   </div>
   <div style="color:var(--text2);">
-    User Guide · Version 1.0 · Build 421 · macOS 13+
+    <a class="footer-link" href="https://github.com/IanCallicott121/DuPane/issues/new/choose" target="_blank" rel="noopener noreferrer">Report an issue</a>
+    · User Guide · Version {{VERSION}} · Build {{BUILD}} · macOS 13+
   </div>
 </footer>
 
 <script>
+// Generate the table of contents from the guide sections so it stays in sync.
+const tocList = document.getElementById('toc-list');
+const sections = document.querySelectorAll('section.section[id]');
+const tocItems = [];
+sections.forEach(section => {
+  const heading = section.querySelector('h2');
+  if (!heading || !tocList) return;
+  const item = document.createElement('li');
+  const link = document.createElement('a');
+  link.href = '#' + section.id;
+  link.textContent = heading.textContent.trim();
+  item.dataset.sectionId = section.id;
+  item.appendChild(link);
+  tocList.appendChild(item);
+  tocItems.push(item);
+});
+
 // Highlight active nav item based on scroll position
-const sections = document.querySelectorAll('section[id]');
 const navItems = document.querySelectorAll('.nav-item');
+let activeSectionId = sections[0]?.id;
+
+function setActiveNavItem(sectionId) {
+  if (!sectionId) return;
+  activeSectionId = sectionId;
+  navItems.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + sectionId));
+}
+
+setActiveNavItem(activeSectionId);
+
+// Filter guide sections and navigation from the in-page search field.
+const searchInput = document.getElementById('guide-search');
+const searchClear = document.getElementById('guide-search-clear');
+const searchStatus = document.getElementById('guide-search-status');
+const navSections = document.querySelectorAll('.nav-section');
+
+function applyGuideSearch() {
+  const query = searchInput?.value.trim().toLowerCase() ?? '';
+  const matchingSections = Array.from(sections).filter(section =>
+    section.textContent.toLowerCase().includes(query)
+  );
+  const matchingIds = new Set(matchingSections.map(section => section.id));
+  const isFiltering = query.length > 0;
+
+  sections.forEach(section => {
+    section.hidden = isFiltering && !matchingIds.has(section.id);
+  });
+  tocItems.forEach(item => {
+    item.hidden = isFiltering && !matchingIds.has(item.dataset.sectionId);
+  });
+  navItems.forEach(item => {
+    const sectionId = item.getAttribute('href')?.slice(1);
+    item.hidden = isFiltering && !matchingIds.has(sectionId);
+  });
+  navSections.forEach(navSection => {
+    const hasVisibleItem = Array.from(navSection.querySelectorAll('.nav-item')).some(item => !item.hidden);
+    navSection.hidden = isFiltering && !hasVisibleItem;
+  });
+
+  if (searchClear) searchClear.hidden = !isFiltering;
+  if (searchStatus) {
+    searchStatus.textContent = isFiltering
+      ? matchingSections.length === 0
+        ? `No sections match “${searchInput.value.trim()}”.`
+        : `Showing ${matchingSections.length} of ${sections.length} sections.`
+      : `Showing all ${sections.length} sections.`;
+  }
+
+  if (isFiltering && matchingSections.length > 0 && !matchingIds.has(activeSectionId)) {
+    setActiveNavItem(matchingSections[0].id);
+  }
+}
+
+searchInput?.addEventListener('input', applyGuideSearch);
+searchClear?.addEventListener('click', () => {
+  if (!searchInput) return;
+  searchInput.value = '';
+  searchInput.focus();
+  applyGuideSearch();
+});
+applyGuideSearch();
 
 const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      navItems.forEach(a => a.classList.remove('active'));
-      const link = document.querySelector('.nav-item[href="#' + entry.target.id + '"]');
-      if (link) link.classList.add('active');
-    }
-  });
+  const intersectingSections = entries
+    .filter(entry => entry.isIntersecting)
+    .sort((a, b) => a.target.offsetTop - b.target.offsetTop);
+  if (intersectingSections.length > 0) {
+    setActiveNavItem(intersectingSections[intersectingSections.length - 1].target.id);
+  }
 }, { rootMargin: '-30% 0px -60% 0px' });
 
 sections.forEach(s => observer.observe(s));
+navItems.forEach(item => {
+  item.addEventListener('click', () => setActiveNavItem(item.getAttribute('href').slice(1)));
+});
 </script>
 </body>
 </html>

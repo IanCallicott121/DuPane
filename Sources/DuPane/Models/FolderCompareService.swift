@@ -127,6 +127,9 @@ struct FolderSyncPlan: Equatable {
 
         let actionText = parts.isEmpty ? "make no filesystem changes" : parts.joined(separator: ", ")
         var message = "Sync \(direction.label)? This will \(actionText). Destination-only items will not be deleted."
+        if overwriteCount > 0 {
+            message += " Overwritten files cannot be recovered through DuPane."
+        }
         if skippedExistingFolderOverwrites > 0 {
             message += " \(skippedExistingFolderOverwrites) existing folder difference\(skippedExistingFolderOverwrites == 1 ? "" : "s") will be skipped."
         }

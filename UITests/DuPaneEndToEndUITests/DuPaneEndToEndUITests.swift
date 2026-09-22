@@ -190,13 +190,6 @@ final class DuPaneEndToEndUITests: DuPaneTestCase {
     }
 
     @MainActor
-    func testCriticalMenuShowsInternalTestBuildMarker() throws {
-        launchApp()
-
-        XCTAssertTrue(app.menuItems["Internal Test Build 421.6"].waitForExistence(timeout: 5))
-    }
-
-    @MainActor
     func testCriticalCopySelectedFileBetweenPanes() throws {
         let sourceURL = try fixture.writeFile(named: "copy-me.txt", contents: "copy source", in: fixture.leftPaneURL)
         launchApp()
@@ -228,22 +221,20 @@ final class DuPaneEndToEndUITests: DuPaneTestCase {
     }
 
     @MainActor
-    func testCriticalCommandVMovesSelectedFileBetweenPanes() throws {
-        let sourceURL = try fixture.writeFile(named: "shortcut-move-me.txt", contents: "shortcut move source", in: fixture.leftPaneURL)
+    func testCriticalCommandCopyAndPasteDoNotTransferFilesBetweenPanes() throws {
+        let sourceURL = try fixture.writeFile(named: "shortcut-file.txt", contents: "shortcut source", in: fixture.leftPaneURL)
         launchApp()
 
-        let sourceRow = waitForRow(named: "shortcut-move-me.txt", in: "left")
+        let sourceRow = waitForRow(named: "shortcut-file.txt", in: "left")
         clickRow(sourceRow)
         waitForSelection(sourceRow)
+        app.typeKey("c", modifierFlags: .command)
         app.typeKey("v", modifierFlags: .command)
 
-        XCTAssertTrue(row(named: "shortcut-move-me.txt", in: "right").waitForExistence(timeout: 5))
-        waitForMissingRow(named: "shortcut-move-me.txt", in: "left")
-        XCTAssertFalse(fixture.exists(sourceURL))
-        XCTAssertEqual(
-            try fixture.fileContents(named: "shortcut-move-me.txt", in: fixture.rightPaneURL),
-            "shortcut move source"
-        )
+        XCTAssertFalse(row(named: "shortcut-file.txt", in: "right").exists)
+        XCTAssertTrue(row(named: "shortcut-file.txt", in: "left").exists)
+        XCTAssertTrue(fixture.exists(sourceURL))
+        XCTAssertEqual(try fixture.fileContents(named: "shortcut-file.txt", in: fixture.leftPaneURL), "shortcut source")
     }
 
     @MainActor
@@ -458,6 +449,21 @@ final class DuPaneEndToEndUITests: DuPaneTestCase {
         XCTAssertTrue(app.menuItems["Open"].waitForExistence(timeout: 2))
         XCTAssertTrue(app.menuItems["Rename…"].exists)
         XCTAssertTrue(app.menuItems["Reveal in Finder"].exists)
+    }
+
+    @MainActor
+    func testCriticalRestrictedFolderOffersPrivacySettingsRecovery() throws {
+        let restrictedFolder = try fixture.createFolder(named: "restricted-folder", in: fixture.leftPaneURL)
+        try FileManager.default.setAttributes([.posixPermissions: 0], ofItemAtPath: restrictedFolder.path)
+        defer { try? FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: restrictedFolder.path) }
+
+        launchApp()
+        rightClickRow(waitForRow(named: "restricted-folder", in: "left"))
+
+        XCTAssertTrue(
+            app.menuItems["Open Privacy & Security Settings…"].waitForExistence(timeout: 2),
+            "restricted folders must offer a macOS privacy-settings recovery action"
+        )
     }
 
     // Critical UI tag: post-build subset for functional, broad, or full test runs.

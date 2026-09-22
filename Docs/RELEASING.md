@@ -3,6 +3,25 @@
 This guide is for DuPane maintainers. Contributors do not need to create or publish
 releases.
 
+## Build numbers
+
+DuPane uses one implementation build number:
+
+| Identifier | Purpose | Source and usage |
+|---|---|---|
+| Main build number, for example `421` | Identifies the implementation/release build | `BuildNumber.txt`; stamped into the built app's `CFBundleVersion` by `project.yml`. The User Guide and FAQs display this number. |
+
+- Increment the main build number explicitly with `Scripts/bump-build-number.sh` only
+  when implementation or release work needs a new visible number. Builds do not increment it.
+- Follow the manual-build and verification sequence in [AGENTS.md](../AGENTS.md).
+  The preparation script verifies the installed app's target and timestamps before testing.
+- To leave a validated UI change ready in `~/Applications/DuPane.app`, run
+  `./Scripts/verify-change.sh ui --prepare-manual-build`. The installed-app preparation
+  runs only after the unit and E2E stages pass.
+
+The public release version, such as `1.0.0` from tag `v1.0.0`, is a separate marketing
+version. It is separate from the implementation build number.
+
 ## Before releasing
 
 1. Make sure the release changes are committed on `main`.

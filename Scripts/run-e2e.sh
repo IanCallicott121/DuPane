@@ -14,6 +14,7 @@ typeset -a high_priority_tests medium_priority_tests low_priority_tests
 high_priority_tests=(
   testCriticalRenameFileThroughToolbarSheet
   testCriticalCommandVPastesIntoCreationAndGoToFolderFields
+  testCriticalCommandCopyAndPasteDoNotTransferFilesBetweenPanes
   testCriticalDefaultInputTextIsSelectedOnFocus
   testCriticalCopySelectedFileBetweenPanes
   testCriticalMoveSelectedFileBetweenPanes
@@ -23,12 +24,11 @@ high_priority_tests=(
   testCommandClickAddsSecondRowToSelection
   testMediumPropertiesAndFolderSizePanelsOpen
   testLaunchShowsFixtureRows
+  testCriticalRestrictedFolderOffersPrivacySettingsRecovery
 )
 medium_priority_tests=(
   testShiftClickExtendsSelectionToRange
   testMediumFilterNarrowsVisibleRows
-  testCriticalMenuShowsInternalTestBuildMarker
-  testCriticalCommandVMovesSelectedFileBetweenPanes
   testCriticalArchiveRoundTripThroughContextMenu
   testCriticalDuplicateFinderScansAndShowsDuplicateGroup
   testCriticalCopyConflictDialogResolvesOverwriteSkipAndKeepBoth

@@ -3,10 +3,6 @@ import AppKit
 import WebKit
 import UniformTypeIdentifiers
 
-enum InternalTestBuildMarker {
-    static let value = "421.6"
-}
-
 @main
 struct DuPaneApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
@@ -35,8 +31,6 @@ struct DuPaneApp: App {
                     openFAQs()
                 }
 
-                Button("Internal Test Build \(InternalTestBuildMarker.value)") {}
-                    .disabled(true)
             }
             CommandGroup(replacing: .windowArrangement) {}
             CommandGroup(replacing: .systemServices) {}

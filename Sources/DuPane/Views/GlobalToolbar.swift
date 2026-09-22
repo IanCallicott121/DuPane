@@ -81,7 +81,7 @@ struct GlobalToolbar: View {
             }
             .disabled(!canCompare)
             .accessibilityIdentifier("toolbar-compare-button")
-            .help(canCompare ? "Compare both active folders" : "Navigate both panes into folders to compare")
+            .help(canCompare ? "Compare the current folders only; nested contents are not scanned" : "Navigate both panes into folders to compare")
 
             if isCompareMode {
                 Button(action: onSyncLeftToRight) {

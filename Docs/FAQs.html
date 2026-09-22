@@ -121,17 +121,22 @@
       <div class="faq-item">
         <div class="faq-q">How do I copy a file from one pane to the other?</div>
         <div class="faq-a">
-          <p>Select the file(s) in one pane, then click the <strong>Copy</strong> button in the toolbar (the arrow-with-square icon). The direction of the arrow shows which pane is receiving the files. The other pane is always the destination — no need to navigate it first.</p>
-          <p>You can also right-click and choose <strong>Copy to Other Pane</strong> from the context menu.</p>
+          <p>Select the file(s) in one pane, navigate the other pane into the destination folder, then click the <strong>Copy</strong> button in the toolbar (the arrow-with-square icon). The direction of the arrow shows which pane is receiving the files. Copy is unavailable while the other pane is at the Computer root.</p>
+          <p>You can also right-click and choose <strong>Copy to [folder]</strong> from the context menu.</p>
         </div>
       </div>
 
       <div class="faq-item">
         <div class="faq-q">How do I move files instead of copy?</div>
         <div class="faq-a">
-          <p>Use the <strong>Move</strong> button (the arrow-with-circle icon). After the move, the files disappear from the source pane and appear in the destination pane. Alternatively, right-click and choose <strong>Move to Other Pane</strong>.</p>
+          <p>Use the <strong>Move</strong> button (the arrow-with-circle icon). The other pane must be inside a real destination folder, not at the Computer root. After the move, the files disappear from the source pane and appear in the destination pane. Alternatively, right-click and choose <strong>Move to [folder]</strong>.</p>
           <p>You can also drag files between panes — hold <kbd>⌥ Option</kbd> while dropping to copy instead of move.</p>
         </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">What do ⌘C and ⌘V do in DuPane?</div>
+        <div class="faq-a"><p><kbd>⌘C</kbd> and <kbd>⌘V</kbd> retain their normal macOS meanings. To copy or move selected items between DuPane's panes, use <kbd>Fn+F5</kbd> for copy or <kbd>Fn+F6</kbd> for move.</p></div>
       </div>
 
       <div class="faq-item">
@@ -185,7 +190,7 @@
 
       <div class="faq-item">
         <div class="faq-q">The breadcrumb path is truncated — how do I see the full path?</div>
-        <div class="faq-a"><p>The breadcrumb auto-scrolls to show the deepest (current) folder. Scroll the breadcrumb horizontally to see ancestor folders, or hover over any segment to see its full name. The status bar at the bottom shows the item count and selection size; use <strong>Get Info</strong> (right-click → Get Info…) to see the full path of a specific file.</p></div>
+        <div class="faq-a"><p>The breadcrumb auto-scrolls to show the deepest (current) folder. Scroll the breadcrumb horizontally to see ancestor folders. The status bar at the bottom shows the item count and selection size; use <strong>Get Info</strong> (right-click → Get Info…) to see the full path of a specific file.</p></div>
       </div>
     </section>
 
@@ -254,7 +259,7 @@
 
       <div class="faq-item">
         <div class="faq-q">What happens when I click a bookmarked file (not a folder)?</div>
-        <div class="faq-a"><p>Clicking a bookmarked file opens it in its default application — the same as double-clicking it in Finder. Clicking a bookmarked folder navigates the active pane into that folder.</p></div>
+        <div class="faq-a"><p>Clicking a bookmarked file opens it in its default application — the same as double-clicking it in Finder. Shell scripts (<code>.sh</code>) are an exception: clicking one shows a confirmation dialog before opening it in Terminal. Clicking a bookmarked folder navigates the active pane into that folder.</p></div>
       </div>
     </section>
 
@@ -300,7 +305,7 @@
 
       <div class="faq-item">
         <div class="faq-q">Compare doesn't scan inside sub-folders — is that a bug?</div>
-        <div class="faq-a"><p>No, it's a current limitation. Compare v1 compares the top-level contents of both folders by name, size, and modification date. Recursive folder comparison is planned for a future release. Folders are flagged as "different" if their metadata differs, but their internal contents are not inspected.</p></div>
+        <div class="faq-a"><p>No, it's a current limitation. Compare checks the immediate items in both folders by name, kind, size, and modification date. Regular files are also compared byte-for-byte when those metadata checks do not settle the result. Existing folders are not opened or compared recursively; compare matching subfolders separately when needed.</p></div>
       </div>
     </section>
 
@@ -331,7 +336,7 @@
 
       <div class="faq-item">
         <div class="faq-q">How does duplicate detection work? Does it compare filenames?</div>
-        <div class="faq-a"><p>No — DuPane compares file <em>content</em>, not names. Two files with different names but identical bytes are detected as duplicates. Files are first grouped by size (which is fast), then files sharing the same size are hashed to confirm they're actually identical. Hidden files are skipped by default.</p></div>
+        <div class="faq-a"><p>No — DuPane compares file <em>content</em>, not names. Two files with different names but identical bytes are detected as duplicates. Files are first grouped by size, then same-size files are hashed to find candidates and compared byte-for-byte before they are grouped as duplicates. Hidden files are skipped by default.</p></div>
       </div>
 
       <div class="faq-item">

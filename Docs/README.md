@@ -96,6 +96,18 @@ Follow the verification lanes in `Docs/AGENT-WORKFLOW.md` (relative to the repos
 root). Use `./Scripts/verify-change.sh docs` for documentation-only edits and the
 appropriate code-change lane for implementation work.
 
+For a UI, project, or release change, append `--prepare-manual-build` to the
+verification command to rebuild and refresh `~/Applications/DuPane.app` only after
+the unit tests and E2E tests pass:
+
+```bash
+./Scripts/verify-change.sh ui --prepare-manual-build
+```
+
+The preparation script verifies that the installed app points to the current external
+Debug build and that its binary is newer than the source. Follow the rebuild and relaunch
+steps in `AGENTS.md` before testing the app.
+
 **First-run permissions**
 
 macOS will prompt for access to `~/Downloads` and any removable volumes the

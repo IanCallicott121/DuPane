@@ -3,18 +3,25 @@ set -euo pipefail
 repo_dir=$(cd "$(dirname "$0")/.." && pwd -P)
 cd "$repo_dir"
 lane="${1:-}"
-[ -n "$lane" ] || { echo "Usage: $0 {docs|logic|service|ui|project|release} [--filter TestName] [--clean]" >&2; exit 2; }
+[ -n "$lane" ] || { echo "Usage: $0 {docs|logic|service|ui|project|release} [--filter TestName] [--clean] [--prepare-manual-build]" >&2; exit 2; }
 shift
 filter=""
 clean=0
+prepare_manual_build=0
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --filter) filter="${2:?--filter requires a test name}"; shift 2 ;;
     --clean) clean=1; shift ;;
+    --prepare-manual-build) prepare_manual_build=1; shift ;;
     *) echo "Unknown option: $1" >&2; exit 2 ;;
   esac
 done
 case "$lane" in docs|logic|service|ui|project|release) ;; *) echo "Unknown lane: $lane" >&2; exit 2 ;; esac
+
+if [ "$prepare_manual_build" -eq 1 ] && [ "$lane" != "ui" ] && [ "$lane" != "project" ] && [ "$lane" != "release" ]; then
+  echo "--prepare-manual-build requires a lane that runs E2E tests (ui, project, or release)" >&2
+  exit 2
+fi
 
 overall_start=$SECONDS
 run_stage() {
@@ -37,4 +44,7 @@ else
   run_stage "app-build" xcodebuild "${build_args[@]}" build
 fi
 case "$lane" in ui|project|release) run_stage "full-e2e" "$repo_dir/Scripts/run-e2e.sh" ;; esac
+if [ "$prepare_manual_build" -eq 1 ]; then
+  run_stage "prepare-manual-build" "$repo_dir/Scripts/prepare-manual-build.sh"
+fi
 printf '\nTIMING total                    %ss\n' "$((SECONDS - overall_start))"

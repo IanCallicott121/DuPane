@@ -130,6 +130,24 @@ final class FolderCompareServiceTests: DuPaneTestCase {
         XCTAssertEqual(plan.confirmationMessage, "Sync Left to Right? This will make no filesystem changes. Destination-only items will not be deleted.")
     }
 
+    func testSyncPlanWarnsThatOverwrittenFilesCannotBeRecovered() {
+        let newer = Date(timeIntervalSince1970: 200)
+        let older = Date(timeIntervalSince1970: 100)
+        let left = makeItem(name: "shared.txt", pane: .left, size: 4, modified: newer)
+        let right = makeItem(name: "shared.txt", pane: .right, size: 4, modified: older)
+        let snapshot = FolderCompareService.compare(leftItems: [left], rightItems: [right])
+
+        let plan = FolderCompareService.syncPlan(
+            from: snapshot,
+            direction: .leftToRight,
+            leftFolder: fixture.leftPaneURL,
+            rightFolder: fixture.rightPaneURL
+        )
+
+        XCTAssertEqual(plan.overwriteCount, 1)
+        XCTAssertTrue(plan.confirmationMessage.contains("Overwritten files cannot be recovered through DuPane."))
+    }
+
     func testSyncPlanSkipsExistingFolderOverwrites() {
         let older = Date(timeIntervalSince1970: 100)
         let newer = Date(timeIntervalSince1970: 200)

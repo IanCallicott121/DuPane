@@ -237,6 +237,10 @@ struct ContentView: View {
             guard !urls.isEmpty else { return }
             QuickLookCoordinator.shared.toggle(urls: urls)
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            leftTabs.activePaneState.load()
+            rightTabs.activePaneState.load()
+        }
         .onReceive(NotificationCenter.default.publisher(for: .operationShortcutRequested)) { notification in
             guard let operation = notification.userInfo?["operation"] as? String else { return }
             switch operation {
@@ -423,10 +427,6 @@ struct ContentView: View {
                 .keyboardShortcut("a", modifiers: [.command, .shift])
             Button("Go Utilities") { active.navigate(to: URL(fileURLWithPath: "/Applications/Utilities")) }
                 .keyboardShortcut("u", modifiers: [.command, .shift])
-            Button("Copy to Other Pane") { moveOrCopy(isMove: false) }
-                .keyboardShortcut("c", modifiers: .command)
-            Button("Move to Other Pane") { moveOrCopy(isMove: true) }
-                .keyboardShortcut("v", modifiers: .command)
             Button("Duplicate") { active.duplicate() }
                 .keyboardShortcut("d", modifiers: .command)
             Button("Quick Look") {
