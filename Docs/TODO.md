@@ -125,6 +125,12 @@ New Folder and Go to Folder were previously verified on a local build.
   assertion. Manual builds are identified by the verified installed-app target and
   timestamps instead.
 
+### README audience split — 2026-09-22
+
+- Split the README into separate download/install guidance for users and build/test/change
+  guidance for developers. Added direct links to the full User Guide and FAQs so the
+  README does not need to duplicate the application's feature documentation.
+
 ### Build-number convention documented — 2026-09-20
 
 - Recorded the main build number convention in [RELEASING.md](RELEASING.md#build-numbers).
