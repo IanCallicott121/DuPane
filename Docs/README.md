@@ -35,11 +35,6 @@ tags, metadata columns, file operations, Compare and Sync, Duplicate Finder, fol
 sizes, settings, keyboard shortcuts, and troubleshooting. See the [FAQs](https://github.com/IanCallicott121/DuPane/blob/main/Docs/FAQs.html)
 for common questions and safety details.
 
-One important shortcut distinction:
-
-- `⌘C` and `⌘V` use the normal macOS clipboard.
-- Use F5 to copy selected items to the other pane and F6 to move them.
-
 ## For developers: build and modify DuPane
 
 ### Requirements
