@@ -34,14 +34,16 @@ final class SmartMetadataService: ObservableObject {
         return cache[url] != nil
     }
 
-    func loadIfNeeded(for items: [FileItem]) {
+    @discardableResult
+    func loadIfNeeded(for items: [FileItem]) -> [Task<Void, Never>] {
         assertMainActor()
+        var tasks: [Task<Void, Never>] = []
         for item in items where !item.isDirectory {
             guard cache[item.url] == nil, !pending.contains(item.url) else { continue }
             pending.insert(item.url)
             let url = item.url
             let ext = item.fileExtension
-            Task.detached(priority: .background) {
+            let task = Task.detached(priority: .background) {
                 let result = await Self.compute(url: url, ext: ext)
                 await MainActor.run {
                     self.assertMainActor()
@@ -57,7 +59,9 @@ final class SmartMetadataService: ObservableObject {
                     }
                 }
             }
+            tasks.append(task)
         }
+        return tasks
     }
 
     private static func compute(url: URL, ext: String) async -> String? {

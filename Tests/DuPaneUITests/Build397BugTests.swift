@@ -315,8 +315,9 @@ final class SmartMetadataMainActorAccessTests: DuPaneTestCase {
         let item = try fixture.fileItem(named: "alpha.txt", in: .left)
         let service = SmartMetadataService.shared
 
-        service.loadIfNeeded(for: [item])
-        try await Task.sleep(nanoseconds: 400_000_000)
+        let task = service.loadIfNeeded(for: [item]).first
+        XCTAssertNotNil(task)
+        await task?.value
 
         XCTAssertTrue(service.hasResolved(item.url),
                       "on-main cache access must succeed with the isolation assertions in place")

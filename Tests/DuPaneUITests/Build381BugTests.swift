@@ -290,12 +290,9 @@ final class SmartMetadataLineCountTests: DuPaneTestCase {
         let item = FileItem(id: url, name: url.lastPathComponent, url: url,
                             isDirectory: false, isVolume: false, isRemovable: false,
                             size: nil, kind: "Swift Source File", modified: nil, tags: [])
-        SmartMetadataService.shared.loadIfNeeded(for: [item])
-
-        let deadline = Date().addingTimeInterval(5)
-        while SmartMetadataService.shared.cache[url] == nil, Date() < deadline {
-            try await Task.sleep(nanoseconds: 50_000_000)
-        }
+        let task = SmartMetadataService.shared.loadIfNeeded(for: [item]).first
+        XCTAssertNotNil(task)
+        await task?.value
         XCTAssertEqual(SmartMetadataService.shared.cache[url], "3 lines",
                        "File with trailing newline should report 3 lines, not 4")
     }
@@ -310,12 +307,9 @@ final class SmartMetadataLineCountTests: DuPaneTestCase {
         let item = FileItem(id: url, name: url.lastPathComponent, url: url,
                             isDirectory: false, isVolume: false, isRemovable: false,
                             size: nil, kind: "Swift Source File", modified: nil, tags: [])
-        SmartMetadataService.shared.loadIfNeeded(for: [item])
-
-        let deadline = Date().addingTimeInterval(5)
-        while SmartMetadataService.shared.cache[url] == nil, Date() < deadline {
-            try await Task.sleep(nanoseconds: 50_000_000)
-        }
+        let task = SmartMetadataService.shared.loadIfNeeded(for: [item]).first
+        XCTAssertNotNil(task)
+        await task?.value
         XCTAssertEqual(SmartMetadataService.shared.cache[url], "3 lines")
     }
 }

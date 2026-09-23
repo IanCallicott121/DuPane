@@ -258,8 +258,9 @@ final class SmartMetadataNegativeCacheTests: DuPaneTestCase {
         let item = try fixture.fileItem(named: "blob.bin", in: .left)
         let service = SmartMetadataService.shared
 
-        service.loadIfNeeded(for: [item])
-        try await Task.sleep(nanoseconds: 400_000_000)
+        let task = service.loadIfNeeded(for: [item]).first
+        XCTAssertNotNil(task)
+        await task?.value
 
         XCTAssertTrue(service.hasResolved(url),
                       "a file whose metadata resolves to nothing must still be recorded, or it is recomputed forever")
@@ -272,8 +273,9 @@ final class SmartMetadataNegativeCacheTests: DuPaneTestCase {
         let item = try fixture.fileItem(named: "alpha.txt", in: .left)
         let service = SmartMetadataService.shared
 
-        service.loadIfNeeded(for: [item])
-        try await Task.sleep(nanoseconds: 400_000_000)
+        let task = service.loadIfNeeded(for: [item]).first
+        XCTAssertNotNil(task)
+        await task?.value
         let resolvedAfterFirst = service.hasResolved(item.url)
 
         service.loadIfNeeded(for: [item])

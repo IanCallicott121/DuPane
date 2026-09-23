@@ -1323,10 +1323,9 @@ final class SmartMetadataServiceTests: DuPaneTestCase {
 
         let service = SmartMetadataService.shared
         let item = makeItem(url: tmp, ext: "swift")
-        service.loadIfNeeded(for: [item])
-
-        // Wait briefly for background task
-        try await Task.sleep(nanoseconds: 500_000_000)
+        let task = service.loadIfNeeded(for: [item]).first
+        XCTAssertNotNil(task)
+        await task?.value
         let info = service.info(for: item)
         XCTAssertTrue(info?.contains("line") == true, "Expected line count, got: \(info ?? "nil")")
     }
@@ -1352,11 +1351,9 @@ final class SmartMetadataServiceTests: DuPaneTestCase {
 
         let service = SmartMetadataService.shared
         let item = makeItem(url: tmp, ext: "png")
-        service.loadIfNeeded(for: [item])
-        let deadline = ContinuousClock.now + .seconds(5)
-        while !service.hasResolved(tmp), ContinuousClock.now < deadline {
-            try await Task.sleep(for: .milliseconds(20))
-        }
+        let task = service.loadIfNeeded(for: [item]).first
+        XCTAssertNotNil(task)
+        await task?.value
         let info = service.info(for: item)
         XCTAssertTrue(info?.contains("px") == true, "Expected pixel dimensions, got: \(info ?? "nil")")
     }

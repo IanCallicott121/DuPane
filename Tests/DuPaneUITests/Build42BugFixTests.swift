@@ -265,12 +265,9 @@ final class Build42BugFixTests: DuPaneTestCase {
         )
 
         let service = SmartMetadataService.shared
-        service.loadIfNeeded(for: [item])
-
-        let deadline = Date().addingTimeInterval(5)
-        while service.cache[tmpURL] == nil, Date() < deadline {
-            try await Task.sleep(nanoseconds: 50_000_000)
-        }
+        let task = service.loadIfNeeded(for: [item]).first
+        XCTAssertNotNil(task)
+        await task?.value
 
         XCTAssertEqual(service.cache[tmpURL], "3 lines")
     }
@@ -291,12 +288,9 @@ final class Build42BugFixTests: DuPaneTestCase {
         )
 
         let service = SmartMetadataService.shared
-        service.loadIfNeeded(for: [item])
-
-        let deadline = Date().addingTimeInterval(5)
-        while service.cache[tmpURL] == nil, Date() < deadline {
-            try await Task.sleep(nanoseconds: 50_000_000)
-        }
+        let task = service.loadIfNeeded(for: [item]).first
+        XCTAssertNotNil(task)
+        await task?.value
 
         XCTAssertEqual(service.cache[tmpURL], "1 line")
     }

@@ -131,6 +131,20 @@ New Folder and Go to Folder were previously verified on a local build.
   guidance for developers. Added direct links to the full User Guide and FAQs so the
   README does not need to duplicate the application's feature documentation.
 
+### User Guide opening panels — 2026-09-23
+
+- Removed the redundant opening 💡 callout and added feature panels for Sidebar &
+  Bookmarks and Network Access.
+
+### Follow Mode wording — 2026-09-23
+
+- Removed the extra example sentence from the Follow Mode section of the User Guide.
+
+### Metadata completion tests — 2026-09-23
+
+- Made `SmartMetadataService.loadIfNeeded` return its background tasks so tests can await
+  cache completion instead of relying on fixed sleeps and polling the shared cache.
+
 ### Build-number convention documented — 2026-09-20
 
 - Recorded the main build number convention in [RELEASING.md](RELEASING.md#build-numbers).
