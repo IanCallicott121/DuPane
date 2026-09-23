@@ -103,6 +103,25 @@ via `Package.swift`. `project.yml` is the source of truth for the generated Xcod
 - A source change is not present in the running app until it is rebuilt. Use `./Scripts/prepare-manual-build.sh` for manual-test builds; do not use `ln -sfn` to refresh the app symlink because directory symlinks may remain stale. The script clean-builds into external DerivedData, safely replaces the symlink, and verifies the target and timestamps.
 - Before manual testing, run `./Scripts/prepare-manual-build.sh`, verify the rebuilt app and symlink timestamps, then quit and relaunch `~/Applications/DuPane.app`.
 
+### One-phrase build and sync
+
+When the user says **“sync build”**, treat it as the complete local-to-remote workflow:
+
+1. Inspect the worktree and diff; stop if unrelated user changes are mixed in and the
+   intended commit scope is unclear.
+2. Run `./Scripts/prepare-manual-build.sh` to clean-build the app and refresh
+   `~/Applications/DuPane.app`, then quit and relaunch the app if it is running.
+3. Run the appropriate local verification lane, including the full unit suite for code
+   changes. Fix failures before continuing.
+4. Commit the in-scope changes with a concise message.
+5. Run `git pull --rebase origin main`; stop for conflicts rather than resolving them
+   without user direction.
+6. Push with `git push origin main` only after the local build, tests, and commit succeed.
+7. Identify the CI run for the pushed commit, wait for it to finish, and report the
+   remote build/test result and URL. Do not create a release or push a version tag.
+
+The exact trigger phrase is **“sync build”**.
+
 ## Application builds
 
 - SPM builds compile the library and tests but do not produce the runnable `DuPane.app`.
